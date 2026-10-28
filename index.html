@@ -2,67 +2,31 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MON BAC — Connexion élève</title>
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#145a9e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="MON BAC">
-<link rel="apple-touch-icon" href="./icons/icon-192.png">
-<style>
-:root{font-family:system-ui,-apple-system,Roboto,Arial,sans-serif;color:#18324c;background:#f2f6fb}*{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:20px}.app{width:min(100%,420px)}.brand{text-align:center;margin-bottom:28px}.logo{width:70px;height:70px;border-radius:20px;background:#145a9e;color:white;display:grid;place-items:center;margin:auto auto 14px;font-size:30px;font-weight:800}.brand h1{margin:0;color:#145a9e;font-size:30px;letter-spacing:1px}.brand p{color:#61758c;margin:8px 0 0}.card{background:#fff;border-radius:22px;padding:26px 22px;box-shadow:0 12px 38px #173f6a14}.card h2{font-size:22px;margin:0 0 7px}.sub{color:#667c93;font-size:14px;margin:0 0 25px}label{display:block;font-size:13px;font-weight:700;margin:18px 0 8px}.field{display:flex;align-items:center;border:1px solid #ccd9e7;border-radius:12px;overflow:hidden;background:#fff}.field:focus-within{border-color:#145a9e;box-shadow:0 0 0 3px #145a9e19}input{width:100%;padding:15px 13px;border:0;outline:0;font-size:16px;background:transparent;min-width:0}button{cursor:pointer;font:inherit}#toggle{border:0;background:none;color:#145a9e;font-size:13px;padding:12px;font-weight:700;white-space:nowrap}.primary{width:100%;background:#145a9e;border:0;color:white;border-radius:12px;padding:16px;font-weight:750;margin-top:26px}.primary:disabled{opacity:.55;cursor:wait}.message{font-size:13px;margin:15px 0 0;min-height:18px;color:#b42318}.message.ok{color:#137547}.footer{text-align:center;font-size:12px;color:#7b8da0;margin:22px 0}.hidden{display:none}.welcome{text-align:center}.welcome h2{color:#145a9e}.secondary{background:#eef4fb;color:#145a9e;border:0;border-radius:12px;padding:14px 20px;font-weight:700;width:100%;margin-top:16px}
-</style>
+<title>MON BAC — Réussir commence ici</title>
+<meta name="description" content="Ton espace de révision : cours, quiz et corrections pour préparer le bac.">
+<meta name="theme-color" content="#145a9e"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="MON BAC">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://nwcatsmfbkcgvgbanwyl.supabase.co wss://nwcatsmfbkcgvgbanwyl.supabase.co; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'">
+<link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./icon-192.png"><link rel="icon" href="./icon-192.png"><link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<main class="app">
-<div class="brand"><div class="logo">M</div><h1>MON BAC</h1><p>Réussir commence ici.</p></div>
-<section class="card" id="loginScreen"><h2>Connexion élève</h2><p class="sub">Retrouve tes cours, tes quiz et tes résultats.</p>
-<form id="loginForm"><label for="email">Adresse e-mail</label><div class="field"><input id="email" type="email" autocomplete="username" placeholder="exemple@email.com" required></div>
-<label for="password">Mot de passe</label><div class="field"><input id="password" type="password" autocomplete="current-password" placeholder="Ton mot de passe" required minlength="1"><button type="button" id="toggle" aria-label="Afficher le mot de passe">Afficher</button></div>
-<button class="primary" type="submit" id="loginBtn">Se connecter</button><p id="message" class="message" role="status" aria-live="polite"></p></form></section>
-<section class="card hidden welcome" id="studentScreen"><h2>Bienvenue sur MON BAC</h2><p id="studentEmail"></p><p class="sub">Connexion réussie. L'espace élève sera ajouté à l'étape suivante.</p><button class="secondary" id="logoutBtn">Se déconnecter</button></section>
-<p class="footer">MON BAC · Espace élève sécurisé</p>
+<a class="skip" href="#content">Aller au contenu</a>
+<div id="offline" class="notice hidden" role="status">Tu es hors connexion. Les cours et les quiz nécessitent Internet.</div>
+<main id="loginScreen" class="login">
+ <div class="brand"><span class="logo">M<span>•</span></span><p class="eyebrow">OBJECTIF RÉUSSITE</p><h1>MON BAC</h1><p>Un cours. Un déclic. Un pas de plus.</p></div>
+ <section class="card"><span class="tag">TON ESPACE DE RÉVISION</span><h2>Heureux de te retrouver.</h2><p class="muted">Connecte-toi pour poursuivre ta préparation.</p>
+ <form id="loginForm"><label for="email">Adresse e-mail</label><input id="email" type="email" autocomplete="username" required placeholder="exemple@email.com">
+ <label for="password">Mot de passe</label><div class="password"><input id="password" type="password" autocomplete="current-password" required><button id="toggle" type="button" aria-label="Afficher le mot de passe">Afficher</button></div>
+ <button id="loginBtn" class="primary wide" type="submit">Se connecter <span aria-hidden="true">→</span></button></form>
+ <p id="loginMessage" role="status" aria-live="polite">Chargement de l’application…</p></section>
+ <p class="muted small">Élèves · Enseignants · Administration</p>
 </main>
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const SUPABASE_URL='https://nwcatsmfbkcgvgbanwyl.supabase.co';
-const SUPABASE_ANON_KEY='sb_publishable_vXuRHP_lqGqtV9d1C_oZWw_SetdoY7L';
-const $=id=>document.getElementById(id);
-const configured=!SUPABASE_ANON_KEY.startsWith('REMPLACER_');
-const supabase=configured?createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null;
-const message=(text,ok=false)=>{$('message').textContent=text;$('message').className='message'+(ok?' ok':'')};
-const showStudent=(email)=>{$('studentEmail').textContent=email||'Élève';$('loginScreen').classList.add('hidden');$('studentScreen').classList.remove('hidden')};
-const showLogin=()=>{$('studentScreen').classList.add('hidden');$('loginScreen').classList.remove('hidden')};
-async function validateStudent(user){
-  if(!user)return false;
-  const {data,error}=await supabase.from('profils').select('role').eq('id',user.id).single();
-  if(error)throw new Error('Impossible de vérifier le rôle du compte. Vérifiez les autorisations du profil.');
-  return data?.role==='eleve';
-}
-async function initialize(){
-  if(!configured){message('Configuration nécessaire : ajoutez la clé publique Supabase dans le fichier.');return;}
-  try{
-    const {data,error}=await supabase.auth.getUser();if(error||!data?.user)return;
-    if(await validateStudent(data.user))showStudent(data.user.email);
-    else{await supabase.auth.signOut();message('Ce compte ne possède pas le rôle élève.');}
-  }catch(e){message(e.message||'Connexion impossible.');}
-}
-$('toggle').addEventListener('click',()=>{const input=$('password');const visible=input.type==='text';input.type=visible?'password':'text';$('toggle').textContent=visible?'Afficher':'Masquer';$('toggle').setAttribute('aria-label',visible?'Afficher le mot de passe':'Masquer le mot de passe')});
-$('loginForm').addEventListener('submit',async(e)=>{
- e.preventDefault();if(!configured){message('Ajoutez d’abord la clé publique Supabase.');return;}
- const btn=$('loginBtn');btn.disabled=true;btn.textContent='Connexion…';message('');
- try{
-  const {data,error}=await supabase.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
-  if(error)throw new Error('Connexion refusée. Vérifiez votre e-mail et votre mot de passe.');
-  if(!await validateStudent(data.user)){await supabase.auth.signOut();throw new Error('Accès réservé aux élèves.');}
-  $('password').value='';showStudent(data.user.email);
- }catch(err){message(err.message||'Erreur de connexion.');}
- finally{btn.disabled=false;btn.textContent='Se connecter';}
-});
-$('logoutBtn').addEventListener('click',async()=>{if(supabase)await supabase.auth.signOut();showLogin();message('Déconnexion effectuée.',true)});
-initialize();
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
-}
-</script>
+<div id="workspace" class="hidden">
+ <aside class="sidebar"><a class="wordmark" href="#accueil"><span class="logo mini">M<span>•</span></span> MON BAC</a><p class="eyebrow" id="spaceLabel">MON ESPACE</p><nav id="navigation" aria-label="Navigation principale"></nav><div class="sidefoot"><p>Chaque effort compte.</p><span class="muted small">Construis ta réussite, un jour à la fois.</span></div></aside>
+ <div class="mainwrap"><header><span id="headerLabel">Mon tableau de bord</span><div class="headerActions"><span id="identity"></span><button id="logoutBtn" class="quiet">Déconnexion</button></div></header>
+ <div id="status" role="status" aria-live="polite"></div><main id="content" tabindex="-1"></main><footer>MON BAC V8 · Apprendre avec confiance</footer></div>
+</div>
+<dialog id="modal"><div class="dialogHead"><h2 id="modalTitle"></h2><button id="closeModal" class="quiet" aria-label="Fermer">✕</button></div><div id="modalBody"></div></dialog>
+<noscript>Active JavaScript pour utiliser MON BAC.</noscript>
+<script src="./vendor/supabase-2.57.4.js"></script>
+<script type="module" src="./js/app.js"></script>
 </body></html>
