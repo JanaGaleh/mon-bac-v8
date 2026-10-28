@@ -1,3 +1,4 @@
+import { initRegistration, ensureTeacherRequest } from "./registration.js";
 import { client, unwrap, rpc, list } from "./api.js";
 import {
   escapeHtml as esc,
@@ -73,6 +74,7 @@ function clearPrivate() {
   $("modalBody").replaceChildren();
   $("modal").close();
   $("workspace").classList.add("hidden");
+  $("registrationScreen").classList.add("hidden");
   $("loginScreen").classList.remove("hidden");
   $("identity").textContent = "";
   status();
@@ -88,9 +90,24 @@ async function enter(user) {
   state.profile = profile;
   $("identity").textContent = profile.nom || user.email;
   $("spaceLabel").textContent = `ESPACE ${roles[profile.role].toUpperCase()}`;
+  $("registrationScreen").classList.add("hidden");
   $("loginScreen").classList.add("hidden");
   $("workspace").classList.remove("hidden");
-  await navigate(location.hash.slice(1) || "accueil");
+  let requestError, teacherRequest;
+  try {
+    teacherRequest = await ensureTeacherRequest(user, profile);
+  } catch (error) {
+    requestError = error;
+  }
+  if (generation !== state.generation) return;
+  const requestedTab =
+    teacherRequest && profile.role === "eleve"
+      ? "profil"
+      : location.hash.slice(1) || "accueil";
+  if (teacherRequest?.statut === "en_attente")
+    $("spaceLabel").textContent = "DEMANDE ENSEIGNANT EN COURS";
+  await navigate(requestedTab);
+  if (requestError) status(friendlyError(requestError));
 }
 async function fetchData() {
   const role = state.profile.role;
@@ -117,6 +134,7 @@ async function fetchData() {
       list("acces_premium"),
       list("paiements"),
       list("annees_scolaires"),
+      rpc("ma_demande_enseignant"),
     ]);
     [
       common.inscriptions,
@@ -124,7 +142,10 @@ async function fetchData() {
       common.premium,
       common.paiements,
       common.annees,
+      common.teacherRequest,
     ] = results;
+    if (Array.isArray(common.teacherRequest))
+      common.teacherRequest = common.teacherRequest[0] || null;
   }
   if (role === "enseignant") {
     const results = await Promise.all([
@@ -151,6 +172,7 @@ async function fetchData() {
       rpc("lister_utilisateurs_admin"),
       rpc("lister_abonnements_admin"),
       rpc("consulter_journal_admin"),
+      rpc("lister_demandes_enseignants_admin"),
     ]);
     [
       common.stats,
@@ -158,6 +180,7 @@ async function fetchData() {
       common.utilisateurs,
       common.premium,
       common.journal,
+      common.teacherRequests,
     ] = results;
   }
   return common;
@@ -225,7 +248,7 @@ function render() {
     html =
       title("Mon profil", "Tes informations et tes accès.") +
       `<div class="grid columns"><section class="card"><span class="badge neutral">${esc(roles[role])}</span><h2>${esc(state.profile.nom || "Mon compte")}</h2><p>${esc(state.user.email)}</p><p class="muted small">Pour modifier tes informations, contacte l’administration.</p><hr class="divider"><h3>Installer MON BAC</h3><p class="muted small">Sur Android : menu du navigateur → Installer l’application. Sur iPhone : Safari → Partager → Sur l’écran d’accueil.</p><p class="muted small">Les cours et quiz nécessitent une connexion Internet.</p></section>${role === "eleve" ? `<section class="card"><h2>Rejoindre un enseignant</h2><p class="muted">Saisis le code transmis par ton enseignant.</p><form id="joinForm"><label for="teacherCode">Code d’invitation</label><input id="teacherCode" name="code" required maxlength="100" autocomplete="off"><button class="primary wide">Rejoindre</button></form></section>` : ""}</div>`;
-    if (role === "eleve") html += premiumSection();
+    if (role === "eleve") html += teacherRequestSection() + premiumSection();
   } else if (role === "eleve") {
     const s = summary(d.tentatives);
     if (state.tab === "accueil") {
@@ -324,7 +347,7 @@ function render() {
           ["ENSEIGNANTS", s.total_enseignants || 0, "comptes enseignants"],
           ["PREMIUM ACTIFS", s.abonnements_actifs || 0, "accès en cours"],
         ]) +
-        `<section class="card"><h2>Paiements à vérifier</h2><p class="muted">Confirme uniquement après vérification effective du règlement. La confirmation active automatiquement l’accès pour l’année 2026-2027.</p>${paymentRows(
+        `${(d.teacherRequests || []).some((r) => r.statut === "en_attente") ? `<section class="card home-section"><div class="sectionhead"><h2>${d.teacherRequests.filter((r) => r.statut === "en_attente").length} demande(s) enseignant à examiner</h2>${button("Examiner →", "goAccounts")}</div></section>` : ""}<section class="card home-section"><h2>Paiements à vérifier</h2><p class="muted">Confirme uniquement après vérification effective du règlement. La confirmation active automatiquement l’accès pour l’année 2026-2027.</p>${paymentRows(
           d.paiements.filter((p) => p.statut === "en_attente"),
           true,
         )}</section>`;
@@ -337,7 +360,8 @@ function render() {
         `<section class="card">${paymentRows(d.paiements, true)}</section><section class="card stack"><h2>Accès Premium</h2>${d.premium.map((x) => `<div class="row"><div>${esc(x.eleve_email)}<p class="muted small">${esc(x.enseignant_email)}</p></div><span class="badge neutral">${esc(x.statut)} · ${date(x.date_fin)}</span></div>`).join("") || empty("Aucun accès Premium.")}</section>`;
     if (state.tab === "utilisateurs")
       html =
-        title("Les comptes", "Les rôles sont gérés dans le système existant.") +
+        title("Les comptes", "Demandes enseignant et comptes existants.") +
+        teacherRequestsAdmin() +
         `<section class="card">${d.utilisateurs.map((u) => `<div class="row"><div><h3>${esc(u.nom || u.email)}</h3><p class="muted small">${esc(u.email)} · ${date(u.date_inscription)}</p></div><span class="badge neutral">${esc(roles[u.role] || u.role)}</span></div>`).join("") || empty("Aucun compte visible.")}</section>`;
     if (state.tab === "journal")
       html =
@@ -349,6 +373,21 @@ function render() {
   }
   $("content").innerHTML = html;
   $("content").focus({ preventScroll: true });
+}
+function teacherRequestSection() {
+  const r = state.data.teacherRequest;
+  if (!r)
+    return `<section class="card home-section"><h2>Tu souhaites enseigner ?</h2><p class="muted small">Présente tes matières et niveaux. L’administration validera ta demande avant l’ouverture de l’espace enseignant.</p>${button("Demander un accès enseignant", "requestTeacher")}</section>`;
+  const labels = {
+    en_attente: "Demande enseignant en cours",
+    approuvee: "Demande enseignant approuvée",
+    refusee: "Demande enseignant refusée",
+  };
+  return `<section class="card home-section"><span class="badge neutral">${esc(labels[r.statut] || r.statut)}</span><p class="muted small">${r.statut === "en_attente" ? "L’administration examine ta demande. Aucun droit de publication n’est encore attribué." : r.statut === "approuvee" ? "Actualise tes accès pour ouvrir ton espace enseignant." : "Contacte l’administration si tu souhaites faire réexaminer ta demande."}</p>${r.motif_decision ? `<p class="reading">${esc(r.motif_decision)}</p>` : ""}${button("Actualiser mes accès", "refreshRole")}</section>`;
+}
+function teacherRequestsAdmin() {
+  const requests = state.data.teacherRequests || [];
+  return `<section class="card home-section"><h2>Demandes enseignant</h2>${requests.length ? requests.map((r) => `<div class="row"><div><h3>${esc(r.nom || r.email)}</h3><p class="muted small">${esc(r.email)} · ${date(r.date_demande)}</p><span class="badge neutral">${esc({ en_attente: "À examiner", approuvee: "Approuvée", refusee: "Refusée" }[r.statut] || r.statut)}</span></div>${r.statut === "en_attente" ? button("Examiner la demande", "reviewTeacher", r.utilisateur_id) : ""}</div>`).join("") : empty("Aucune demande enseignant pour le moment.")}</section>`;
 }
 function filters() {
   return `<div class="toolbar"><input id="courseSearch" type="search" aria-label="Rechercher un cours" placeholder="Rechercher un cours…"><select id="courseType" aria-label="Type de cours"><option value="all">Tous les cours</option><option value="free">Gratuits</option><option value="premium">Premium</option></select><select id="courseSubject" aria-label="Matière"><option value="all">Toutes les matières</option>${state.data.matieres.map((m) => `<option value="${m.id}">${esc(m.nom)}</option>`).join("")}</select></div>`;
@@ -464,6 +503,33 @@ async function editQuiz(id) {
 }
 async function act(action, id) {
   switch (action) {
+    case "goAccounts":
+      location.hash = "utilisateurs";
+      return;
+    case "refreshRole": {
+      const { data, error } = await client.auth.getUser();
+      if (error || !data.user)
+        throw error || new Error("AUTHENTIFICATION_REQUISE");
+      return enter(data.user);
+    }
+    case "requestTeacher":
+      modal(
+        "Demander un accès enseignant",
+        `<p class="muted small">L’administration examinera ta demande. Ton compte reste élève jusqu’à approbation.</p><form id="teacherRequestForm"><label for="teacherMotivation">Matières et niveaux enseignés</label><textarea id="teacherMotivation" name="motivation" required minlength="10" maxlength="2000"></textarea><button class="primary wide">Envoyer ma demande</button></form>`,
+      );
+      return;
+    case "reviewTeacher": {
+      const r = (state.data.teacherRequests || []).find(
+        (r) => r.utilisateur_id === id,
+      );
+      if (!r) throw new Error("DEMANDE_INTROUVABLE");
+      modal(
+        "Examiner la demande enseignant",
+        `<h3>${esc(r.nom || r.email)}</h3><p class="muted small">${esc(r.email)}</p><p class="reading">${esc(r.motivation)}</p><p class="muted small">L’approbation ouvre les fonctions de création de cours et de quiz dans MON BAC.</p><form id="teacherDecisionForm" data-id="${esc(id)}"><label for="teacherDecision">Décision</label><select id="teacherDecision" name="decision" required><option value="">Choisir</option><option value="approuvee">Approuver l’accès enseignant</option><option value="refusee">Refuser la demande</option></select><label for="teacherDecisionReason">Message au candidat (facultatif)</label><textarea id="teacherDecisionReason" name="motif" maxlength="1000"></textarea><label class="option"><input type="checkbox" required>J’ai vérifié cette demande.</label><button class="primary wide">Enregistrer ma décision</button></form>`,
+      );
+      return;
+    }
+
     case "reload":
       return navigate(state.tab, { refresh: true });
     case "goCourses":
@@ -522,6 +588,33 @@ async function submit(form) {
       .forEach((input) => (input.disabled = false));
   const f = new FormData(form);
   switch (form.id) {
+    case "teacherRequestForm": {
+      await rpc("demander_role_enseignant", {
+        p_motivation: String(f.get("motivation")).trim(),
+      });
+      $("modal").close();
+      await navigate(state.tab, { refresh: true });
+      status(
+        "Ta demande a été enregistrée. L’administration doit l’examiner.",
+        true,
+      );
+      return;
+    }
+    case "teacherDecisionForm": {
+      const decision = f.get("decision");
+      if (!["approuvee", "refusee"].includes(decision))
+        throw new Error("DECISION_INVALIDE");
+      await rpc("decider_demande_enseignant", {
+        p_utilisateur_id: form.dataset.id,
+        p_decision: decision,
+        p_motif: String(f.get("motif") || "").trim() || null,
+      });
+      $("modal").close();
+      await navigate(state.tab, { refresh: true });
+      status("Décision enseignant enregistrée.", true);
+      return;
+    }
+
     case "joinForm": {
       const result = await rpc("rejoindre_enseignant", {
         p_code: f.get("code").trim(),
@@ -661,18 +754,15 @@ async function submit(form) {
             throw new Error("CHOIX_INCOMPLETS");
           if (!existing.length)
             await unwrap(
-              client
-                .from("choix_questions")
-                .insert(
-                  choices.map((texte, i) => ({
-                    question_id: question.id,
-                    texte,
-                    ordre: i,
-                    est_correct: i === correct - 1,
-                    explication:
-                      i === correct - 1 ? f.get("explication") : null,
-                  })),
-                ),
+              client.from("choix_questions").insert(
+                choices.map((texte, i) => ({
+                  question_id: question.id,
+                  texte,
+                  ordre: i,
+                  est_correct: i === correct - 1,
+                  explication: i === correct - 1 ? f.get("explication") : null,
+                })),
+              ),
             );
         } catch (e) {
           $("questionMessage").textContent =
@@ -746,7 +836,9 @@ $("loginForm").addEventListener("submit", async (e) => {
     });
     if (error) {
       $("loginMessage").textContent =
-        "Connexion refusée. Vérifie ton e-mail et ton mot de passe.";
+        error.code === "email_not_confirmed"
+          ? "Confirme d’abord ton adresse e-mail avec le lien reçu, puis reconnecte-toi."
+          : "Connexion refusée. Vérifie ton e-mail et ton mot de passe.";
       return;
     }
     $("password").value = "";
@@ -811,7 +903,7 @@ document.addEventListener("click", async (e) => {
 });
 document.addEventListener("submit", async (e) => {
   const form = e.target;
-  if (form.id === "loginForm") return;
+  if (["loginForm", "registrationForm"].includes(form.id)) return;
   e.preventDefault();
   const buttons = [...form.querySelectorAll("button")];
   buttons.forEach((b) => (b.disabled = true));
@@ -866,6 +958,7 @@ async function initialize() {
       "Connexion indisponible. Vérifie Internet puis réessaie.";
   }
 }
+initRegistration({ onAuthenticated: enter });
 initialize();
 if ("serviceWorker" in navigator)
   window.addEventListener("load", () =>

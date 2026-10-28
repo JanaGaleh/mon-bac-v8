@@ -77,8 +77,94 @@
         <p id="loginMessage" role="status" aria-live="polite">
           Chargement de l’application…
         </p>
+        <div class="signup-invite">
+          <span>Pas encore de compte ?</span
+          ><button id="openRegistration" type="button" class="secondary">
+            Créer un compte
+          </button>
+        </div>
       </section>
       <p class="muted small">Élèves · Enseignants · Administration</p>
+    </main>
+    <main id="registrationScreen" class="login hidden">
+      <div class="brand">
+        <span class="logo">M<span>•</span></span>
+        <h1>MON BAC</h1>
+        <p>Un compte pour apprendre ou transmettre.</p>
+      </div>
+      <section class="card">
+        <span class="tag">INSCRIPTION</span>
+        <h2 id="signupHeading">Créer mon compte</h2>
+        <form id="registrationForm">
+          <label for="registrationRole">Je souhaite m’inscrire comme</label
+          ><select id="registrationRole">
+            <option value="eleve">Élève</option>
+            <option value="enseignant">Enseignant — sur demande</option>
+          </select>
+          <label for="signupName">Nom affiché</label
+          ><input
+            id="signupName"
+            autocomplete="name"
+            required
+            maxlength="100"
+          />
+          <label for="signupEmail">Adresse e-mail</label
+          ><input id="signupEmail" type="email" autocomplete="email" required />
+          <label for="signupPassword">Mot de passe</label>
+          <div class="password">
+            <input
+              id="signupPassword"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="12"
+            /><button
+              id="signupToggle"
+              type="button"
+              aria-label="Afficher le mot de passe"
+            >
+              Afficher
+            </button>
+          </div>
+          <p class="muted small">
+            Au moins 12 caractères. Ton mot de passe n’est jamais visible par
+            l’administrateur.
+          </p>
+          <div id="teacherPresentation" class="hidden">
+            <label for="signupPresentation">Matières et niveaux enseignés</label
+            ><textarea
+              id="signupPresentation"
+              minlength="10"
+              maxlength="2000"
+              placeholder="Présente les matières et niveaux que tu souhaites enseigner."
+            ></textarea>
+            <p class="muted small">
+              L’administrateur examinera ta demande après confirmation de ton
+              e-mail. Aucun droit enseignant n’est attribué automatiquement.
+            </p>
+          </div>
+          <button id="signupBtn" class="primary wide">Créer mon compte</button>
+        </form>
+        <div id="signupSuccess" class="hidden">
+          <p id="signupTeacherNote" class="muted small hidden">
+            À ta première connexion après confirmation, ta demande enseignant
+            sera transmise à l’administrateur. Tu pourras ensuite suivre son
+            état depuis ton profil.
+          </p>
+          <button id="resendSignup" type="button" class="secondary wide">
+            Renvoyer le lien de confirmation
+          </button>
+        </div>
+        <p
+          id="signupMessage"
+          class="auth-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+        <button id="backToLogin" type="button" class="quiet wide">
+          J’ai déjà un compte — Se connecter
+        </button>
+      </section>
     </main>
     <div id="workspace" class="hidden">
       <aside class="sidebar">

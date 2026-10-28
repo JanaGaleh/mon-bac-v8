@@ -945,3 +945,4 @@ progress {
     display: none;
   }
 }
+.signup-invite{border-top:1px solid var(--line);padding-top:18px;margin-top:18px;display:flex;gap:10px;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}.signup-invite button{font-size:12px;padding:10px 13px}.auth-message{font-size:13px;line-height:1.7;color:#8f4b24;min-height:20px}#registrationScreen .brand{margin-bottom:22px}#registrationScreen .brand h1{font-size:27px}#registrationScreen .brand p{font-size:13px}#registrationScreen select{margin-bottom:3px}#registrationScreen .quiet.wide{margin-top:12px;font-size:12px}

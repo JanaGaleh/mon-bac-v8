@@ -43,3 +43,9 @@ La page d’accueil présente désormais les applications. MON BAC reste accessi
 [`parcours.html`](parcours.html) est une **maquette interactive isolée**, avec données fictives et sans connexion réseau : profils, inscription, formules et moyens de paiement. Elle ne crée aucun compte et ne traite aucun paiement réel.
 
 Voir [la structure de plateforme et les évolutions serveur proposées](docs/PLATEFORME-JANAGALEH.md). Le rattachement du domaine `janagaleh.com` reste à configurer séparément ; aucune modification DNS n’a été effectuée.
+
+## Inscription et validation enseignant
+
+Le bouton **Créer un compte** permet une inscription élève ou une candidature enseignant, avec confirmation de l’e-mail. Les droits enseignants sont attribués uniquement par une décision administrative dans **Comptes**. Un élève existant peut candidater depuis son profil.
+
+Consulter [le fonctionnement, les tests et la configuration e-mail à contrôler](docs/INSCRIPTION-ET-VALIDATION.md). La migration additive et les tests de sécurité transactionnels sont conservés dans le dépôt.
