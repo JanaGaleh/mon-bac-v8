@@ -1,7 +1,7 @@
 const { createClient } = window.supabase;
 export const client = createClient(
-  "https://nwcatsmfbkcgvgbanwyl.supabase.co",
-  "sb_publishable_vXuRHP_lqGqtV9d1C_oZWw_SetdoY7L",
+  "https://yxlyfgyviupkzoboxpte.supabase.co",
+  "sb_publishable_Ln3sgAe3kgHFQexLxI_ohg__TfKdRzC",
   {
     auth: {
       persistSession: true,

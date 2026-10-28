@@ -10,7 +10,7 @@ async function scenario(engine,role,viewport){
  page.on('pageerror',e=>errors.push(e.message));
  let signedIn=false;let finished=false;
  const course={id:1,titre:'Économie : la croissance',contenu:'<script>alert(1)</script>\nUne économie en mouvement.',matiere_id:1,classe_id:1,enseignant_id:teacher,est_premium:false,date_creation:'2026-10-28T05:00:00Z'};
- await context.route('https://nwcatsmfbkcgvgbanwyl.supabase.co/**',async route=>{
+ await context.route('https://yxlyfgyviupkzoboxpte.supabase.co/**',async route=>{
  const req=route.request();const url=new URL(req.url());const name=url.pathname.split('/').pop();let result=[];const body=req.postDataJSON?.();calls.push({name,method:req.method(),body});
  if(req.method()==='OPTIONS'){await route.fulfill({status:200,headers:{'access-control-allow-origin':'*','access-control-allow-headers':'*','access-control-allow-methods':'*'}});return;}
  if(url.pathname.includes('/auth/v1/token')){signedIn=true;result={access_token:'eyJhbGciOiJIUzI1NiJ9.'+Buffer.from(JSON.stringify({sub:uid,exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.test',refresh_token:'test-only',expires_in:3600,token_type:'bearer',user};}
