@@ -1,4 +1,4 @@
-const CACHE='mon-bac-v8-shell-5';
+const CACHE='mon-bac-v8-janagaleh-shell-1';
 const SHELL=['./','./index.html','./mon-bac.html','./platform.css','./platform-icon.svg','./js/platform.js','./js/modules.js','./styles.css','./js/app.js','./js/registration.js','./js/api.js','./js/domain.js','./vendor/supabase-2.57.4.js','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)));self.skipWaiting();});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('mon-bac-v8-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});

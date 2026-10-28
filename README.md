@@ -1,5 +1,7 @@
 # MON BAC V8
 
+**Branche de migration, non publiée :** la configuration ci-dessous cible `janagaleh-plateform`. La base a été copiée et contrôlée ; la bascule attend la recette réelle de l’authentification. Voir [le bilan et les conditions de bascule](docs/MIGRATION-JANAGALEH.md).
+
 PWA éducative en français, publiée sur https://janagaleh.github.io/mon-bac-v8/.
 
 Architecture conservée : HTML/CSS/JavaScript statiques sur GitHub Pages, Supabase Auth et Postgres, permissions RLS et fonctions RPC existantes. Aucun framework ni serveur supplémentaire requis. Le client Supabase 2.57.4 est distribué localement avec sa licence, sans dépendance à un CDN à l’ouverture.
