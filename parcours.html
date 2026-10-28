@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>MON BAC — Aperçu des nouveaux parcours</title>
+    <meta name="robots" content="noindex" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <link rel="icon" href="./platform-icon.svg" />
+    <link rel="stylesheet" href="./platform.css" />
+    <link rel="stylesheet" href="./parcours.css" />
+  </head>
+  <body class="prototype-page">
+    <a class="skip" href="#previewContent">Aller au contenu</a>
+    <div class="preview-banner">
+      <strong>Maquette interactive</strong
+      ><span>Données fictives · Aucun compte créé ni paiement réel</span>
+    </div>
+    <header class="platform-header">
+      <a class="platform-brand" href="./"
+        ><span class="brand-symbol" aria-hidden="true">j<span>•</span></span
+        ><span>janagaleh<span class="brand-domain">.com</span></span></a
+      ><a class="preview-live-link" href="./mon-bac.html"
+        >MON BAC en service ↗</a
+      >
+    </header>
+    <main class="preview-main">
+      <div class="preview-heading">
+        <div>
+          <p class="kicker">MON BAC · PARCOURS À VALIDER</p>
+          <h1>Simple à chaque étape.</h1>
+          <p>Explorez les futurs écrans, sans modifier votre compte.</p>
+        </div>
+        <span class="preview-stamp">APERÇU</span>
+      </div>
+      <nav class="preview-nav" aria-label="Parcours de démonstration">
+        <a href="#catalogue" data-view="catalogue">Catalogue</a
+        ><a href="#profils" data-view="profils">Profils</a
+        ><a href="#inscription" data-view="inscription">Inscription</a
+        ><a href="#administration" data-view="administration">Administration</a>
+      </nav>
+      <div id="previewContent" tabindex="-1"></div>
+      <p class="preview-bottom-note">
+        Cet aperçu présente le fonctionnement envisagé. Les droits, les offres
+        et les intégrations de paiement restent à configurer et à valider.
+      </p>
+    </main>
+    <dialog id="previewDialog">
+      <div class="preview-dialog-head">
+        <h2 id="previewDialogTitle"></h2>
+        <button
+          type="button"
+          id="previewClose"
+          class="plain-button"
+          aria-label="Fermer"
+        >
+          ✕
+        </button>
+      </div>
+      <div id="previewDialogBody"></div>
+    </dialog>
+    <script type="module" src="./js/prototype.js"></script>
+  </body>
+</html>

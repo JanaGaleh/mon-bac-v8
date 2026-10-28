@@ -2,7 +2,7 @@
   "name": "MON BAC — Révisions et quiz",
   "short_name": "MON BAC",
   "description": "Cours et quiz pour les élèves",
-  "start_url": "./index.html",
+  "start_url": "./mon-bac.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f2f6fb",

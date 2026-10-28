@@ -1,0 +1,11 @@
+MON BAC — Document de démonstration
+
+Ce fichier sert uniquement à tester le téléchargement depuis la maquette.
+Il ne s’agit pas d’un cours publié ni d’un contenu Premium.
+
+Le futur espace de cours regroupera :
+1. Le cours et ses objectifs.
+2. Les documents, images et graphiques autorisés.
+3. Les exercices, quiz et corrections.
+
+Les droits de téléchargement des contenus réels seront vérifiés côté serveur.

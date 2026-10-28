@@ -30,7 +30,7 @@ async function scenario(engine,role,viewport){
  else if(name==='invitations')result=[{id:1,code:'MONBAC-TEST'}];
  await route.fulfill({status:200,json:result,headers:{'access-control-allow-origin':'*','access-control-expose-headers':'*'}});
  });
- await page.goto(base);await page.locator('#email').fill(user.email);await page.locator('#password').fill('test-only');await page.locator('#loginBtn').click();await page.locator('#workspace').waitFor({state:'visible'});await page.locator('#content h1').waitFor();await page.waitForFunction(()=>!document.querySelector('#content .busy'));
+ await page.goto(base+'/mon-bac.html');await page.locator('#email').fill(user.email);await page.locator('#password').fill('test-only');await page.locator('#loginBtn').click();await page.locator('#workspace').waitFor({state:'visible'});await page.locator('#content h1').waitFor();await page.waitForFunction(()=>!document.querySelector('#content .busy'));
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'débordement horizontal');
  if(role==='eleve'){
  await page.locator('[data-action="goCourses"]').first().click();await page.locator('#courseSearch').waitFor();await page.locator('#courseSearch').fill('absent');await page.waitForTimeout(100);assert.equal(await page.locator('[data-action="course"]').count(),0);await page.locator('#courseSearch').fill('');await page.locator('[data-action="course"]').click();await page.locator('#modal').waitFor({state:'visible'});assert.match(await page.locator('#modalBody').innerText(),/<script>alert/);assert.equal(await page.locator('#modalBody script').count(),0);await page.locator('#closeModal').click();

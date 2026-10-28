@@ -35,3 +35,11 @@ GitHub Pages utilise `main`, dossier racine, comme avant. Les fichiers sont dire
 ## Limites et suite
 
 Voir [le bilan technique](docs/BILAN-2026-10-28.md). Ne jamais ajouter de clé secrète/service_role dans les fichiers publics. Les changements RLS, de droits ou de fonctions de sécurité nécessitent justification et validation du propriétaire.
+
+## Plateforme janagaleh.com
+
+La page d’accueil présente désormais les applications. MON BAC reste accessible directement dans [`mon-bac.html`](mon-bac.html), avec le même compte Supabase et les mêmes droits. Les anciens liens avec onglets sont redirigés vers le module correspondant.
+
+[`parcours.html`](parcours.html) est une **maquette interactive isolée**, avec données fictives et sans connexion réseau : profils, inscription, formules et moyens de paiement. Elle ne crée aucun compte et ne traite aucun paiement réel.
+
+Voir [la structure de plateforme et les évolutions serveur proposées](docs/PLATEFORME-JANAGALEH.md). Le rattachement du domaine `janagaleh.com` reste à configurer séparément ; aucune modification DNS n’a été effectuée.
