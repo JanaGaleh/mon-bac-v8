@@ -57,10 +57,7 @@ async function setup() {
 const tick = () => new Promise((r) => setTimeout(r, 10));
 function fill(type = "eleve") {
   document.querySelector("#openRegistration").click();
-  document.querySelector("#registrationRole").value = type;
-  document
-    .querySelector("#registrationRole")
-    .dispatchEvent(new window.Event("change", { bubbles: true }));
+  document.querySelector(`[data-account-role="${type}"]`).click();
   document.querySelector("#signupName").value = "Compte de test";
   document.querySelector("#signupEmail").value = "test@example.invalid";
   document.querySelector("#signupPassword").value = "Un mot de passe long";

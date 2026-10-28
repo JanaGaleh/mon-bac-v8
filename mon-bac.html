@@ -35,16 +35,18 @@
     <div id="offline" class="notice hidden" role="status">
       Tu es hors connexion. Les cours et les quiz nécessitent Internet.
     </div>
-    <main id="loginScreen" class="login">
+    <main id="loginScreen" class="login auth-layout">
       <div class="brand">
-        <span class="logo">M<span>•</span></span>
-        <p class="eyebrow">OBJECTIF RÉUSSITE</p>
-        <h1>MON BAC</h1>
-        <p>Un cours. Un déclic. Un pas de plus.</p>
+<div class="auth-wordmark"><span class="logo">M<span>•</span></span><span>MON BAC<small>PAR JANAGALEH</small></span></div>
+        <p class="auth-kicker">À TOI DE JOUER</p>
+        <h1>Ton avenir.<br>Ton <em>élan.</em></h1>
+        <p class="auth-lead">Apprends. Entraîne-toi.<br> Avance à ton rythme.</p>
+        <div class="auth-art" aria-hidden="true"><span class="art-spark">✦</span><div class="art-note"><span>LE DÉCLIC COMMENCE ICI</span><strong>Chaque effort<br>te rapproche<br><em>du bac.</em></strong><div class="art-path"><i></i><i></i><i></i><b>↗</b></div></div><span class="art-sticker">C’est parti ↗</span></div>
+        <div class="auth-benefits"><span>Cours</span><span>Quiz</span><span>Corrections</span></div>
       </div>
       <section class="card">
         <span class="tag">TON ESPACE DE RÉVISION</span>
-        <h2>Heureux de te retrouver.</h2>
+        <h2>On reprend ? <span class="auth-arrow" aria-hidden="true">↗</span></h2>
         <p class="muted">Connecte-toi pour poursuivre ta préparation.</p>
         <form id="loginForm">
           <label for="email">Adresse e-mail</label
@@ -84,20 +86,27 @@
           </button>
         </div>
       </section>
-      <p class="muted small">Élèves · Enseignants · Administration</p>
+
     </main>
-    <main id="registrationScreen" class="login hidden">
+    <main id="registrationScreen" class="login auth-layout hidden">
       <div class="brand">
-        <span class="logo">M<span>•</span></span>
-        <h1>MON BAC</h1>
-        <p>Un compte pour apprendre ou transmettre.</p>
+<div class="auth-wordmark"><span class="logo">M<span>•</span></span><span>MON BAC<small>PAR JANAGALEH</small></span></div>
+        <p class="auth-kicker">REJOINS LE MOUVEMENT</p>
+        <h1>Ta réussite<br>commence <em>ici.</em></h1>
+        <p class="auth-lead">Apprends. Entraîne-toi.<br> Avance à ton rythme.</p>
+        <div class="auth-art" aria-hidden="true"><span class="art-spark">✦</span><div class="art-note"><span>LE DÉCLIC COMMENCE ICI</span><strong>Chaque effort<br>te rapproche<br><em>du bac.</em></strong><div class="art-path"><i></i><i></i><i></i><b>↗</b></div></div><span class="art-sticker">C’est parti ↗</span></div>
+        <div class="auth-benefits"><span>Cours</span><span>Quiz</span><span>Corrections</span></div>
       </div>
       <section class="card">
-        <span class="tag">INSCRIPTION</span>
+        <span class="tag">UN NOUVEAU DÉPART</span>
         <h2 id="signupHeading">Créer mon compte</h2>
         <form id="registrationForm">
-          <label for="registrationRole">Je souhaite m’inscrire comme</label
-          ><select id="registrationRole">
+          <p class="role-label" id="roleLabel">Je rejoins MON BAC comme</p>
+          <div class="role-choices" role="group" aria-labelledby="roleLabel">
+            <button type="button" data-account-role="eleve" aria-pressed="true"><span class="role-symbol" aria-hidden="true">↗</span><strong>Élève</strong><small>Je prépare mon bac</small></button>
+            <button type="button" data-account-role="enseignant" aria-pressed="false"><span class="role-symbol" aria-hidden="true">✦</span><strong>Enseignant</strong><small>Je partage mon savoir</small></button>
+          </div>
+          <select id="registrationRole" aria-label="Type de compte" hidden>
             <option value="eleve">Élève</option>
             <option value="enseignant">Enseignant — sur demande</option>
           </select>
@@ -107,9 +116,10 @@
             autocomplete="name"
             required
             maxlength="100"
+            placeholder="Ton prénom et ton nom"
           />
           <label for="signupEmail">Adresse e-mail</label
-          ><input id="signupEmail" type="email" autocomplete="email" required />
+          ><input id="signupEmail" placeholder="toi@exemple.com" type="email" autocomplete="email" required />
           <label for="signupPassword">Mot de passe</label>
           <div class="password">
             <input
@@ -127,8 +137,7 @@
             </button>
           </div>
           <p class="muted small">
-            Au moins 12 caractères. Ton mot de passe n’est jamais visible par
-            l’administrateur.
+            12 caractères minimum pour protéger ton compte.
           </p>
           <div id="teacherPresentation" class="hidden">
             <label for="signupPresentation">Matières et niveaux enseignés</label

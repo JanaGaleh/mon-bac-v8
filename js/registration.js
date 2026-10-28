@@ -62,6 +62,7 @@ export function initRegistration({ onAuthenticated }) {
       $("signupHeading").textContent = "Créer mon compte";
       $("teacherPresentation").classList.add("hidden");
       $("signupPresentation").required = false;
+      syncRoleChoices();
     }
     if (!show) $("signupPassword").value = "";
     screen.classList.toggle("hidden", !show);
@@ -73,7 +74,19 @@ export function initRegistration({ onAuthenticated }) {
   }
   $("openRegistration").addEventListener("click", () => view(true));
   $("backToLogin").addEventListener("click", () => view(false));
+  function syncRoleChoices() {
+    document.querySelectorAll('[data-account-role]').forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.accountRole === $("registrationRole").value));
+    });
+  }
+  document.querySelectorAll('[data-account-role]').forEach(button => {
+    button.addEventListener('click', () => {
+      $("registrationRole").value = button.dataset.accountRole;
+      $("registrationRole").dispatchEvent(new window.Event('change'));
+    });
+  });
   $("registrationRole").addEventListener("change", () => {
+    syncRoleChoices();
     $("teacherPresentation").classList.toggle(
       "hidden",
       $("registrationRole").value !== "enseignant",
