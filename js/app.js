@@ -44,6 +44,7 @@ const menus = {
     ["paiements", "▤", "Paiements"],
     ["utilisateurs", "♧", "Comptes"],
     ["journal", "▥", "Journal"],
+    ["terrainadmin", "▤", "Suivi terrain"],
     ["profil", "○", "Profil"],
   ],
 };
@@ -244,6 +245,7 @@ function render() {
   const d = state.data,
     role = state.profile.role;
   let html = "";
+  if (state.tab === "terrainadmin" && role === "super_admin") html = title("Suivi du terrain", "Progression et gestion des accès.") + `<section class="card"><h2>Dépréciation du terrain</h2><p>Consultez les tentatives et ouvrez ou verrouillez les exercices.</p><a class="primary" href="./admin-terrain.html">Ouvrir le tableau de suivi →</a></section>`;
   if (state.tab === "profil") {
     html =
       title("Mon profil", "Tes informations et tes accès.") +
