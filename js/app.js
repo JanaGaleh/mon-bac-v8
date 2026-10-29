@@ -285,6 +285,7 @@ function render() {
           "Mes cours",
           "Tes ressources pour comprendre, réviser et réussir.",
         ) +
+        `<section class="card"><span class="badge">Cours interactif gratuit</span><h2>Dépréciation du terrain</h2><p class="muted">Terminale GFM · Calcul, journal, bilan et ajustements N+1.</p><a class="primary" href="./cours-depreciation-terrain.html">Commencer le cours →</a></section>` +
         filters() +
         `<div id="courseList">${courseCards(d.cours)}</div><p class="muted small">Les cours gratuits sont accessibles après inscription auprès de l’enseignant. Les cours Premium apparaissent une fois ton accès validé.</p>`;
     if (state.tab === "quiz")
