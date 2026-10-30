@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "check": "node --check js/app.js && node --check js/api.js && node --check js/platform.js && node --check js/modules.js && node --check js/prototype.js && node --check service-worker.js && node --check js/registration.js && node --check ege/app.js && node --check ege/domain.js && node --check ege/data.js && node --check ege/files.js && node --check ege/pwa.js && node --check ege/service-worker.js && node --check supabase/functions/ege-telecharger-word/handler.js && node --check ege/api.js && node --check ege/html.js"
+    "check": "node --check prof-jana-galeh/app.js && node --check js/app.js && node --check js/api.js && node --check js/platform.js && node --check js/modules.js && node --check js/prototype.js && node --check service-worker.js && node --check js/registration.js && node --check ege/app.js && node --check ege/domain.js && node --check ege/data.js && node --check ege/files.js && node --check ege/pwa.js && node --check ege/service-worker.js && node --check supabase/functions/ege-telecharger-word/handler.js && node --check ege/api.js && node --check ege/html.js"
   },
   "devDependencies": {
     "happy-dom": "21.0.4"

@@ -2,6 +2,16 @@
 // Ajouter un module ici ne lui accorde aucun accès aux données ni aux rôles de MON BAC.
 export const modules = Object.freeze([
   Object.freeze({
+    id: "prof-jana-galeh",
+    name: "Prof. Jana Galeh",
+    category: "Gestion Financière · MENFOP Djibouti",
+    description: "Cours, exercices et QCM hebdomadaires. Chapitre 3 — Partie 2 : Dépréciation des titres immobilisés.",
+    tags: Object.freeze(["Cours", "Exercices", "QCM"]),
+    entry: "./prof-jana-galeh/",
+    account: "./mon-bac.html#profil",
+    status: "available",
+  }),
+  Object.freeze({
     id: "ege",
     name: "EGE 2026/2027",
     category: "Terminale GFM · Djibouti",
