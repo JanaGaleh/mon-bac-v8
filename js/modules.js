@@ -2,6 +2,16 @@
 // Ajouter un module ici ne lui accorde aucun accès aux données ni aux rôles de MON BAC.
 export const modules = Object.freeze([
   Object.freeze({
+    id: "ege",
+    name: "EGE 2026/2027",
+    category: "Terminale GFM · Djibouti",
+    description: "Thèmes, dossiers documentaires et suivi de votre étude de gestion encadrée.",
+    tags: Object.freeze(["Catalogue", "Dossiers Word", "Suivi"]),
+    entry: "./ege/",
+    account: "./ege/#workspace",
+    status: "available",
+  }),
+  Object.freeze({
     id: "mon-bac",
     name: "MON BAC",
     category: "Enseignement & formation",
@@ -28,3 +38,4 @@ export function legacyModuleTarget(hash) {
   const tab = String(hash).replace(/^#/, "");
   return legacyTabs.has(tab) ? `./mon-bac.html#${tab}` : null;
 }
+

@@ -1,0 +1,1 @@
+create index if not exists ege_versions_admin on public.ege_versions_word(admin_id); create index if not exists ege_journal_corrections_admin on public.ege_journal_corrections(administrateur_id); create index if not exists ege_journal_configuration_admin on ege_private.journal_configuration(administrateur_id);

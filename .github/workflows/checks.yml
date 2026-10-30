@@ -17,3 +17,30 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run check
+  ege-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm install --prefix "$RUNNER_TEMP/ege-browser" --ignore-scripts --no-audit --no-fund playwright@1.62.1
+      - run: '"$RUNNER_TEMP/ege-browser/node_modules/.bin/playwright" install --with-deps chromium'
+      - name: Vérifier EGE sur mobile et ordinateur
+        shell: bash
+        run: |
+          python -m http.server 8765 >/tmp/ege-http.log 2>&1 &
+          EGE_SERVER_PID=$!
+          trap 'kill "$EGE_SERVER_PID"' EXIT
+          for attempt in {1..20}; do
+            if curl --silent --fail http://127.0.0.1:8765/ege/ >/dev/null; then break; fi
+            sleep 0.2
+          done
+          NODE_PATH="$RUNNER_TEMP/ege-browser/node_modules" node tests/ege-browser.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ege-chromium
+          path: /tmp/ege-*.png
+          if-no-files-found: ignore
+

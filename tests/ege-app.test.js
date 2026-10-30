@@ -1,0 +1,65 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {Window} from 'happy-dom';
+const uid='11111111-1111-4111-8111-111111111111';
+const offerId='22222222-2222-4222-8222-222222222222';
+const orderId='33333333-3333-4333-8333-333333333333';
+const user={id:uid,email:'test@example.invalid'};
+const fixtures={calls:[],admin:false,fail:false,offers:[],orders:[],profile:null};
+let authEvent;
+const api={auth:{getUser:async()=>({data:{user:null}}),signInWithPassword:async()=>({data:{user}}),onAuthStateChange:fn=>authEvent=fn,signOut:async()=>({data:{}})},from(table){
+ const query={body:null,select(){return this},eq(){return this},limit(){return this},range(){return this},order(){return this},maybeSingle(){return this},upsert(body){this.body=body;return this},insert(body){this.body=body;return this},then(resolve,reject){
+  fixtures.calls.push({table,body:this.body});
+  if(table==='ege_profils'&&this.body)fixtures.profile=this.body;
+  const data={ege_themes:[{id:1,titre:'Fidélisation',annee_scolaire:'2026/2027'}],ege_sous_themes:[{id:1,theme_id:1,numero:1,intitule:'Rentabilité'}],ege_tarifs:[{code:'dossier_individuel',montant_djf:1000}],ege_catalogue_dossiers:fixtures.offers,ege_profils:fixtures.profile,ege_commandes:fixtures.orders,ege_dossiers:[],ege_comptes_paiement:[]};
+  return Promise.resolve(fixtures.fail?{data:null,error:{message:'Erreur de connexion de test'}}:{data:data[table]??[],error:null}).then(resolve,reject);
+ }};return query;
+},async rpc(name,args){fixtures.calls.push({name,args});let data=null;
+ if(name==='ege_est_admin')data=fixtures.admin;
+ if(name==='ege_preparer_commande'){data=orderId;fixtures.orders=[{id:orderId,dossier_id:'test-dossier',type_travail:'individuel',prix_convenu_djf:1000,moyen_paiement:'cash',statut:'en_attente'}];}
+ return {data,error:null};
+}};
+async function until(predicate){for(let i=0;i<100;i++){if(predicate())return;await new Promise(r=>setTimeout(r,5));}assert.fail('Délai de test dépassé');}
+test('EGE : catalogue réel indisponible, connexion, profil, réservation serveur et effacement privé',async()=>{
+ const w=new Window({url:'http://localhost/ege/'});
+ w.document.write(await readFile(new URL('../ege/index.html',import.meta.url),'utf8'));
+ w.supabase={createClient:()=>api};
+ for(const k of ['window','document','location','navigator','FormData'])Object.defineProperty(globalThis,k,{value:w[k],configurable:true,writable:true});
+ const dialog=document.querySelector('dialog');dialog.showModal=()=>dialog.open=true;dialog.close=()=>dialog.open=false;
+ w.HTMLElement.prototype.scrollIntoView=()=>{};
+ const submit=id=>document.getElementById(id).dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+ await import('../ege/app.js?ui-test');
+ await until(()=>document.getElementById('catalogueCount').textContent.includes('1 thèmes'));
+ assert.match(document.getElementById('catalogueMessage').textContent,/préparation/);
+ assert.equal(document.querySelectorAll('[data-offer]').length,0);
+ assert.equal(document.getElementById('workspace').hidden,true);
+ document.getElementById('accountButton').click();
+ document.querySelector('[name="email"]').value=user.email;
+ document.querySelector('[name="password"]').value='test-password';submit('authForm');
+ await until(()=>document.getElementById('profileForm'));
+ const values={nom:'Test',prenom:'Élève',whatsapp:'+253 77 00 00 00',etablissement:'Lycée test',classe:'Terminale GFM',statut_candidat:'scolarise'};
+ for(const [name,value] of Object.entries(values))document.querySelector(`#profileForm [name="${name}"]`).value=value;
+ submit('profileForm');await until(()=>fixtures.profile);
+ await until(()=>document.getElementById('privateMessage').textContent.includes('confirmé'));
+ fixtures.offers=[{id:offerId,sous_theme_id:1,type_travail:'individuel',titre:'<img src=x onerror=alert(1)>',problematique:'Comment fidéliser les clients ?'}];
+ document.getElementById('reloadCatalogue').click();
+ await until(()=>document.getElementById('catalogueMessage').textContent.includes('Ouvrez un sous-thème'));
+ document.querySelector('[data-subtheme]').open=true;
+ document.querySelector('[data-subtheme]').dispatchEvent(new w.Event('toggle'));
+ await until(()=>document.querySelector('[data-offer]'));
+ assert.equal(document.querySelectorAll('#themeGrid img').length,0,'titres échappés');
+ document.querySelector('[data-offer]').click();
+ assert(document.getElementById('orderForm'));
+ document.querySelector('#orderForm [type="checkbox"]').checked=true;submit('orderForm');
+ await until(()=>document.getElementById('orders').textContent.includes(orderId));
+ const call=fixtures.calls.find(x=>x.name==='ege_preparer_commande');
+ assert.deepEqual(call.args,{p_modele:offerId,p_moyen:'cash',p_binome:null});
+ assert(!('prix' in call.args),'aucun prix envoyé par le navigateur');
+ assert.equal(document.querySelectorAll('[data-download]').length,0,'pas de téléchargement avant livraison');
+ assert.match(document.getElementById('orders').textContent,/encaissement/);
+ authEvent('SIGNED_OUT');
+ assert.equal(document.getElementById('workspace').hidden,true);
+ for(const id of ['orders','profilePanel','adminPanel','dialogBody','corrections'])assert.equal(document.getElementById(id).textContent,'');
+ await w.happyDOM.close();
+});
