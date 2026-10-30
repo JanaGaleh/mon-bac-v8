@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#ffffff"><title>Prof. Jana Galeh — MON BAC</title>
+<meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Prof. Jana Galeh"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png"><title>Prof. Jana Galeh — MON BAC</title>
 <meta name="description" content="Cours, exercices et QCM de Gestion Financière — Prof. Jana Galeh, dans MON BAC.">
 <link rel="icon" href="./logo.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css">
 </head><body>
@@ -9,7 +9,7 @@
 <header class="top">
 <a class="back" href="../mon-bac.html">← MON BAC</a>
 <a href="./" class="brand"><img src="./logo.svg" alt=""><span>Prof. Jana Galeh<small>APPRENDRE · S'ENTRAÎNER · RÉUSSIR</small></span></a>
-<button id="account" class="quiet">Mon compte</button>
+<button id="installApp" type="button" class="install-button" aria-label="Installer l’application">Installer</button><button id="account" class="quiet">Mon compte</button>
 </header>
 <div class="ticker" aria-label="Informations du soutien scolaire"><span class="ticker-name">SOUTIEN SCOLAIRE</span><div class="ticker-window"><div class="ticker-track"><span>Gestion Financière · Lycée Mandela · Samedi et lundi 19 h–21 h · 3 500 FDJ · WhatsApp 77 23 19 04</span><span aria-hidden="true">Gestion Financière · Lycée Mandela · Samedi et lundi 19 h–21 h · 3 500 FDJ · WhatsApp 77 23 19 04</span></div></div></div>
 <main id="principal">
@@ -21,5 +21,5 @@
 <section id="resultats" class="pane" hidden><div class="sectionhead"><h2>Mes résultats</h2><p>Les résultats des exercices d’entraînement sont indicatifs, non certifiés.</p></div><div id="results-list"></div></section>
 <section id="admin" class="pane" hidden><div class="sectionhead"><h2>Administration pédagogique</h2><p>Publiez chaque semaine et validez manuellement les demandes d’accès.</p></div><div class="admin-grid"><div><h3>Demandes en attente</h3><div id="requests">Chargement…</div></div><div><h3>Nouvelle publication</h3><form id="publish-form"><label for="pub-title">Titre</label><input id="pub-title" required minlength="3" maxlength="180"><label for="pub-kind">Type</label><select id="pub-kind"><option value="cours">Cours</option><option value="exercice">Exercice</option><option value="qcm">QCM</option></select><label for="pub-summary">Description courte</label><input id="pub-summary" maxlength="240"><label for="pub-body">Contenu pédagogique</label><textarea id="pub-body" rows="5" placeholder="Votre cours ou les consignes de l’exercice…"></textarea><div id="qcm-builder" hidden><label for="question">Question de QCM</label><input id="question"><label for="qcm-a">Proposition A</label><input id="qcm-a"><label for="qcm-b">Proposition B</label><input id="qcm-b"><label for="qcm-c">Proposition C</label><input id="qcm-c"><label for="qcm-d">Proposition D</label><input id="qcm-d"><label for="qcm-answer">Bonne réponse</label><select id="qcm-answer"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select></div><label class="check"><input id="pub-free" type="checkbox"> Accessible gratuitement à tous les élèves inscrits</label><button type="submit" class="primary">Publier</button></form></div></div></section>
 </main><footer>Prof. Jana Galeh · Une ressource de MON BAC · <a href="../">janagaleh.com</a></footer>
-<script src="../vendor/supabase-2.57.4.js"></script><script type="module" src="./app.js"></script>
+<script src="../vendor/supabase-2.57.4.js"></script><script type="module" src="./app.js"></script><script src="./install.js" defer></script>
 </body></html>
