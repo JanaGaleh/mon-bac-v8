@@ -30,6 +30,7 @@ async function scenario(width){
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'débordement horizontal');
  assert.equal(await page.locator('[data-offer]').count(),0);
  await page.locator('#themeGrid summary').click();
+ await page.getByText('Aucun dossier validé disponible pour le moment.',{exact:true}).waitFor();
  assert.match(await page.locator('#themeGrid').innerText(),/Aucun dossier validé disponible/);
  await page.locator('#search').fill('inexistant');
  assert.match(await page.locator('#themeGrid').innerText(),/Aucun sous-thème/);

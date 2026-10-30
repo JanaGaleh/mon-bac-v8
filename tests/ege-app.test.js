@@ -9,7 +9,7 @@ const user={id:uid,email:'test@example.invalid'};
 const fixtures={calls:[],admin:false,fail:false,offers:[],orders:[],profile:null};
 let authEvent;
 const api={auth:{getUser:async()=>({data:{user:null}}),signInWithPassword:async()=>({data:{user}}),onAuthStateChange:fn=>authEvent=fn,signOut:async()=>({data:{}})},from(table){
- const query={body:null,select(){return this},eq(){return this},limit(){return this},order(){return this},maybeSingle(){return this},upsert(body){this.body=body;return this},insert(body){this.body=body;return this},then(resolve,reject){
+ const query={body:null,select(){return this},eq(){return this},limit(){return this},range(){return this},order(){return this},maybeSingle(){return this},upsert(body){this.body=body;return this},insert(body){this.body=body;return this},then(resolve,reject){
   fixtures.calls.push({table,body:this.body});
   if(table==='ege_profils'&&this.body)fixtures.profile=this.body;
   const data={ege_themes:[{id:1,titre:'Fidélisation',annee_scolaire:'2026/2027'}],ege_sous_themes:[{id:1,theme_id:1,numero:1,intitule:'Rentabilité'}],ege_tarifs:[{code:'dossier_individuel',montant_djf:1000}],ege_catalogue_dossiers:fixtures.offers,ege_profils:fixtures.profile,ege_commandes:fixtures.orders,ege_dossiers:[],ege_comptes_paiement:[]};
@@ -44,6 +44,9 @@ test('EGE : catalogue réel indisponible, connexion, profil, réservation serveu
  await until(()=>document.getElementById('privateMessage').textContent.includes('confirmé'));
  fixtures.offers=[{id:offerId,sous_theme_id:1,type_travail:'individuel',titre:'<img src=x onerror=alert(1)>',problematique:'Comment fidéliser les clients ?'}];
  document.getElementById('reloadCatalogue').click();
+ await until(()=>document.getElementById('catalogueMessage').textContent.includes('Ouvrez un sous-thème'));
+ document.querySelector('[data-subtheme]').open=true;
+ document.querySelector('[data-subtheme]').dispatchEvent(new w.Event('toggle'));
  await until(()=>document.querySelector('[data-offer]'));
  assert.equal(document.querySelectorAll('#themeGrid img').length,0,'titres échappés');
  document.querySelector('[data-offer]').click();
@@ -57,6 +60,6 @@ test('EGE : catalogue réel indisponible, connexion, profil, réservation serveu
  assert.match(document.getElementById('orders').textContent,/encaissement/);
  authEvent('SIGNED_OUT');
  assert.equal(document.getElementById('workspace').hidden,true);
- for(const id of ['orders','profilePanel','adminPanel','dialogBody'])assert.equal(document.getElementById(id).textContent,'');
+ for(const id of ['orders','profilePanel','adminPanel','dialogBody','corrections'])assert.equal(document.getElementById(id).textContent,'');
  await w.happyDOM.close();
 });
