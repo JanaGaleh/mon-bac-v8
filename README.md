@@ -1,5 +1,7 @@
 # MON BAC V8
 
+Le module **EGE 2026/2027** est ajouté dans [`ege/`](ege/), avec catalogue Supabase et parcours de commande privé. Voir [l’état vérifié, les tests et les blocages de réception](docs/EGE-2026-10-30.md). Les 450 modèles sont des brouillons et les buckets sont vides : cette livraison de code n’ouvre pas la commercialisation.
+
 PWA éducative en français, publiée sur https://janagaleh.github.io/mon-bac-v8/.
 
 Architecture conservée : HTML/CSS/JavaScript statiques sur GitHub Pages, Supabase Auth et Postgres, permissions RLS et fonctions RPC existantes. Aucun framework ni serveur supplémentaire requis. Le client Supabase 2.57.4 est distribué localement avec sa licence, sans dépendance à un CDN à l’ouverture.
@@ -49,3 +51,4 @@ Voir [la structure de plateforme et les évolutions serveur proposées](docs/PLA
 Le bouton **Créer un compte** permet une inscription élève ou une candidature enseignant, avec confirmation de l’e-mail. Les droits enseignants sont attribués uniquement par une décision administrative dans **Comptes**. Un élève existant peut candidater depuis son profil.
 
 Consulter [le fonctionnement, les tests et la configuration e-mail à contrôler](docs/INSCRIPTION-ET-VALIDATION.md). La migration additive et les tests de sécurité transactionnels sont conservés dans le dépôt.
+
