@@ -4,8 +4,8 @@ import { readFile, access } from "node:fs/promises";
 import { Window } from "happy-dom";
 import { modules, legacyModuleTarget } from "../js/modules.js";
 test("le registre sépare la plateforme du module et conserve uniquement les liens anciens connus", () => {
-  assert.equal(modules.length, 1);
-  assert.equal(modules[0].entry, "./mon-bac.html");
+  assert.equal(modules.find(m=>m.id==='mon-bac').entry, "./mon-bac.html");
+  assert.equal(modules.find(m=>m.id==='ege').entry, "./ege/");
   assert.equal(legacyModuleTarget("#cours"), "./mon-bac.html#cours");
   assert.equal(legacyModuleTarget("#applications"), null);
   assert.equal(legacyModuleTarget("#https://evil.invalid"), null);
@@ -58,3 +58,4 @@ test('l’accueil réutilise la session sans afficher de données personnelles n
  assert.equal(document.querySelector('#platformAccountLabel').textContent,'Se connecter');
  await window.happyDOM.close();
 });
+
