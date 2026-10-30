@@ -96,7 +96,7 @@ async function adminScenario(){
  },buffer.toString('base64'));
  assert.match(checked.sha256,/^[0-9a-f]{64}$/);assert.match(checked.rejection,/Lien externe actif interdit/);
  await page.locator('[data-review-correction]').waitFor();await page.locator('[data-review-correction]').click();await page.locator('[name="reponse"]').fill('Votre demande est acceptée après examen.');await page.locator('#correctionDecisionForm button').click();
- await page.locator('#dialog').waitFor({state:'hidden'});await page.locator('#adminCorrectionFilter').selectOption('acceptee');await page.locator('[data-correction-id]').waitFor();await page.locator('[data-correction-id]').click();
+ await page.locator('#dialog').waitFor({state:'hidden'});await page.locator('#privateMessage').filter({hasText:'Enregistrement confirmé'}).waitFor();await page.locator('#adminCorrectionFilter').selectOption('acceptee');await page.locator('[data-correction-id]').waitFor();await page.locator('[data-correction-id]').click();
  await page.locator('#deliveryForm').waitFor();await page.locator('#deliveryForm [name="word"]').setInputFiles({name:'correction.docx',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',buffer});await page.locator('#deliveryForm [type="checkbox"]').check();await page.locator('#deliveryForm button').click();
  await page.locator('#dialog').waitFor({state:'hidden'});assert(calls.some(c=>c.name==='ege_admin_finaliser_livraison'));
  await page.locator('#adminCorrectionFilter').selectOption('traitee');await page.getByText('Traitée · nouveau Word disponible',{exact:true}).waitFor();

@@ -346,7 +346,7 @@ document.addEventListener('toggle', event => {
 }, true);
 document.addEventListener('change', async event => {
   const id = event.target.id;
-  if (!['adminOrderFilter', 'adminCorrectionFilter'].includes(id) || state.busy) return;
+  if (!['adminOrderFilter', 'adminCorrectionFilter'].includes(id)) return;
   if (id === 'adminOrderFilter') { state.adminOrderFilter = event.target.value; state.adminOrderOffset = 0; }
   else { state.adminCorrectionFilter = event.target.value; state.adminCorrectionOffset = 0; }
   try { await renderAdmin(); } catch (error) { note(userMessage(error)); }
