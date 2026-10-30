@@ -1,6 +1,6 @@
 # MON BAC V8
 
-Le module **EGE 2026/2027** est ajouté dans [`ege/`](ege/), avec catalogue Supabase et parcours de commande privé. Voir [l’état vérifié, les tests et les blocages de réception](docs/EGE-2026-10-30.md). Les 450 modèles sont des brouillons et les buckets sont vides : cette livraison de code n’ouvre pas la commercialisation.
+Le module **EGE 2026/2027** est ajouté dans [`ege/`](ege/), avec catalogue Supabase, import de brouillons, commandes privées, réponses aux corrections et livraisons Word versionnées. Voir [le guide d'exploitation et les contrôles de réception](docs/EGE-EXPLOITATION.md), ainsi que [le bilan initial](docs/EGE-2026-10-30.md). Les 450 modèles sont des brouillons et les buckets sont vides : cette livraison de code n’ouvre pas la commercialisation.
 
 PWA éducative en français, publiée sur https://janagaleh.github.io/mon-bac-v8/.
 
