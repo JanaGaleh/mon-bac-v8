@@ -107,7 +107,17 @@ async function submit(form){
   if(!file||!file.name.toLowerCase().endsWith('.docx')||file.size<4||file.size>20*1024*1024)throw new Error('Choisissez un fichier DOCX de moins de 20 Mo.');
   const signature=new Uint8Array(await file.slice(0,4).arrayBuffer());if(signature[0]!==80||signature[1]!==75||signature[2]!==3||signature[3]!==4)throw new Error('Format DOCX invalide.');
   const path=form.dataset.id+'/dossier-personnalise.docx';
-  await unwrap(client.storage.from('ege-word-prive').upload(path,file,{upsert:false,contentType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));
+  const bucket=client.storage.from('ege-word-prive');
+  const uploaded=await bucket.upload(path,file,{upsert:false,contentType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  if(uploaded.error){
+   // Si le transfert précédent a abouti mais son accusé s'est perdu, reprendre
+   // uniquement avec le même contenu. Aucun écrasement de version existante.
+   if(!['409','Duplicate'].includes(String(uploaded.error.statusCode))&&!/already exists|duplicate/i.test(uploaded.error.message||''))throw uploaded.error;
+   const existing=await unwrap(bucket.download(path));
+   const [a,b]=await Promise.all([file.arrayBuffer(),existing.arrayBuffer()]);
+   const [ha,hb]=await Promise.all([crypto.subtle.digest('SHA-256',a),crypto.subtle.digest('SHA-256',b)]);
+   if(new Uint8Array(ha).some((value,index)=>value!==new Uint8Array(hb)[index]))throw new Error('Un autre fichier existe déjà pour cette commande. Contactez l’administration pour gérer sa version.');
+  }
   await rpc('ege_enregistrer_word_livraison',{p_commande:form.dataset.id,p_chemin:path});
  }
  if(epoch!==state.epoch)return;

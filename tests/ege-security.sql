@@ -31,6 +31,10 @@ do $$ declare n integer; begin
  select count(*) into n from public.ege_dossiers where id='eeeeeeee-0000-4000-8000-000000000003';
  if n<>0 then raise exception 'Dossier B visible par A'; end if;
  if has_table_privilege(current_user,'public.ege_dossiers','TRUNCATE') then raise exception 'TRUNCATE contourne RLS'; end if;
+ begin
+  perform public.ege_creer_commande('eeeeeeee-0000-4000-8000-000000000002',null);
+  raise exception 'Moyen de paiement NULL accepté';
+ exception when raise_exception then if sqlerrm not like '%Moyen de paiement invalide%' then raise; end if; end;
  -- Reproduit précisément la faille : une livraison de A ne permet pas une
  -- correction sur un autre dossier de A, ni sur celui de B.
  begin
