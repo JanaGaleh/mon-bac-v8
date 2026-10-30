@@ -113,7 +113,8 @@ function renderProfile() {
     <p class="small">L’établissement est obligatoire pour les élèves scolarisés. La réservation pour les candidats libres n’est pas encore ouverte.</p><button class="primary">Enregistrer mon profil</button></form></details>`;
 }
 function renderOrders() {
-  $('orders').innerHTML = state.orders.map(c => `<article class="order"><h3>${esc(orderLabels[c.statut] || c.statut)}</h3><p>Commande <strong>${esc(c.id)}</strong><br>${esc(money(c.prix_convenu_djf))} · ${esc(methodLabels[c.moyen_paiement] || c.moyen_paiement)} · ${c.type_travail === 'binome' ? 'Binôme' : 'Individuel'}</p>
+  const dossiers = new Map(state.dossiers.map(d => [d.id, d]));
+  $('orders').innerHTML = state.orders.map(c => `<article class="order"><h3>${esc(orderLabels[c.statut] || c.statut)}</h3>${dossiers.get(c.dossier_id)?.problematique ? `<p><strong>${esc(dossiers.get(c.dossier_id).problematique)}</strong></p>` : ''}<p>Commande <strong>${esc(c.id)}</strong><br>${esc(money(c.prix_convenu_djf))} · ${esc(methodLabels[c.moyen_paiement] || c.moyen_paiement)} · ${c.type_travail === 'binome' ? 'Binôme' : 'Individuel'}</p>
     ${c.reference_transaction ? `<p>Référence : ${esc(c.reference_transaction)}</p>` : ''}<div class="actions">
     ${c.statut === 'en_attente' && c.moyen_paiement !== 'cash' ? `<button class="secondary" data-receipt="${c.id}">Déclarer mon reçu</button>` : ''}
     ${c.statut === 'en_attente' && c.moyen_paiement === 'cash' ? '<p class="muted">Contactez l’administration pour régler en espèces. Le paiement sera confirmé après encaissement.</p>' : ''}
@@ -133,7 +134,7 @@ async function enter(user) {
     const [profile, orders, dossiers, methods, admin, corrections] = await Promise.all([
       read(query('ege_profils').eq('utilisateur_id', user.id).maybeSingle()),
       read(query('ege_commandes').eq('acheteur_id', user.id).order('date_creation', { ascending: false }).order('id', { ascending: false }).range(0, pageSize - 1)),
-      read(query('ege_dossiers', 'id,sujet_confirme_le').eq('eleve_id', user.id).limit(500)),
+      read(query('ege_dossiers', 'id,sujet_confirme_le,problematique').eq('eleve_id', user.id).limit(500)),
       read(query('ege_comptes_paiement').eq('actif', true).limit(10)), call('ege_est_admin'),
       read(query('ege_demandes_correction', 'id,dossier_id,champ,detail,statut,cree_le,traite_le,reponse').eq('demandeur_id', user.id).order('cree_le', { ascending: false }).limit(100)),
     ]);
@@ -274,6 +275,7 @@ async function submit(form) {
   }
   if (!current(epoch)) return;
   $('dialog').close(); await enter(state.user); $('privateMessage').textContent = 'Enregistrement confirmé.';
+  if (form.id === 'orderForm') { $('workspace').scrollIntoView(); $('spaceTitle').tabIndex = -1; $('spaceTitle').focus({ preventScroll: true }); }
   if (form.id === 'profileForm' && state.pendingOffer) chooseOffer(state.pendingOffer);
 }
 
@@ -306,8 +308,12 @@ async function action(button) {
     modal('Versions de votre dossier', `<p>Les 20 dernières versions sont affichées. La dernière version reste accessible depuis votre commande.</p>${versions.map(v => `<p>Version ${v.numero} · ${esc(date(v.cree_le))} <button class="secondary" data-download="${d.versions}" data-version="${v.id}">Télécharger cette version</button></p>`).join('') || '<p>Aucune version antérieure enregistrée.</p>'}`); return;
   }
   if (d.download) {
-    const data = await read(client.functions.invoke('ege-telecharger-word', { body: { commande_id: d.download, ...(d.version ? { version_id: d.version } : {}) } }));
-    if (current(epoch)) location.assign(safeDownload(data.url)); return;
+    const result = await timed(client.functions.invoke('ege-telecharger-word', { body: { commande_id: d.download, ...(d.version ? { version_id: d.version } : {}) } }));
+    if (result.error) {
+      let explanation; try { explanation = await result.error.context?.json(); } catch {}
+      throw new Error(explanation?.error || 'Téléchargement non confirmé. Actualisez votre espace ou contactez l’administration.');
+    }
+    if (current(epoch)) location.assign(safeDownload(result.data.url)); return;
   }
   if (d.receipt) {
     const order = state.orders.find(c => c.id === d.receipt), method = state.methods.find(m => m.moyen === order?.moyen_paiement);

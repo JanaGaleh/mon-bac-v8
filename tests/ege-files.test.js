@@ -1,17 +1,14 @@
-import test, { after } from 'node:test';
+import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
-import { Window } from 'happy-dom';
 import { inspectZip, validateDocx, extractImport, sha256, uploadImmutable } from '../ege/files.js';
 import { timed } from '../ege/data.js';
-const window = new Window();
+const window = {};
 Object.defineProperty(globalThis, 'window', { value: window, configurable: true });
-Object.defineProperty(globalThis, 'DOMParser', { value: window.DOMParser, configurable: true });
 const context = { module: { exports: {} }, exports: {}, setTimeout, clearTimeout, setImmediate, Promise, Buffer, Uint8Array, ArrayBuffer };
 vm.runInNewContext(await readFile(new URL('../vendor/jszip-3.10.1.min.js', import.meta.url), 'utf8'), context);
 const JSZip = window.JSZip = context.module.exports;
-after(async () => { await window.happyDOM.close(); });
 async function fixture(mutator = () => {}) {
   const zip = new JSZip();
   zip.file('[Content_Types].xml', '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
@@ -20,12 +17,10 @@ async function fixture(mutator = () => {}) {
   await mutator(zip);
   return new File([await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' })], 'T1_ST01_D01_individuel.docx');
 }
-test('un vrai conteneur Word non vide produit une empreinte vérifiable sans validation pédagogique', async () => {
-  const file = await fixture(), info = await validateDocx(file);
-  assert.equal(info.sha256, await sha256(await file.arrayBuffer())); assert.equal(info.taille, file.size);
-});
-test('refus des faux Word, macros, chemins traversants et modèles externes actifs', async () => {
-  for (const mutate of [zip => zip.remove('word/document.xml'), zip => zip.file('word/vbaProject.bin', 'bad'), zip => zip.file('../escape.xml', 'bad'), zip => zip.file('word/_rels/document.xml.rels', '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="bad" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/attachedTemplate" TargetMode="External" Target="https://evil.invalid/template"/></Relationships>')]) await assert.rejects(() => fixture(mutate).then(validateDocx));
+// Le XML et les espaces de noms sont testés avec le vrai DOMParser de Chromium,
+// dans ege-browser.cjs ; un DOM simulé ne garantit pas sa fidélité au XML Word.
+test('refus des faux Word, macros et chemins traversants avant lecture du XML', async () => {
+  for (const [mutate, reason] of [[zip => zip.remove('word/document.xml'), /n’est pas un document Word/], [zip => zip.file('word/vbaProject.bin', 'bad'), /Macros/], [zip => zip.file('../escape.xml', 'bad'), /Chemin dangereux/]]) await assert.rejects(() => fixture(mutate).then(validateDocx), reason);
   await assert.rejects(() => validateDocx(new File(['not-a-word'], 'fake.docx')));
 });
 test('limites de décompression contrôlées avant ouverture et doublons de dossiers refusés', async () => {

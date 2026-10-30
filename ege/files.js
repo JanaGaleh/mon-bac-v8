@@ -60,6 +60,7 @@ function xmlDocument(source) {
 }
 export async function validateDocx(file) {
   if (!file || !/\.docx$/i.test(file.name)) throw new Error('Choisissez un document Word DOCX.');
+  if (file.size < 22 || file.size > 20 * MB) throw new Error('Choisissez un document Word de moins de 20 Mo.');
   const buffer = await file.arrayBuffer(), entries = inspectZip(buffer);
   const names = new Set(entries.map(entry => entry.name));
   for (const name of ['[Content_Types].xml', '_rels/.rels', 'word/document.xml']) {
@@ -87,6 +88,7 @@ export async function extractImport(files) {
   const output = [], names = new Set();
   for (const file of files) {
     if (/\.zip$/i.test(file.name)) {
+      if (file.size > 100 * MB) throw new Error('L’archive ZIP doit faire moins de 100 Mo.');
       const buffer = await file.arrayBuffer();
       const entries = inspectZip(buffer, { maxBytes: 100 * MB, maxExpanded: 256 * MB, maxEntries: 1500 });
       const zip = await (await zipLibrary()).loadAsync(buffer);
