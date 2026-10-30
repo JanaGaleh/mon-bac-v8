@@ -17,6 +17,9 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run check
+      - name: Vérifier l'accès public à la production EGE
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: node tests/ege-production-smoke.cjs
   ege-browser:
     runs-on: ubuntu-latest
     steps:
