@@ -107,4 +107,15 @@ async function adminScenario(){
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'débordement horizontal administration');assert.deepEqual(errors,[]);
  await page.screenshot({path:'/tmp/ege-admin-390.png',fullPage:true});await context.close();await browser.close();console.log('PASS EGE administration : réponse correction, livraison versionnée, import Word et coordonnées marchandes');
 }
-(async()=>{for(const width of [390,1440])await scenario(width);await adminScenario();})().catch(e=>{console.error(e);process.exit(1)});
+async function liveCatalogue(){
+ // Lecture anonyme uniquement du catalogue public réel ; aucun compte ni paiement.
+ const browser=await chromium.launch({headless:true}),context=await browser.newContext({viewport:{width:390,height:900},serviceWorkers:'block'}),page=await context.newPage();
+ await page.goto(base+'/ege/');
+ try{await page.waitForFunction(()=>document.querySelector('#catalogueCount').textContent.includes('7 thèmes · 67 sous-thèmes'),{},{timeout:30000});}
+ catch(error){console.error('Catalogue Supabase réel :',await page.locator('#catalogueMessage').innerText());throw error;}
+ assert.equal(await page.locator('#themeGrid .theme-card').count(),7);
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+ await page.screenshot({path:'/tmp/ege-live-390.png',fullPage:true});
+ await context.close();await browser.close();console.log('PASS catalogue Supabase réel : 7 thèmes, 67 sous-thèmes, accès visiteur et affichage mobile');
+}
+(async()=>{for(const width of [390,1440])await scenario(width);await adminScenario();await liveCatalogue();})().catch(e=>{console.error(e);process.exit(1)});
