@@ -45,7 +45,7 @@ async function zipLibrary() {
   if (window.JSZip) return window.JSZip;
   if (!zipLoading) zipLoading = new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = new URL('../vendor/jszip-3.10.1.min.js', import.meta.url).href;
+    script.src = new URL('./vendor/jszip-3.10.1.min.js', import.meta.url).href;
     script.onload = () => window.JSZip ? resolve(window.JSZip) : reject(new Error('Lecteur Word indisponible.'));
     script.onerror = () => { zipLoading = null; script.remove(); reject(new Error('Le lecteur Word est indisponible. Vérifiez votre connexion puis réessayez.')); };
     document.head.append(script);

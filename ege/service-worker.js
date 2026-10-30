@@ -1,5 +1,5 @@
-const CACHE='ege-shell-v2';
-const SHELL=['./','./index.html','./styles.css','./app.js','./domain.js','./data.js','./files.js','./pwa.js','./manifest.webmanifest','../platform.css','../js/api.js','../js/domain.js','../vendor/supabase-2.57.4.js','../icon-192.png','../icon-512.png'];
+const CACHE='ege-shell-v3';
+const SHELL=['./','./index.html','./styles.css','./app.js','./api.js','./html.js','./domain.js','./data.js','./files.js','./pwa.js','./manifest.webmanifest','./vendor/supabase-2.57.4.js','./icon.svg','./icon-192.png','./icon-512.png'];
 const urls=SHELL.map(path=>new URL(path,self.registration.scope).href);
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(urls)));});
 self.addEventListener('message',event=>{if(event.data?.type==='SKIP_WAITING')self.skipWaiting();});

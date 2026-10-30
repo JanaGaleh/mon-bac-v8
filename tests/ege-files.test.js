@@ -7,7 +7,7 @@ import { timed } from '../ege/data.js';
 const window = {};
 Object.defineProperty(globalThis, 'window', { value: window, configurable: true });
 const context = { module: { exports: {} }, exports: {}, setTimeout, clearTimeout, setImmediate, Promise, Buffer, Uint8Array, ArrayBuffer };
-vm.runInNewContext(await readFile(new URL('../vendor/jszip-3.10.1.min.js', import.meta.url), 'utf8'), context);
+vm.runInNewContext(await readFile(new URL('../ege/vendor/jszip-3.10.1.min.js', import.meta.url), 'utf8'), context);
 const JSZip = window.JSZip = context.module.exports;
 async function fixture(mutator = () => {}) {
   const zip = new JSZip();

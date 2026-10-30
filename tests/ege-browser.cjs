@@ -55,7 +55,7 @@ async function scenario(width){
 async function adminScenario(){
  const vm=require('node:vm'),fs=require('node:fs');
  const ctx={module:{exports:{}},exports:{},setTimeout,clearTimeout,setImmediate,Promise,Buffer,Uint8Array,ArrayBuffer};
- vm.runInNewContext(fs.readFileSync('vendor/jszip-3.10.1.min.js','utf8'),ctx);
+ vm.runInNewContext(fs.readFileSync('ege/vendor/jszip-3.10.1.min.js','utf8'),ctx);
  const zip=new ctx.module.exports();
  zip.file('[Content_Types].xml','<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>');
  zip.file('_rels/.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>');

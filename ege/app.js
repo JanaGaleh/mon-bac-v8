@@ -1,5 +1,5 @@
-import { client, rpc, unwrap } from '../js/api.js';
-import { escapeHtml as esc } from '../js/domain.js';
+import { client, rpc, unwrap } from './api.js';
+import { escapeHtml as esc } from './html.js';
 import { academicYear, money, correctionOpen, validateProfile, safeDownload, orderLabels } from './domain.js';
 import { timed, userMessage, correctionLabels, methodLabels } from './data.js';
 import { validateDocx, extractImport, uploadImmutable } from './files.js';
@@ -40,7 +40,7 @@ function clearPrivate() {
 function authForm(mode = 'login') {
   const signup = mode === 'signup', reset = mode === 'reset', recovery = mode === 'recovery', resend = mode === 'resend';
   const title = { signup: 'Créer mon compte', reset: 'Réinitialiser mon mot de passe', recovery: 'Choisir un nouveau mot de passe', resend: 'Renvoyer le lien de confirmation', login: 'Se connecter' }[mode];
-  modal(title, `<p>Votre compte JanaGaleh permet d’accéder à EGE.</p><form id="authForm" data-mode="${mode}">
+  modal(title, `<p>Votre compte MON BAC fonctionne aussi dans EGE. Vous pouvez également créer un compte.</p><form id="authForm" data-mode="${mode}">
     ${signup ? '<label>Nom complet<input name="nom" autocomplete="name" maxlength="100" required></label>' : ''}
     ${!recovery ? '<label>E-mail<input name="email" type="email" autocomplete="email" maxlength="254" required></label>' : ''}
     ${!reset && !resend ? `<label>Mot de passe<input name="password" type="password" autocomplete="${signup || recovery ? 'new-password' : 'current-password'}" ${signup || recovery ? 'minlength="12"' : ''} required maxlength="200"></label>` : ''}

@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import vm from 'node:vm';
 import {wordCount,correctionOpen,validateProfile,safeDownload} from '../ege/domain.js';
+test('EGE peut être servi uniquement sous /ege sans dépendre des scripts du portail',async()=>{
+ const html=await readFile(new URL('../ege/index.html',import.meta.url),'utf8');
+ assert.doesNotMatch(html,/(?:src|href)="\.\.\/(?:vendor|js|icon|platform)/);
+ for(const name of ['app.js','files.js','styles.css','manifest.webmanifest','service-worker.js']){
+  const source=await readFile(new URL('../ege/'+name,import.meta.url),'utf8');
+  assert.doesNotMatch(source,/\.\.\/(?:vendor|js|icon|platform)/);
+ }
+});
 test('corrections : livraison réelle, borne de 7 jours et date future refusée',()=>{
  const date=Date.parse('2026-10-30T12:00:00Z');const order={statut:'livre',date_livraison:new Date(date).toISOString()};
  assert(correctionOpen(order,date));assert(correctionOpen(order,date+7*86400000));
