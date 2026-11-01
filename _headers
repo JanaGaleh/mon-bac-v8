@@ -1,0 +1,14 @@
+# Hébergement Cloudflare Pages — application Prof. Jana Galeh
+# Les Service Workers doivent rester à jour après chaque déploiement.
+/prof-jana-galeh/sw.js
+  Cache-Control: no-cache, max-age=0
+  X-Content-Type-Options: nosniff
+/ege/service-worker.js
+  Cache-Control: no-cache, max-age=0
+  X-Content-Type-Options: nosniff
+/monbac/service-worker.js
+  Cache-Control: no-cache, max-age=0
+  X-Content-Type-Options: nosniff
+/* 
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
