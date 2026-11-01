@@ -9,3 +9,6 @@
 #pjg-install-help h2{font-family:Georgia,serif;font-weight:500;margin:0 0 15px}
 #pjg-install-help button{background:#286f9f;color:white;border:0;border-radius:8px;font-weight:700;padding:12px 19px}
 @media(max-width:560px){.top{gap:7px;padding-inline:10px}.install-button{padding:9px 11px;font-size:11px}.brand span{font-size:12px}.brand small{font-size:6px}.brand img{height:31px;width:31px}.top .quiet{font-size:10px;padding:8px}}
+
+/* Bibliothèque partagée avec janagaleh.com/cours. */
+.pjg-files-frame{width:100%;min-height:1080px;border:1px solid #d8e5eb;border-radius:13px;background:#fff}.pjg-files-notice{padding:14px 16px;background:#eef7fb;border-radius:10px;font-size:13px;line-height:1.6;color:#315d77;margin-bottom:20px}.pjg-files-notice a{text-decoration:underline;color:#136eab}@media(max-width:600px){.pjg-files-frame{min-height:1250px;border-radius:9px}}
