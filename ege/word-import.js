@@ -205,6 +205,7 @@ function applyImport(){
  imported.resumeAt=imported.step;
  const previous=data;
  data=imported;
+ window.EGE2027Phase1?.detachCurrent();
  if(!save()){
   data=previous;notice('Espace de stockage insuffisant : le dossier actuel a été conservé. Libère de l’espace et réessaie.',true);return;
  }
