@@ -118,6 +118,12 @@ async function saveDossier(){
  finally{busy=false}
 }
 async function openDossiers(){
+ if(!cloud()){
+  dialog(false);
+  if(typeof egeCloudOpen==='function')egeCloudOpen(true);
+  cloudMsg('Connecte-toi pour créer et retrouver tes dossiers en ligne.');
+  return;
+ }
  dialog(true);
  status('Chargement de tes dossiers…');
  try{await fetchList();status('Sélectionne un dossier ou crée un nouveau projet. Le dossier actuel n’est pas remplacé sans confirmation.')}
