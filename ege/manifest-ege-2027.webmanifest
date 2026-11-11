@@ -1,0 +1,31 @@
+{
+  "id": "./assistant-dossier-gfm-2027.html",
+  "name": "EGE GFM 2027 — Mon dossier guidé",
+  "short_name": "EGE 2027",
+  "description": "Assistant de préparation des Études de Gestion Encadrées — terminale GFM, Djibouti.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./assistant-dossier-gfm-2027.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fb",
+  "theme_color": "#245ed7",
+  "categories": [
+    "education"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icon-ege-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-ege-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
