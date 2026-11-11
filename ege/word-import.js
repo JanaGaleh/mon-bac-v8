@@ -32,7 +32,7 @@ function fieldFromParagraphs(parts,labels){
   for(const label of normalizedLabels){
    if(s===label){
     const next=parts[i+1]||'';
-    if(next&&next.length<=600&&!/^(?:annexe|titre|source|th[eè]me|sous.th[eè]me|probl[eé]matique|candidat)/i.test(next))return trim(next);
+    if(next&&next.length<=600&&!/^(?:annexe\s*\d|titre$|source$|th[eè]me$|sous.th[eè]me$|probl[eé]matique$)/i.test(next))return trim(next);
    }
    const asText=normal(text.split(/[:：]/)[0]);
    if(asText===label&&/[:：]/.test(text)){
@@ -95,10 +95,15 @@ function parseAnnexes(parts){
  return best;
 }
 function parseWord(parts){
- const candidate=fieldFromParagraphs(parts,['Candidat(e)','Candidat','Nom du candidat','Nom du candidat(e)','Noms des candidats']);
+ const candidate=fieldFromParagraphs(parts,['Candidat(e)','Candidat','Nom du candidat','Nom du candidat(e)','Noms des candidats'])||fieldFromParagraphs(parts,['Nom du candidat']);
  let student=candidate,partner='',className='';
  const classMark=student.match(/\s*[—–-]\s*((?:[1T]GFM|TGFM|[1T]OGRH)\s*\d+)\s*$/i);
  if(classMark){className=trim(classMark[1]);student=trim(student.slice(0,classMark.index));}
+ if(!className){
+  const other=fieldFromParagraphs(parts,['Nom du candidat','Nom du candidat(e)']);
+  const match=other.match(/\s*[—–-]\s*((?:[1T]GFM|TGFM|[1T]OGRH)\s*\d+)\s*$/i);
+  if(match)className=trim(match[1]);
+ }
  if(!className){const v=fieldFromParagraphs(parts,['Classe','Classe du candidat']);if(v&&v.length<40)className=v;}
  const binome=/\s+et\s+/i.test(student)&&student.length<120;
  if(binome){const a=student.split(/\s+et\s+/i);student=trim(a[0]);partner=trim(a.slice(1).join(' et '));}
