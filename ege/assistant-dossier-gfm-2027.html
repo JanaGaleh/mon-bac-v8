@@ -897,9 +897,9 @@ function shareGeneratedWord(){
 }
 function downloadBlob(blob,name){let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),7000)}
 function backup(){downloadBlob(new Blob([JSON.stringify({version:3,data},null,2)],{type:'application/json'}),'EGE_GFM_2027_sauvegarde.json');toast('Projet sauvegardé dans un fichier JSON.');}
-$('backupTop').onclick=backup;$('importBtn').onclick=()=>$('importFile').click();$('resetBtn').onclick=()=>{if(confirm('Effacer le dossier actuel sur cet appareil ? Fais une sauvegarde si nécessaire.')){data=empty();localStorage.removeItem(KEY);render();toast('Nouveau dossier créé.')}};
+$('backupTop').onclick=backup;$('importBtn').onclick=()=>$('importFile').click();$('resetBtn').onclick=()=>{if(confirm('Effacer le dossier actuel sur cet appareil ? Fais une sauvegarde si nécessaire.')){data=empty();window.EGE2027Phase1?.detachCurrent();localStorage.removeItem(KEY);render();toast('Nouveau dossier créé.')}};
 $('brand').onclick=e=>{e.preventDefault();if(data.step!=='welcome')data.resumeAt=data.step;data.step='welcome';render()};
-$('importFile').onchange=async e=>{let f=e.target.files?.[0];if(!f)return;try{let obj=JSON.parse(await f.text()),v=obj.data||obj;if(!v||!['individuel','binome'].includes(v.mode))throw Error('Format non reconnu');let n=empty();for(let k of Object.keys(n))if(Object.prototype.hasOwnProperty.call(v,k))n[k]=v[k];n.annexes=v.annexes&&typeof v.annexes==='object'?v.annexes:{};n.sources=v.sources&&typeof v.sources==='object'?v.sources:{};n.sourceChecks=v.sourceChecks&&typeof v.sourceChecks==='object'?v.sourceChecks:{};n.researchEvidence=v.researchEvidence&&typeof v.researchEvidence==='object'?v.researchEvidence:{};n.annexBackup=v.annexBackup&&typeof v.annexBackup==='object'?v.annexBackup:{};n.candidates=Array.isArray(v.candidates)?v.candidates.slice(0,7):Array(7).fill('');n.theme=Number.isInteger(v.theme)&&v.theme>=0&&v.theme<6?v.theme:null;n.subtheme=n.theme!==null&&Number.isInteger(v.subtheme)&&v.subtheme>=0&&v.subtheme<CATALOG[n.theme].subthemes.length?v.subtheme:null;n.step='finish';data=n;save();render();toast('Projet restauré.')}catch(err){toast('Impossible de restaurer ce fichier : '+err.message)}e.target.value=''};
+$('importFile').onchange=async e=>{let f=e.target.files?.[0];if(!f)return;try{let obj=JSON.parse(await f.text()),v=obj.data||obj;if(!v||!['individuel','binome'].includes(v.mode))throw Error('Format non reconnu');let n=empty();for(let k of Object.keys(n))if(Object.prototype.hasOwnProperty.call(v,k))n[k]=v[k];n.annexes=v.annexes&&typeof v.annexes==='object'?v.annexes:{};n.sources=v.sources&&typeof v.sources==='object'?v.sources:{};n.sourceChecks=v.sourceChecks&&typeof v.sourceChecks==='object'?v.sourceChecks:{};n.researchEvidence=v.researchEvidence&&typeof v.researchEvidence==='object'?v.researchEvidence:{};n.annexBackup=v.annexBackup&&typeof v.annexBackup==='object'?v.annexBackup:{};n.candidates=Array.isArray(v.candidates)?v.candidates.slice(0,7):Array(7).fill('');n.theme=Number.isInteger(v.theme)&&v.theme>=0&&v.theme<6?v.theme:null;n.subtheme=n.theme!==null&&Number.isInteger(v.subtheme)&&v.subtheme>=0&&v.subtheme<CATALOG[n.theme].subthemes.length?v.subtheme:null;n.step='finish';data=n;window.EGE2027Phase1?.detachCurrent();save();render();toast('Projet restauré.')}catch(err){toast('Impossible de restaurer ce fichier : '+err.message)}e.target.value=''};
 document.addEventListener('DOMContentLoaded',()=>{
  const overlay=wordEl('wordExportOverlay');
  if(!overlay)return;
@@ -942,8 +942,8 @@ render();
    <p>Après inscription, vérifie ta boîte e-mail et les courriers indésirables. Confirme ton adresse avant de te connecter. N’appuie pas plusieurs fois sur « Créer un compte » : Supabase impose un délai entre deux envois.</p>
   </div>
   <div class="ege-cloud-actions" id="egeCloudActions" hidden>
-   <div class="ege-cloud-buttons"><button type="button" class="ege-cloud-primary" id="egeCloudSave">Sauvegarder en ligne</button><button type="button" id="egeCloudLoad">Récupérer mon dossier</button></div>
-   <div class="ege-cloud-buttons"><button type="button" id="egeCloudReviews">Voir les corrections</button><button type="button" id="egeCloudSignOut">Se déconnecter</button></div>
+   <div class="ege-cloud-buttons"><button type="button" class="ege-cloud-primary" id="egeCloudSave">Sauvegarder en ligne</button><button type="button" id="egeCloudLoad">Mes dossiers</button></div>
+   <div class="ege-cloud-buttons"><button type="button" id="egeCloudReviews">Corrections du dossier</button><button type="button" id="egeCloudSignOut">Se déconnecter</button></div>
   </div>
   <div class="ege-cloud-admin-shortcut" id="egeCloudAdminShortcut" hidden>
    <h3>Mon administration</h3>
@@ -1021,6 +1021,7 @@ function egeCloudRefresh(){
  const who=egeCloud('egeCloudWho');if(who)who.textContent=logged?'Compte : '+(egeCloudUser.email||'utilisateur connecté'):'Aucun compte connecté';
  const small=egeCloud('egeCloudBadge');if(small)small.textContent=logged?'☁ Connecté':'☁ En ligne';
  const adminLink=egeCloud('egeAdminPageLink');if(adminLink)adminLink.hidden=!(logged&&egeCloudStaff?.role==='admin');
+ window.EGE2027Phase1?.onAuthChanged(egeCloudUser);
  egeMobileNavUpdate();
 }
 async function egeCloudLoadStaff(){
@@ -1069,52 +1070,9 @@ async function egeCloudResend(){
  }catch(e){egeCloudMsg(egeCloudFriendlyError(e,true))}
  finally{egeCloudBusy=false;egeCloudUpdateCooldown();}
 }
-async function egeCloudSave(){
- if(!egeSupabaseClient||!egeCloudUser){egeCloudMsg('Connecte-toi avant de sauvegarder.');return}
- if(egeCloudBusy)return;
- egeCloudBusy=true;egeCloudMsg('Enregistrement du dossier…');
- try{
-  const {error}=await egeSupabaseClient.from('ege2027_dossiers').upsert({owner_id:egeCloudUser.id,student:typeof data.student==='string'?data.student.slice(0,140):'',payload:JSON.parse(JSON.stringify(data)),updated_at:new Date().toISOString()},{onConflict:'owner_id'});
-  if(error)throw error;
-  egeCloudMsg('Dossier sauvegardé sur Supabase (Mon Bac), dans les tables réservées à EGE.');
- }catch(e){egeCloudMsg('Sauvegarde en ligne impossible : '+(e.message||String(e))+'. Ton travail reste sauvegardé localement.')}finally{egeCloudBusy=false;}
-}
-async function egeCloudLoad(){
- if(!egeSupabaseClient||!egeCloudUser){egeCloudMsg('Connecte-toi avant de récupérer un dossier.');return}
- if(egeCloudBusy)return;
- egeCloudBusy=true;egeCloudMsg('Recherche du dossier enregistré…');
- try{
-  const {data:row,error}=await egeSupabaseClient.from('ege2027_dossiers').select('payload,updated_at').eq('owner_id',egeCloudUser.id).maybeSingle();
-  if(error)throw error;
-  if(!row){egeCloudMsg('Aucun dossier en ligne pour ce compte.');return}
-  if(!confirm('Remplacer le dossier présent sur cet appareil par celui enregistré en ligne ? Utilise d’abord « Sauvegarder » pour conserver une copie locale.'))return;
-  const source=row.payload;
-  if(!source||typeof source!=='object'||Array.isArray(source)||!['','binome','individuel'].includes(source.mode ?? ''))throw Error('Dossier sauvegardé non reconnu');
-  const fresh=empty();
-  for(const key of Object.keys(fresh))if(Object.prototype.hasOwnProperty.call(source,key))fresh[key]=source[key];
-  fresh.annexes=source.annexes&&typeof source.annexes==='object'?source.annexes:{};
-  fresh.sources=source.sources&&typeof source.sources==='object'?source.sources:{};
-  fresh.sourceChecks=source.sourceChecks&&typeof source.sourceChecks==='object'?source.sourceChecks:{};
-  fresh.researchEvidence=source.researchEvidence&&typeof source.researchEvidence==='object'?source.researchEvidence:{};
-  fresh.annexBackup=source.annexBackup&&typeof source.annexBackup==='object'?source.annexBackup:{};
-  fresh.candidates=Array.isArray(source.candidates)?source.candidates.slice(0,7):Array(7).fill('');
-  fresh.mode=['','individuel','binome'].includes(source.mode)?source.mode:'';
-  if(!fresh.mode)fresh.step='mode';
-  else if(!/^(welcome|mode|student|partner|className|school|teacher|theme|subtheme|problem|annex[1-4]|source[1-4]|company|candidates|finish)$/.test(fresh.step))fresh.step='welcome';
-  fresh.theme=Number.isInteger(source.theme)&&source.theme>=0&&source.theme<6?source.theme:null;
-  fresh.subtheme=fresh.theme!==null&&Number.isInteger(source.subtheme)&&source.subtheme>=0&&source.subtheme<CATALOG[fresh.theme].subthemes.length?source.subtheme:null;
-  data=fresh;save();render();
-  egeCloudMsg('Dossier récupéré. Dernière synchronisation : '+new Date(row.updated_at).toLocaleString('fr-FR'));
- }catch(e){egeCloudMsg('Récupération impossible : '+(e.message||String(e)))}finally{egeCloudBusy=false;}
-}
-async function egeCloudReadReviews(){
- if(!egeCloudUser||!egeSupabaseClient)return;
- const {data:dossier,error}=await egeSupabaseClient.from('ege2027_dossiers').select('id').eq('owner_id',egeCloudUser.id).maybeSingle();
- if(error||!dossier){egeCloudMsg(error?.message||'Aucun dossier soumis.');return}
- const {data:reviews,error:err}=await egeSupabaseClient.from('ege2027_reviews').select('decision,observation,created_at').eq('dossier_id',dossier.id).order('created_at',{ascending:false}).limit(5);
- if(err){egeCloudMsg(err.message);return}
- egeCloudMsg(!reviews?.length?'Pas encore de retour du professeur.':reviews.map(r=>(r.decision==='valide'?'Validé':'À corriger')+' ('+new Date(r.created_at).toLocaleDateString('fr-FR')+') : '+r.observation).join('\n\n'));
-}
+async function egeCloudSave(){return window.EGE2027Phase1?.saveDossier()}
+async function egeCloudLoad(){return window.EGE2027Phase1?.openDossiers()}
+async function egeCloudReadReviews(){return window.EGE2027Phase1?.showReviews()}
 async function egeCloudListAdmin(){
  if(!egeCloudStaff||!egeCloudUser||!egeSupabaseClient)return;
  const {data:rows,error}=await egeSupabaseClient.from('ege2027_dossiers').select('id,student,updated_at,payload').order('updated_at',{ascending:false}).limit(100);
@@ -1182,10 +1140,7 @@ function egeMobileNavInit(){
   egeCloudOpen(true);
   await egeCloudSave();
  });
- files.addEventListener('click',()=>{
-  egeCloudOpen(true);
-  egeCloudMsg(egeCloudUser?'Choisis « Récupérer mon dossier » ou « Voir les corrections ».':'Connecte-toi pour retrouver tes dossiers et corrections en ligne.');
- });
+ files.addEventListener('click',()=>window.EGE2027Phase1?.openDossiers());
  document.addEventListener('focusin',ev=>{
   if(ev.target?.matches?.('input:not([type=checkbox]):not([type=radio]),textarea,select,[contenteditable=true]'))document.body.classList.add('ege-keyboard-open');
  });
@@ -1218,7 +1173,7 @@ function egeCloudInit(){
  if(!window.supabase?.createClient){egeCloudMsg('Bibliothèque Supabase non chargée : vérifie ta connexion Internet. Le dossier reste utilisable hors ligne.');egeCloudRefresh();return}
  egeSupabaseClient=window.supabase.createClient(EGE_SUPABASE_URL,EGE_SUPABASE_PUBLIC_KEY);
  egeCloudLoadPublicSettings().catch(()=>{});
- egeSupabaseClient.auth.onAuthStateChange((_event,session)=>{egeCloudUser=session?.user||null;egeCloudRefresh();setTimeout(()=>egeCloudLoadStaff().catch(e=>egeCloudMsg(e.message)),0)});
+ egeSupabaseClient.auth.onAuthStateChange((_event,session)=>{egeCloudUser=session?.user||null;egeCloudRefresh();if(_event==='PASSWORD_RECOVERY')setTimeout(()=>window.EGE2027Phase1?.showRecovery(),0);setTimeout(()=>egeCloudLoadStaff().catch(e=>egeCloudMsg(e.message)),0)});
  egeSupabaseClient.auth.getUser().then(({data:res,error})=>{if(!error&&res?.user){egeCloudUser=res.user;egeCloudLoadStaff().catch(e=>egeCloudMsg(e.message))}egeCloudRefresh()}).catch(e=>egeCloudMsg('Connexion au projet Mon Bac impossible : '+e.message));
  egeCloudRefresh();
 }
@@ -1313,4 +1268,5 @@ if('serviceWorker' in navigator && location.protocol==='https:'){
 </section>
 </div>
 <script defer src="./word-import.js"></script>
+<script defer src="./phase1.js"></script>
 </body></html>
