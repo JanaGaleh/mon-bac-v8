@@ -118,6 +118,7 @@ function tab(name){
  activeTab=name;
  for(const x of ['overview','dossiers','settings','security'])visible(x,x===name);
  document.querySelectorAll('[data-tab]').forEach(b=>{const on=b.dataset.tab===name;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
+ document.querySelectorAll('[data-admin-bottom]').forEach(b=>{const on=b.dataset.adminBottom===name;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
  if(name==='dossiers')$('search').focus();
 }
 async function signOut(){await client.auth.signOut();loginView('Déconnexion effectuée.')}
@@ -155,6 +156,14 @@ async function start(){
  $('markRevision').addEventListener('click',()=>sendReview('a_corriger'));
  $('settingsForm').addEventListener('submit',saveSettings);
  document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.tab)));
+ document.querySelectorAll('[data-admin-bottom]').forEach(b=>b.addEventListener('click',()=>{tab(b.dataset.adminBottom);window.scrollTo({top:0,behavior:'smooth'})}));
+ document.addEventListener('focusin',ev=>{
+   if(ev.target?.matches?.('input:not([type=checkbox]):not([type=radio]),textarea,select,[contenteditable=true]'))document.body.classList.add('admin-keyboard-open');
+ });
+ document.addEventListener('focusout',()=>requestAnimationFrame(()=>{
+   if(!document.activeElement?.matches?.('input:not([type=checkbox]):not([type=radio]),textarea,select,[contenteditable=true]'))document.body.classList.remove('admin-keyboard-open');
+ }));
+ 
  client.auth.onAuthStateChange((event)=>{if(event==='SIGNED_OUT')loginView('Tu as été déconnecté.')});
  await ensureAdmin();
 }
