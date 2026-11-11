@@ -124,6 +124,17 @@ async function signOut(){await client.auth.signOut();loginView('Déconnexion eff
 async function start(){
  if(!window.supabase?.createClient){loginView('Bibliothèque Supabase indisponible. Vérifie ta connexion Internet.');return}
  client=window.supabase.createClient(URL_DB,PUBLIC_KEY);
+ const eye=$('togglePassword');
+ eye?.addEventListener('click',()=>{
+  const field=$('loginPassword');
+  if(!field)return;
+  const show=field.type==='password';
+  field.type=show?'text':'password';
+  eye.setAttribute('aria-pressed',String(show));
+  eye.setAttribute('aria-label',show?'Masquer le mot de passe':'Afficher le mot de passe');
+  eye.title=show?'Masquer le mot de passe':'Afficher le mot de passe';
+  field.focus();
+ });
  $('loginForm').addEventListener('submit',async event=>{
   event.preventDefault();$('loginBtn').disabled=true;
   message('Authentification en cours…');
