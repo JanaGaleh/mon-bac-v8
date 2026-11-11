@@ -149,6 +149,17 @@ async function start(){
   finally{$('loginBtn').disabled=false}
  });
  $('signOut').addEventListener('click',signOut);
+ $('adminPasswordReset')?.addEventListener('click',async()=>{
+  const email=pad($('loginEmail')?.value).toLowerCase();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){message('Entre ton adresse e-mail pour réinitialiser le mot de passe.','error');return;}
+  const btn=$('adminPasswordReset');btn.disabled=true;
+  try{
+   const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:'https://ege-gfm-2027.janakaleh.workers.dev/'});
+   if(error)throw error;
+   message('Un e-mail de réinitialisation a été demandé. Vérifie ta boîte et les spams. Le lien ouvre EGE 2027.','ok');
+  }catch(e){message('Réinitialisation impossible : '+e.message,'error');}
+  finally{btn.disabled=false;}
+ });
  $('reload').addEventListener('click',refreshAll);
  $('search').addEventListener('input',()=>showList($('dossierList'),filtered(),true));
  $('closeReview').addEventListener('click',()=>{selected=null;visible('reviewPanel',false)});
