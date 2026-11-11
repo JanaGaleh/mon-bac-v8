@@ -81,6 +81,68 @@
 @media(display-mode:standalone){.ege-install-button{display:none!important}}
 
 .ege-student-note{max-width:1380px;margin:18px auto 0;padding:13px 19px;background:#eaf3ff;border:1px solid #cfe2fa;border-radius:14px;color:#245487;font-size:13px;display:flex;gap:15px;align-items:start}.ege-student-note strong{white-space:nowrap}.ege-admin-link{background:#e8f6ef!important;border-color:#bfe2d0!important;color:#146b4c!important;text-decoration:none}@media(max-width:740px){.ege-student-note{margin:10px 14px 0;display:block}.ege-student-note strong{display:block;margin-bottom:2px}.ege-admin-link{font-size:12px;padding:8px 9px}}[hidden]{display:none!important}
+
+/* Correctif mobile : fenêtre utilisable avec clavier et barre Android. */
+.ege-cloud-overlay{
+  inset:0;
+  height:100vh;
+  height:100dvh;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  padding: max(12px,env(safe-area-inset-top)) 12px max(16px,env(safe-area-inset-bottom));
+}
+.ege-cloud-dialog{
+  max-height:calc(100vh - 32px);
+  max-height:calc(100dvh - max(12px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom)));
+  min-height:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scroll-padding-bottom:90px;
+}
+.ege-cloud-dialog > .ege-cloud-buttons:last-child{
+  position:sticky;
+  bottom:0;
+  z-index:2;
+  background:#fff;
+  padding:10px 0 max(4px,env(safe-area-inset-bottom));
+  margin-bottom:-3px;
+  border-top:1px solid #e2eaf6;
+}
+.ege-cloud-dialog > .ege-cloud-buttons:last-child .ege-cloud-close{
+  flex:1;
+  min-height:46px;
+}
+.ege-cloud-admin > .ege-cloud-buttons:last-child{
+  position:sticky;
+  bottom:64px;
+  background:#fff;
+  z-index:1;
+  padding:8px 0;
+}
+.ege-cloud-admin-shortcut{
+  border-top:1px solid #d6e2ee;
+  margin-top:18px;
+  padding-top:18px;
+}
+.ege-cloud-admin-shortcut h3{margin:0 0 7px;font-size:16px}
+.ege-cloud-admin-shortcut p{margin:0 0 10px;color:#60758c;font-size:13px}
+.ege-cloud-admin-shortcut a{display:flex;align-items:center;justify-content:center;min-height:48px;background:#245ed7;color:#fff;border-radius:12px;font-weight:750;text-decoration:none;padding:11px 16px}
+body:has(.ege-cloud-overlay:not([hidden])){overflow:hidden}
+@media(max-width:740px){
+  .ege-cloud-overlay{padding:8px 8px max(10px,env(safe-area-inset-bottom));}
+  .ege-cloud-dialog{
+    max-height:calc(100vh - 20px);
+    max-height:calc(100dvh - 12px - env(safe-area-inset-bottom));
+    border-radius:18px;
+    padding:17px 17px 12px;
+  }
+  .ege-cloud-dialog > .ege-cloud-buttons:last-child{padding-top:10px;}
+  .ege-cloud-admin > .ege-cloud-buttons:last-child{bottom:64px;}
+}
+
 </style>
 </head><body>
 <header class="topbar"><a class="brand" id="brand"><span class="brandlogo">EGE</span><span><b>Mon dossier EGE</b><small>Gestion Financière & Mercatique · 2027</small></span></a><div class="topright"><span class="pill">RÉFÉRENTIEL OFFICIEL · 51 SOUS-THÈMES</span><button type="button" class="textbutton ege-install-button" id="egeInstallButton" title="Installer EGE 2027 sur cet appareil"><span aria-hidden="true">↓ </span><span>Installer l’app</span></button><a class="textbutton ege-admin-link" id="egeAdminPageLink" href="./admin.html" hidden title="Accéder aux paramètres et à l’administration EGE">Administration</a><button type="button" class="textbutton" id="egeCloudOpen" title="Compte EGE et sauvegarde Supabase"><span id="egeCloudBadge">☁ En ligne</span></button><button type="button" class="textbutton" id="backupTop" title="Sauvegarder le projet en fichier JSON">↓ Sauvegarder</button></div></header>
@@ -810,6 +872,11 @@ render();
    <div class="ege-cloud-buttons"><button type="button" class="ege-cloud-primary" id="egeCloudSave">Sauvegarder en ligne</button><button type="button" id="egeCloudLoad">Récupérer mon dossier</button></div>
    <div class="ege-cloud-buttons"><button type="button" id="egeCloudReviews">Voir les corrections</button><button type="button" id="egeCloudSignOut">Se déconnecter</button></div>
   </div>
+  <div class="ege-cloud-admin-shortcut" id="egeCloudAdminShortcut" hidden>
+   <h3>Mon administration</h3>
+   <p>Les dossiers, corrections et paramètres sont regroupés sur une page dédiée, plus confortable sur téléphone.</p>
+   <a href="./admin.html">Ouvrir l’administration</a>
+  </div>
   <div class="ege-cloud-admin" id="egeCloudAdmin" hidden>
    <h3>Administration · Enseignant autorisé</h3>
    <p>Accès accordé uniquement aux utilisateurs présents dans la table sécurisée ege2027_staff.</p>
@@ -868,13 +935,14 @@ function egeCloudFriendlyError(err,signup=false){
 }
 
 const egeCloudOpen = value => {
- const d=egeCloud('egeCloudOverlay');if(d){d.hidden=!value;if(value)egeCloud('egeCloudEmail')?.focus()}
+ const d=egeCloud('egeCloudOverlay');if(d){d.hidden=!value;if(value){d.scrollTop=0;d.querySelector('.ege-cloud-dialog')?.scrollTo(0,0);if(!egeCloudUser)egeCloud('egeCloudEmail')?.focus()}}
 };
 function egeCloudRefresh(){
  const logged=!!egeCloudUser;
  egeCloud('egeCloudAuth')?.toggleAttribute('hidden',logged);
  egeCloud('egeCloudActions')?.toggleAttribute('hidden',!logged);
- egeCloud('egeCloudAdmin')?.toggleAttribute('hidden',!(logged&&egeCloudStaff));
+ egeCloud('egeCloudAdmin')?.toggleAttribute('hidden',!(logged&&egeCloudStaff?.role==='enseignant'));
+ egeCloud('egeCloudAdminShortcut')?.toggleAttribute('hidden',!(logged&&egeCloudStaff?.role==='admin'));
  const who=egeCloud('egeCloudWho');if(who)who.textContent=logged?'Compte : '+(egeCloudUser.email||'utilisateur connecté'):'Aucun compte connecté';
  const small=egeCloud('egeCloudBadge');if(small)small.textContent=logged?'☁ Connecté':'☁ En ligne';
  const adminLink=egeCloud('egeAdminPageLink');if(adminLink)adminLink.hidden=!(logged&&egeCloudStaff?.role==='admin');
