@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#123d66"><meta name="robots" content="noindex,nofollow">
+<title>Administration | EGE GFM 2027</title>
+<link rel="icon" href="./icon-ege-192.png" type="image/png">
+<link rel="stylesheet" href="./admin.css">
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+<script defer src="./admin.js"></script>
+</head>
+<body>
+<header class="topbar">
+ <a class="identity" href="./assistant-dossier-gfm-2027.html"><span class="mark">EGE</span><span><b>EGE GFM 2027</b><small>Administration sécurisée</small></span></a>
+ <div class="toplinks"><span id="connectionBadge">Accès restreint</span><a class="outline" href="./assistant-dossier-gfm-2027.html">Ouvrir l'application</a><button id="signOut" class="outline" hidden type="button">Se déconnecter</button></div>
+</header>
+<div id="status" class="status" role="status" aria-live="polite">Contrôle de l'autorisation…</div>
+<main>
+ <section id="gate" class="gate" hidden>
+  <div class="gateVisual"><div class="gateSymbol">EGE<span>27</span></div><h1>Votre espace<br>administrateur</h1><p>Suivez les dossiers des élèves, vérifiez leurs annexes et configurez l'application sans accès aux mots de passe.</p></div>
+  <form id="loginForm" class="loginCard">
+    <span class="eyebrow">ACCÈS PROTÉGÉ</span><h2>Connexion administrateur</h2>
+    <p>Connecte-toi avec le compte EGE autorisé dans Supabase MonBac.</p>
+    <label for="loginEmail">Adresse e-mail</label><input id="loginEmail" type="email" autocomplete="username" placeholder="Adresse du compte autorisé" required>
+    <label for="loginPassword">Mot de passe</label><input id="loginPassword" type="password" autocomplete="current-password" required>
+    <button type="submit" class="primary" id="loginBtn">Accéder à l'administration</button>
+    <p class="tiny">Cette page exige un compte authentifié possédant le rôle « admin ». Un simple compte élève ou enseignant ne donne pas cet accès.</p>
+  </form>
+ </section>
+ <section id="dashboard" class="dashboard" hidden>
+   <div class="intro"><div><span class="eyebrow">TABLEAU DE BORD</span><h1>Administration EGE</h1><p id="adminIdentity">Administration</p></div><div><button class="outline" type="button" id="reload">Actualiser</button></div></div>
+   <nav class="tabs" aria-label="Rubriques de l'administration">
+      <button type="button" data-tab="overview" class="active" aria-pressed="true">Vue d'ensemble</button>
+      <button type="button" data-tab="dossiers" aria-pressed="false">Dossiers élèves</button>
+      <button type="button" data-tab="settings" aria-pressed="false">Paramètres</button>
+      <button type="button" data-tab="security" aria-pressed="false">Accès et sécurité</button>
+   </nav>
+   <section id="overview" class="tabPanel">
+     <div class="stats"><article><small>Dossiers enregistrés</small><strong id="statDossiers">—</strong><span>Dans l'espace EGE 2027</span></article>
+       <article><small>Corrections enregistrées</small><strong id="statReviews">—</strong><span>Historique des avis</span></article>
+       <article><small>Année scolaire</small><strong id="statYear">—</strong><span>Paramètres de l'application</span></article></div>
+     <div class="panel"><h2>Activité récente</h2><p class="muted">Derniers dossiers modifiés, sans divulgation aux autres élèves.</p><div id="recentList" class="entries"></div></div>
+   </section>
+   <section id="dossiers" class="tabPanel" hidden>
+     <div class="panel"><div class="panelHead"><div><h2>Dossiers des élèves</h2><p class="muted">Affiche les 100 dossiers les plus récents. Les corrections sont conservées dans Supabase.</p></div><input type="search" id="search" placeholder="Rechercher un candidat" aria-label="Rechercher un candidat"></div>
+      <div id="dossierList" class="entries"></div></div>
+     <div id="reviewPanel" class="panel" hidden>
+      <div class="panelHead"><div><span class="eyebrow">RELECTURE</span><h2 id="selectedStudent">Dossier</h2></div><button type="button" class="outline" id="closeReview">Fermer</button></div>
+      <div id="studentMeta" class="meta"></div>
+      <div class="document" id="studentDocument"></div>
+      <h3>Historique des corrections</h3><div id="reviewHistory" class="entries"></div>
+      <label for="observation">Observation pédagogique</label><textarea id="observation" maxlength="5000" rows="4" placeholder="Indique précisément les éléments à corriger ou le motif de validation."></textarea>
+      <div class="actions"><button type="button" class="primary" id="markApproved">Valider le dossier</button><button type="button" class="secondary" id="markRevision">Demander une correction</button></div>
+     </div>
+   </section>
+   <section id="settings" class="tabPanel" hidden>
+    <div class="panel">
+      <h2>Paramètres de l'application</h2><p class="muted">Ces réglages sont enregistrés dans Supabase et affectent la présentation de l'application EGE accessible aux élèves.</p>
+      <form id="settingsForm" class="settingsForm">
+       <label for="appTitle">Nom affiché de l'application</label><input id="appTitle" maxlength="100" minlength="3" required>
+       <label for="academicYear">Année scolaire</label><input id="academicYear" maxlength="18" minlength="4" required placeholder="2026–2027">
+       <label for="studentMessage">Message affiché aux élèves</label><textarea id="studentMessage" maxlength="650" rows="4" placeholder="Exemple : Pensez à vérifier vos annexes avant de soumettre votre dossier."></textarea>
+       <div class="actions"><button type="submit" class="primary" id="saveSettings">Enregistrer les paramètres</button><span id="settingsSaved" class="tiny"></span></div>
+      </form>
+    </div>
+   </section>
+   <section id="security" class="tabPanel" hidden>
+     <div class="panel">
+       <h2>Accès et sécurité</h2><p>Les dossiers ne sont accessibles qu'à leur auteur et aux enseignants autorisés. Les modifications des paramètres sont réservées aux administrateurs EGE.</p>
+       <div class="securityList">
+         <div><strong>Statut du compte</strong><span id="secureRole">Administrateur</span></div>
+         <div><strong>Base de données</strong><span>Supabase MonBac — tables EGE 2027 séparées</span></div>
+         <div><strong>Protection</strong><span>Authentification Supabase et politiques RLS</span></div>
+         <div><strong>Comptes des élèves</strong><span>Leurs mots de passe ne sont jamais consultables dans cet espace</span></div>
+       </div>
+       <p class="muted">La nomination d'autres administrateurs se fait uniquement par une opération sécurisée dans Supabase ; aucun utilisateur ne peut se donner ce rôle depuis l'interface.</p>
+     </div>
+   </section>
+ </section>
+</main>
+<footer>Prof. Jana Galeh · Administration EGE GFM 2027 · Données protégées par Supabase</footer>
+</body>
+</html>
