@@ -839,6 +839,7 @@ async function egeCloudLogin(signup){
  if(egeCloudBusy||!egeSupabaseClient)return;
  const email=egeCloud('egeCloudEmail')?.value.trim()||'',password=egeCloud('egeCloudPassword')?.value||'';
  if(!email.includes('@')||password.length<6){egeCloudMsg('Indique un e-mail valide et un mot de passe de 6 caractères au minimum.');return}
+ if(signup&&password.length<12){egeCloudMsg('Pour créer un compte, choisis un mot de passe de 12 caractères minimum.');return}
  egeCloudBusy=true;egeCloudMsg('Vérification du compte…');
  try{
   const {data:result,error}=signup
@@ -871,14 +872,18 @@ async function egeCloudLoad(){
   if(!row){egeCloudMsg('Aucun dossier en ligne pour ce compte.');return}
   if(!confirm('Remplacer le dossier présent sur cet appareil par celui enregistré en ligne ? Utilise d’abord « Sauvegarder » pour conserver une copie locale.'))return;
   const source=row.payload;
-  if(!source||typeof source!=='object'||!['binome','individuel'].includes(source.mode))throw Error('Dossier sauvegardé non reconnu');
+  if(!source||typeof source!=='object'||Array.isArray(source)||!['','binome','individuel'].includes(source.mode ?? ''))throw Error('Dossier sauvegardé non reconnu');
   const fresh=empty();
   for(const key of Object.keys(fresh))if(Object.prototype.hasOwnProperty.call(source,key))fresh[key]=source[key];
   fresh.annexes=source.annexes&&typeof source.annexes==='object'?source.annexes:{};
   fresh.sources=source.sources&&typeof source.sources==='object'?source.sources:{};
   fresh.sourceChecks=source.sourceChecks&&typeof source.sourceChecks==='object'?source.sourceChecks:{};
   fresh.researchEvidence=source.researchEvidence&&typeof source.researchEvidence==='object'?source.researchEvidence:{};
+  fresh.annexBackup=source.annexBackup&&typeof source.annexBackup==='object'?source.annexBackup:{};
   fresh.candidates=Array.isArray(source.candidates)?source.candidates.slice(0,7):Array(7).fill('');
+  fresh.mode=['','individuel','binome'].includes(source.mode)?source.mode:'';
+  if(!fresh.mode)fresh.step='mode';
+  else if(!/^(welcome|mode|student|partner|className|school|teacher|theme|subtheme|problem|annex[1-4]|source[1-4]|company|candidates|finish)$/.test(fresh.step))fresh.step='welcome';
   fresh.theme=Number.isInteger(source.theme)&&source.theme>=0&&source.theme<6?source.theme:null;
   fresh.subtheme=fresh.theme!==null&&Number.isInteger(source.subtheme)&&source.subtheme>=0&&source.subtheme<CATALOG[fresh.theme].subthemes.length?source.subtheme:null;
   data=fresh;save();render();
