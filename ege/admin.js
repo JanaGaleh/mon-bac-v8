@@ -41,7 +41,7 @@ async function refreshAll(){
  $('settingsSaved').textContent='Dernière mise à jour : '+date(settings.data.updated_at);
  showList($('recentList'),rows.slice(0,6),false);
  showList($('dossierList'),filtered(),true);
- if(selected){selected=rows.find(r=>r.id===selected.id)||null;if(selected)renderSelected(reviews.data||[]);}
+ if(selected){selected=rows.find(r=>r.id===selected.id)||null;if(selected)renderSelected((reviews.data||[]).filter(r=>r.dossier_id===selected.id));}
  message('Données actualisées. Accès réservé aux administrateurs EGE.', 'ok');
 }
 function filtered(){const q=pad($('search').value).toLocaleLowerCase('fr');return q?rows.filter(x=>(x.student||x.payload?.student||'').toLocaleLowerCase('fr').includes(q)):rows}
