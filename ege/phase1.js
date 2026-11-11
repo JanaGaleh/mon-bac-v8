@@ -272,6 +272,7 @@ function init(){
   setTimeout(()=>{if(typeof egeCloudUser!=='undefined'&&egeCloudUser)showRecovery()},600);
  }
 }
-window.EGE2027Phase1={init,onAuthChanged,saveDossier,openDossiers,showReviews,showRecovery};
+function detachCurrent(){currentId=null;currentTitle='';store();notifyCurrent()}
+window.EGE2027Phase1={init,onAuthChanged,saveDossier,openDossiers,showReviews,showRecovery,detachCurrent};
 document.addEventListener('DOMContentLoaded',init);
 })();
