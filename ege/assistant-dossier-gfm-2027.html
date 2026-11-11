@@ -788,7 +788,8 @@ render();
    <label for="egeCloudEmail">Adresse e-mail</label><input id="egeCloudEmail" type="email" autocomplete="username" placeholder="eleve@exemple.com">
    <label for="egeCloudPassword">Mot de passe</label><input id="egeCloudPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Mot de passe du compte">
    <div class="ege-cloud-buttons"><button type="button" class="ege-cloud-primary" id="egeCloudSignIn">Se connecter</button><button type="button" id="egeCloudSignUp">Créer un compte</button></div>
-   <p>Attention : les identifiants appartiennent au projet d’authentification partagé avec Mon Bac. Une confirmation par e-mail peut être nécessaire.</p>
+   <div class="ege-cloud-buttons"><button type="button" id="egeCloudResend">Renvoyer l’e-mail de confirmation</button></div>
+   <p>Après inscription, vérifie ta boîte e-mail et les courriers indésirables. Confirme ton adresse avant de te connecter. N’appuie pas plusieurs fois sur « Créer un compte » : Supabase impose un délai entre deux envois.</p>
   </div>
   <div class="ege-cloud-actions" id="egeCloudActions" hidden>
    <div class="ege-cloud-buttons"><button type="button" class="ege-cloud-primary" id="egeCloudSave">Sauvegarder en ligne</button><button type="button" id="egeCloudLoad">Récupérer mon dossier</button></div>
@@ -816,6 +817,41 @@ let egeSupabaseClient = null, egeCloudUser = null, egeCloudStaff = null;
 let egeCloudRows = [], egeCloudSelected = null, egeCloudBusy = false;
 const egeCloud = id => document.getElementById(id);
 const egeCloudMsg = message => {const el=egeCloud('egeCloudMessage');if(el)el.textContent=message};
+
+// Lien de retour stable pour la confirmation d'e-mail.
+// Ajouter cette URL aux redirections autorisées dans Supabase Auth.
+const EGE_AUTH_REDIRECT='https://ege-gfm-2027.janakaleh.workers.dev/';
+let egeCloudNextEmailAt=0, egeCloudCooldownTimer=null;
+try{egeCloudNextEmailAt=Math.max(0,Number(sessionStorage.getItem('ege2027_email_next')||0))}catch(_){}
+function egeCloudUpdateCooldown(){
+ const remaining=Math.max(0,Math.ceil((egeCloudNextEmailAt-Date.now())/1000));
+ const create=egeCloud('egeCloudSignUp'),resend=egeCloud('egeCloudResend');
+ if(create){create.disabled=egeCloudBusy||remaining>0;create.textContent=remaining>0?'Patienter '+remaining+' s':'Créer un compte'}
+ if(resend){resend.disabled=egeCloudBusy||remaining>0;resend.textContent=remaining>0?'Renvoi possible dans '+remaining+' s':'Renvoyer l’e-mail de confirmation'}
+ if(egeCloudCooldownTimer)clearTimeout(egeCloudCooldownTimer);
+ egeCloudCooldownTimer=remaining>0?setTimeout(egeCloudUpdateCooldown,1000):null;
+}
+function egeCloudStartCooldown(seconds=65){
+ egeCloudNextEmailAt=Math.max(egeCloudNextEmailAt,Date.now()+Math.ceil(seconds)*1000);
+ try{sessionStorage.setItem('ege2027_email_next',String(egeCloudNextEmailAt))}catch(_){}
+ egeCloudUpdateCooldown();
+}
+function egeCloudFriendlyError(err,signup=false){
+ const message=String(err?.message||err||'Erreur inconnue');
+ const code=String(err?.code||'');
+ if(code==='email_not_confirmed'||/email not confirmed/i.test(message))return 'Ton compte existe, mais ton adresse e-mail n’est pas confirmée. Ouvre le message de Supabase (vérifie aussi les spams), puis connecte-toi. Tu peux demander un renvoi après le délai indiqué.';
+ if(code==='over_email_send_rate_limit'||err?.status===429||/rate limit|after \d+ second|too many requests/i.test(message)){
+   const seconds=Number(message.match(/after (\d+) seconds/i)?.[1]||65);
+   egeCloudStartCooldown(Math.max(65,seconds+2));
+   return 'Trop de demandes rapprochées. Attends le délai affiché avant un nouvel essai. Si ton premier envoi a réussi, regarde d’abord ta boîte e-mail.';
+ }
+ if(code==='user_already_exists'||/user already registered|already exists/i.test(message))return 'Un compte existe déjà avec cette adresse. Utilise « Se connecter » ou confirme le compte depuis ton e-mail.';
+ if(/invalid login credentials/i.test(message))return 'Adresse ou mot de passe incorrect. Si tu viens de t’inscrire, confirme d’abord ton e-mail.';
+ if(/weak.password|password.*(weak|short)|password should/i.test(message))return 'Choisis un mot de passe plus fort (au moins 12 caractères pour une inscription).';
+ if(/failed to fetch|networkerror|network request failed/i.test(message))return 'Connexion au service impossible. Vérifie Internet et réessaie.';
+ return (signup?'Inscription impossible : ':'Connexion impossible : ')+message;
+}
+
 const egeCloudOpen = value => {
  const d=egeCloud('egeCloudOverlay');if(d){d.hidden=!value;if(value)egeCloud('egeCloudEmail')?.focus()}
 };
@@ -837,20 +873,41 @@ async function egeCloudLoadStaff(){
 }
 async function egeCloudLogin(signup){
  if(egeCloudBusy||!egeSupabaseClient)return;
- const email=egeCloud('egeCloudEmail')?.value.trim()||'',password=egeCloud('egeCloudPassword')?.value||'';
- if(!email.includes('@')||password.length<6){egeCloudMsg('Indique un e-mail valide et un mot de passe de 6 caractères au minimum.');return}
+ if(signup&&egeCloudNextEmailAt>Date.now()){egeCloudUpdateCooldown();egeCloudMsg('Un e-mail a peut-être déjà été envoyé. Vérifie ta boîte de réception ou attends le délai affiché.');return}
+ const email=egeCloud('egeCloudEmail')?.value.trim().toLowerCase()||'',password=egeCloud('egeCloudPassword')?.value||'';
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||password.length<6){egeCloudMsg('Indique un e-mail valide et un mot de passe de 6 caractères minimum.');return}
  if(signup&&password.length<12){egeCloudMsg('Pour créer un compte, choisis un mot de passe de 12 caractères minimum.');return}
- egeCloudBusy=true;egeCloudMsg('Vérification du compte…');
+ egeCloudBusy=true;egeCloudUpdateCooldown();egeCloudMsg(signup?'Création du compte…':'Connexion en cours…');
  try{
   const {data:result,error}=signup
-   ?await egeSupabaseClient.auth.signUp({email,password})
-   :await egeSupabaseClient.auth.signInWithPassword({email,password});
+  ?await egeSupabaseClient.auth.signUp({email,password,options:{emailRedirectTo:EGE_AUTH_REDIRECT}})
+  :await egeSupabaseClient.auth.signInWithPassword({email,password});
   if(error)throw error;
-  if(signup&&!result.session){egeCloudMsg('Compte créé. Consulte ton e-mail pour confirmer ton inscription avant de te connecter.');return}
+  if(signup)egeCloudStartCooldown(70);
+  if(signup&&!result.session){
+   egeCloud('egeCloudPassword').value='';
+   egeCloudMsg('Inscription enregistrée. Un e-mail de confirmation a été demandé : vérifie ta boîte de réception et les spams. Clique sur le lien reçu, puis utilise « Se connecter ». Inutile de recréer le compte.');
+   return;
+  }
   egeCloudUser=result.user||null;
-  egeCloudMsg('Connexion réussie. Utilise « Sauvegarder en ligne » pour copier ton dossier.');
+  egeCloudMsg('Connexion réussie. Tu peux sauvegarder ton dossier en ligne.');
   await egeCloudLoadStaff();
- }catch(e){egeCloudMsg('Connexion impossible : '+(e.message||String(e)))}finally{egeCloudBusy=false;}
+ }catch(e){egeCloudMsg(egeCloudFriendlyError(e,signup))}
+ finally{egeCloudBusy=false;egeCloudUpdateCooldown();}
+}
+async function egeCloudResend(){
+ if(egeCloudBusy||!egeSupabaseClient)return;
+ if(egeCloudNextEmailAt>Date.now()){egeCloudUpdateCooldown();egeCloudMsg('Attends la fin du délai avant de demander un nouvel e-mail.');return}
+ const email=egeCloud('egeCloudEmail')?.value.trim().toLowerCase()||'';
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){egeCloudMsg('Indique d’abord l’adresse e-mail de ton compte.');return}
+ egeCloudBusy=true;egeCloudUpdateCooldown();egeCloudMsg('Demande de renvoi…');
+ try{
+  const {error}=await egeSupabaseClient.auth.resend({type:'signup',email,options:{emailRedirectTo:EGE_AUTH_REDIRECT}});
+  if(error)throw error;
+  egeCloudStartCooldown(70);
+  egeCloudMsg('Si ce compte attend une confirmation, un nouvel e-mail a été demandé. Vérifie la boîte de réception et les spams.');
+ }catch(e){egeCloudMsg(egeCloudFriendlyError(e,true))}
+ finally{egeCloudBusy=false;egeCloudUpdateCooldown();}
 }
 async function egeCloudSave(){
  if(!egeSupabaseClient||!egeCloudUser){egeCloudMsg('Connecte-toi avant de sauvegarder.');return}
@@ -935,6 +992,8 @@ function egeCloudInit(){
  egeCloud('egeCloudOverlay')?.addEventListener('click',ev=>{if(ev.target===egeCloud('egeCloudOverlay'))egeCloudOpen(false)});
  egeCloud('egeCloudSignIn')?.addEventListener('click',()=>egeCloudLogin(false));
  egeCloud('egeCloudSignUp')?.addEventListener('click',()=>egeCloudLogin(true));
+ egeCloud('egeCloudResend')?.addEventListener('click',egeCloudResend);
+ egeCloudUpdateCooldown();
  egeCloud('egeCloudSave')?.addEventListener('click',egeCloudSave);
  egeCloud('egeCloudLoad')?.addEventListener('click',egeCloudLoad);
  egeCloud('egeCloudReviews')?.addEventListener('click',egeCloudReadReviews);
