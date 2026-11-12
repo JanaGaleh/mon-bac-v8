@@ -56,7 +56,7 @@ enseignant:[["teacher-home","Accueil","home"],["teacher-groups","Groupes","users
 admin:[["admin-home","Accueil","home"],["admin-users","Utilisateurs","users"],["admin-monitor","Contrôle","shield"],["profile","Profil","user"]]
 };
 const homes={eleve:"student-home",enseignant:"teacher-home",admin:"admin-home"};
-const st={screen:"welcome",role:"eleve",desired:"eleve",user:null,db:null,staff:null,teacher:null,docs:[],groups:[],members:[],shares:[],reviews:[],requests:[],audit:[],settings:null,selectedDocId:null,selectedGroupId:null,selectedStudentId:null,annex:1,reviewAnnex:1,wizardStep:1,adminTab:"dossiers",filter:"",mode:"login",busy:false,saving:false,saveTimer:null,saveBadge:"Non enregistré",warning:"",notice:"",lastError:"",draft:null,teacherOpen:false,adminOpen:false,expandedGroup:false,loaded:false,pendingPasswordReset:false};
+const st={screen:"welcome",role:"eleve",desired:"eleve",user:null,db:null,staff:null,teacher:null,docs:[],groups:[],members:[],shares:[],reviews:[],requests:[],audit:[],ads:[],adError:'',settings:null,selectedDocId:null,selectedGroupId:null,selectedStudentId:null,annex:1,reviewAnnex:1,wizardStep:1,adminTab:"dossiers",filter:"",mode:"login",busy:false,saving:false,saveTimer:null,saveBadge:"Non enregistré",warning:"",notice:"",lastError:"",draft:null,teacherOpen:false,adminOpen:false,expandedGroup:false,loaded:false,pendingPasswordReset:false};
 const $=id=>document.getElementById(id);
 const cleaned=v=>String(v??"").trim();
 const shortDate=v=>v?new Date(v).toLocaleDateString("fr-FR"):"—";
@@ -152,7 +152,7 @@ async function loadAll(){
    const ids=st.docs.map(d=>d.id);
    st.reviews=ids.length?await readRows("ege2027_reviews","id,dossier_id,decision,observation,annex_number,created_at",q=>q.in("dossier_id",ids).order("created_at",{ascending:false}).limit(500)):[];
   } else if(role==="enseignant"){
-   if(st.teacher?.status!=="approved"){st.docs=[];st.groups=[];st.members=[];st.shares=[];st.reviews=[];st.loaded=true;render();return;}
+   if(st.teacher?.status!=="approved"){st.docs=[];st.groups=[];st.members=[];st.shares=[];st.reviews=[];await loadAds();st.loaded=true;render();return;}
    st.groups=await readRows("ege2027_teacher_groups","id,name,school,join_code,active,teacher_id,created_at",q=>q.eq("teacher_id",st.user.id).order("created_at",{ascending:false}));
    const gids=st.groups.map(x=>x.id);
    st.members=gids.length?await readRows("ege2027_group_members","group_id,student_id,student_name,joined_at",q=>q.in("group_id",gids)):[];
@@ -177,6 +177,7 @@ async function loadAll(){
   }
   if(st.selectedDocId&&st.role==="eleve"&&!st.draft)selectDoc(st.selectedDocId);
   if(!st.groups.some(g=>g.id===st.selectedGroupId))st.selectedGroupId=st.groups[0]?.id||null;
+  await loadAds();
   st.loaded=true;render();
  }catch(e){st.loaded=true;fail(e);render()}
 }
@@ -184,6 +185,7 @@ async function initApp(){
  const factory=window.supabase?.createClient;
  if(!factory){st.lastError="Impossible de charger le service de connexion. Vérifiez Internet.";render();return}
  st.db=factory(DB_URL,DB_PUBLIC);
+ await loadAds();
  st.db.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){st.pendingPasswordReset=true;st.screen="auth";render()}});
  try{
   const {data,error}=await st.db.auth.getUser();
@@ -469,6 +471,12 @@ async function dispatchClick(e){
    if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");
    return;
   }
+  if(a==="ad-info"){egeShowAdInfo(id);return}
+  if(a==="ad-close"){const dialog=document.getElementById("egeAdDialog");if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");return}
+  if(["ad-approve","ad-save-positions","ad-pause","ad-reject"].includes(a)){
+   await egeAdminUpdateAd(id,a==="ad-approve"?"approve":a==="ad-pause"?"pause":a==="ad-reject"?"reject":"save");
+   return;
+  }
   if(a==="goto"){go(el.dataset.to);return}
   if(a==="role"){choiceRole(el.dataset.role);return}
   if(a==="mode"){st.mode=mode;if(st.screen==="profile"){st.screen="auth";st.desired=st.role}render();return}
@@ -513,7 +521,7 @@ async function dispatchClick(e){
  }catch(error){fail(error);render()}
 }
 async function dispatchSubmit(e){
- if(!["authForm","groupJoinForm","groupShareForm","teacherNewGroupForm","adminNewGroupForm"].includes(e.target.id))return;
+ if(!["authForm","groupJoinForm","groupShareForm","teacherNewGroupForm","adminNewGroupForm","egeAdTeacherForm","egeAdAdminForm"].includes(e.target.id))return;
  e.preventDefault();
  if(st.busy)return;st.busy=true;
  try{
@@ -522,6 +530,8 @@ async function dispatchSubmit(e){
   else if(e.target.id==="groupShareForm")await associateDoc();
   else if(e.target.id==="teacherNewGroupForm")await createGroup();
   else if(e.target.id==="adminNewGroupForm")await adminGroupCreate();
+  else if(e.target.id==="egeAdTeacherForm")await egeSubmitTeacherAd();
+  else if(e.target.id==="egeAdAdminForm")await egeAdminCreateAd();
  }catch(error){fail(error)}
  finally{st.busy=false;render()}
 }
