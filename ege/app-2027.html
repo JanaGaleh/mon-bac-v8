@@ -286,6 +286,60 @@ html,body{min-height:100%;background:#fff}
 .ege-directory-card h3{font-size:15px}
 .ege-directory-top h1{font-size:24px}
 }
+
+/* EGE 2027 : bannières Premium compactes à rotation douce, sans animation intrusive. */
+.ege-ad-banner{position:relative;align-content:center}
+.ege-ad-banner .ege-ad-copy strong{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ line-clamp:2;overflow:hidden;
+}
+.ege-ad-banner .ege-ad-copy p{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ line-clamp:2;overflow:hidden;
+}
+.ege-ad-carousel-nav{display:flex;align-items:center;justify-content:flex-start;gap:6px;min-height:27px;margin-top:6px}
+.ege-ad-arrow{width:27px;height:27px;display:grid;place-items:center;padding:0;border:1px solid #f1d6dc;border-radius:50%;color:#a40824;background:#fff;font-size:20px;line-height:1;cursor:pointer}
+.ege-ad-arrow:hover{background:#ffedf0}
+.ege-ad-arrow:focus-visible{outline:3px solid #e89eaa;outline-offset:2px}
+.ege-ad-dots{display:flex;align-items:center;gap:5px;padding:0 2px;flex-wrap:wrap}
+.ege-ad-dot{width:9px;height:9px;padding:0;flex-shrink:0;border:0;border-radius:50%;background:#e6bdc4;cursor:pointer}
+.ege-ad-dot.active{width:19px;border-radius:20px;background:#bb1030}
+.ege-ad-dot:focus-visible{outline:3px solid #e89eaa;outline-offset:2px}
+.ege-ad-practical{margin:16px 0;padding:14px 15px 17px;background:#fafbfc;border:0;border-radius:14px}
+.ege-ad-practical legend{font-weight:800;color:#263748;font-size:14px;padding:0 8px}
+.ege-ad-fields-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ege-ad-practical .field{margin-bottom:12px}
+.ege-ad-practical .small{font-size:11px;margin:3px 0 0}
+.ege-directory-facts{margin:9px 0 11px;display:grid;gap:5px}
+.ege-directory-facts div{display:flex;gap:5px;font-size:12px;line-height:1.4;align-items:flex-start;min-width:0}
+.ege-directory-facts dt{font-weight:800;color:#263748;flex-shrink:0}
+.ege-directory-facts dd{margin:0;min-width:0;color:#586577;overflow-wrap:anywhere}
+.ege-directory-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.ege-wa-button{display:inline-flex;align-items:center;gap:6px;background:#119c55;color:#fff;border-radius:10px;padding:10px 13px;font:800 12px system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+.ege-wa-button:hover{background:#087b43}
+.ege-wa-button:focus-visible{outline:3px solid #5add98;outline-offset:2px}
+.ege-wa-button svg{width:16px;height:16px;stroke:#fff;fill:none}
+@media(max-width:700px){
+ .ege-ad-fields-row{grid-template-columns:1fr;gap:0}
+ .ege-directory-facts div{font-size:11px}
+ .ege-directory-actions{gap:8px}
+ .ege-wa-button{padding:8px 10px}
+ .ege-ad-carousel-nav{gap:5px;margin-top:5px}
+ .ege-ad-arrow{width:26px;height:26px}
+ .ege-ad-dot{width:8px;height:8px}
+ .ege-ad-dot.active{width:16px}
+}
+@media(max-width:380px){
+ .ege-ad-banner .ege-ad-copy strong{font-size:13px}
+ .ege-ad-banner .ege-ad-copy p{font-size:10.5px}
+ .ege-ad-carousel-nav{min-height:23px}
+ .ege-ad-arrow{width:23px;height:23px;font-size:18px}
+ .ege-ad-practical{padding:12px 10px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ege-ad-dot,.ege-ad-arrow{transition:none}
+}
+
 </style>
 <script defer src="./vendor/supabase-2.57.4.js"></script>
 <script defer src="./app-2027.js"></script>
