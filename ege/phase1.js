@@ -103,7 +103,7 @@ async function saveDossier(options={}){
   const json=JSON.parse(JSON.stringify(data));
   const student=str(data.student||'').slice(0,140);
   const title=(str(currentTitle)||('Dossier de '+(student||'nouveau candidat'))).slice(0,100);
-  let row=null,error=null;
+  let row=null,error=null;let succeeded=false;
   const payload={student,title,payload:json,updated_at:new Date().toISOString()};
   if(currentId){
    if(!currentRevision){
@@ -124,11 +124,11 @@ async function saveDossier(options={}){
      .insert({...payload,owner_id:egeCloudUser.id}).select('id,title,updated_at').single());
   }
   if(error)throw error;
-  currentId=row.id;currentTitle=row.title;currentRevision=row.updated_at;autoCreate=true;lastSyncedJson=JSON.stringify(json);conflict=false;store();notifyCurrent();setSyncBadge('Enregistré en ligne');
+  currentId=row.id;currentTitle=row.title;currentRevision=row.updated_at;autoCreate=true;lastSyncedJson=JSON.stringify(json);conflict=false;succeeded=true;store();notifyCurrent();setSyncBadge('Enregistré en ligne');
   status('Dossier sauvegardé. Une version précédente pourra être restaurée depuis « Versions ».');
   return true;
  }catch(e){setSyncBadge(conflict?'Conflit à résoudre':navigator.onLine?'Échec de synchronisation':'Hors connexion');status('Sauvegarde impossible : '+(e?.message||String(e))+'. Ton travail reste sur cet appareil.',true);return false}
- finally{busy=false;if(!conflict&&cloud()&&currentId&&JSON.stringify(data)!==lastSyncedJson)scheduleSync();}
+ finally{busy=false;if(succeeded&&!conflict&&cloud()&&currentId&&JSON.stringify(data)!==lastSyncedJson)scheduleSync();}
 }
 function setSyncBadge(txt){const e=id('egeCloudBadge');if(e)e.textContent=txt}
 function scheduleSync(){
