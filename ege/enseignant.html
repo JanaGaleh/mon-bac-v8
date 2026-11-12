@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#163e68"><meta name="robots" content="noindex,nofollow">
+<title>Espace enseignant | EGE GFM 2027</title><link rel="icon" href="./icon-ege-192.png">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#163450;background:#f3f7fc;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom)}a{color:#1c5bb8}button,input,textarea{font:inherit}button{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #90c4ff;outline-offset:2px}
+header{background:#fff;border-bottom:1px solid #e0e9f5;box-shadow:0 2px 15px #12345b0d}
+.head{max-width:1060px;margin:auto;padding:14px 18px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.brand{text-decoration:none;color:#173b62;display:flex;align-items:center;gap:11px;font-weight:800}.logo{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#1761c1;color:white}.brand small{display:block;font-weight:500;font-size:12px;color:#7a8a9d}
+main{max-width:1060px;margin:22px auto;padding:0 16px 45px}.title{font-size:clamp(24px,4vw,34px);letter-spacing:-.7px;margin:2px 0 7px}
+.eyebrow{color:#2763b8;font-size:11px;font-weight:850;letter-spacing:1.2px}.lead,.muted{color:#6c8095}.lead{margin:0 0 20px}.card{background:white;border:1px solid #dfe9f4;border-radius:18px;padding:22px;box-shadow:0 6px 20px #12345b09;margin:14px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}.grid>.card{margin:0}
+label{display:block;font-size:13px;font-weight:750;margin:14px 0 5px}
+input,textarea{width:100%;border:1px solid #cbdbea;border-radius:11px;background:white;color:#18344f;padding:12px;min-height:44px}textarea{resize:vertical}
+input[readonly]{background:#f4f8fd;font-weight:800;letter-spacing:1px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{min-width:0}
+.btn{border:1px solid #c7d8ee;background:#f0f6fc;color:#235987;border-radius:11px;padding:11px 16px;min-height:44px;font-weight:750}
+.btn.primary{background:#2064c6;color:white;border-color:#2064c6}.btn.danger{background:#fff5f4;color:#a44747;border-color:#f1c9c5}
+.btn.sm{font-size:12px;padding:8px 11px;min-height:36px}
+#flash{margin:0 auto;max-width:1060px;padding:10px 17px;color:#1d5d95;white-space:pre-wrap;min-height:20px}
+#flash.error{color:#ac3d33}
+.tag{display:inline-block;background:#eaf3ff;color:#2460af;border-radius:9px;padding:5px 9px;font-size:12px;font-weight:800}
+.pupil{border-top:1px solid #e6edf6;padding:13px 0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pupil b{display:block}.pupil small{color:#76899c;display:block;margin-top:3px}.pupil button{white-space:nowrap}
+.groupHead{display:flex;gap:10px;justify-content:space-between;align-items:start;flex-wrap:wrap}.groupHead h2{margin:2px 0 5px;font-size:19px}
+.codebar{background:#eff5fd;border:1px dashed #b3cce7;border-radius:12px;padding:12px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}.codebar strong{letter-spacing:2px;font-size:19px}
+hr{border:0;border-top:1px solid #e5ecf5;margin:16px 0}
+[hidden]{display:none!important}
+dialog{width:min(94vw,750px);border:1px solid #d8e5f3;border-radius:18px;padding:23px;box-shadow:0 20px 70px #10294655;max-height:90dvh;overflow:auto}
+dialog::backdrop{background:#102b48ac}#documentBody{white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;background:#f7faff;padding:14px;border-radius:12px;font-size:13px}
+.history{max-height:140px;overflow:auto;color:#435d75;font-size:12px}.history p{margin:8px 0;padding:8px;background:#f4f8fd;border-radius:9px}
+@media(max-width:640px){main{margin-top:15px}.card{padding:16px;border-radius:14px}.pupil{align-items:start;flex-direction:column}.groupHead{display:block}}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+<script defer src="./enseignant.js"></script></head>
+<body><header><div class="head"><a class="brand" href="./assistant-dossier-gfm-2027.html"><span class="logo">EGE</span><span>EGE GFM 2027<small>Encadrement pédagogique</small></span></a><button type="button" class="btn sm" id="signOut" hidden>Déconnexion</button></div></header>
+<div id="flash" role="status" aria-live="polite"></div><main><div class="eyebrow">ESPACE ENSEIGNANT</div><h1 class="title">Encadrer mes élèves</h1><p class="lead">Un compte, plusieurs groupes, les dossiers de vos élèves et vos observations.</p>
+<section id="authSection" class="card" hidden><h2>Connexion ou inscription</h2><p class="muted">Utilisez une adresse e-mail personnelle. L'accès enseignant doit ensuite être validé par l'administrateur.</p>
+<label for="email">Adresse e-mail</label><input type="email" id="email" autocomplete="username" required placeholder="enseignant@exemple.com">
+<label for="password">Mot de passe</label><input type="password" id="password" autocomplete="current-password" minlength="12" required placeholder="12 caractères minimum">
+<div class="row" style="margin-top:15px"><button id="login" class="btn primary" type="button">Se connecter</button><button id="signup" class="btn" type="button">Créer mon compte</button><button id="recover" class="btn sm" type="button">Mot de passe oublié ?</button></div>
+<p class="muted" style="font-size:12px">Après l'inscription, confirmez votre e-mail. Puis revenez sur cette page pour demander l'accès enseignant.</p></section>
+<section id="requestSection" class="card" hidden><h2>Demander l'accès enseignant</h2><p class="muted">Votre compte est connecté. Renseignez votre identité professionnelle. L'administrateur examinera la demande.</p>
+<form id="requestForm"><label for="fullName">Nom et prénom</label><input id="fullName" required minlength="3" maxlength="120" autocomplete="name">
+<label for="school">Établissement</label><input id="school" required minlength="2" maxlength="160" placeholder="Ex. Lycée d'État de Djibouti">
+<button class="btn primary" type="submit" style="margin-top:15px">Envoyer ma demande</button></form></section>
+<section id="pendingSection" class="card" hidden><h2 id="pendingTitle">Demande en attente</h2><p id="pendingText" class="muted"></p><button class="btn" id="checkStatus" type="button">Vérifier mon statut</button></section>
+<section id="teacherSection" hidden><div class="card"><div class="groupHead"><div><span class="tag" id="teacherIdentity">Enseignant approuvé</span><h2>Mes groupes</h2><p class="muted">Créez une classe, communiquez le code aux élèves et consultez leurs dossiers après leur inscription.</p></div><button class="btn" id="reload" type="button">Actualiser</button></div>
+<form id="groupForm"><div class="grid"><div><label for="groupName">Nom du groupe / classe</label><input id="groupName" maxlength="90" required placeholder="Ex. TGFM6"></div><div><label for="groupSchool">Établissement</label><input id="groupSchool" maxlength="160" placeholder="Ex. LED"></div></div><button type="submit" class="btn primary" style="margin-top:14px">+ Créer un groupe</button></form></div>
+<div id="groups" class="grid" aria-live="polite"></div></section>
+</main>
+<dialog id="dossierDialog" aria-labelledby="dossierTitle"><div class="groupHead"><h2 id="dossierTitle">Dossier EGE</h2><button class="btn sm" id="closeDialog" type="button">Fermer</button></div><div id="documentBody"></div><h3>Historique des corrections</h3><div id="reviewsHistory" class="history"></div>
+<form id="reviewForm"><label for="reviewText">Votre observation (obligatoire pour demander une correction)</label><textarea id="reviewText" rows="3" maxlength="5000"></textarea>
+<div class="row" style="margin-top:12px"><button type="button" class="btn primary" id="approve">Valider le dossier</button><button type="button" class="btn" id="revise">Demander une correction</button></div></form>
+</dialog></body></html>
