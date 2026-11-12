@@ -20,8 +20,8 @@ async function loadAds(){
   if(!st.db)return;
   try{
     const {data,error}=await st.db.from("ege2027_ads")
-      .select("id,submitted_by,title,description,details,destination_url,placements,status,priority,start_at,end_at,created_at,updated_at")
-      .order("priority",{ascending:false}).order("created_at",{ascending:false}).limit(150);
+      .select("id,submitted_by,title,description,details,destination_url,placements,status,is_premium,priority,start_at,end_at,created_at,updated_at")
+      .order("is_premium",{ascending:false}).order("priority",{ascending:false}).order("created_at",{ascending:false}).limit(150);
     if(error)throw error;
     st.ads=data||[];
     st.adError="";
@@ -35,16 +35,51 @@ function adBanner(place){
   if(!active&&place!=="home"&&place!=="auth")return "";
   const title=active?.title||"Soutien scolaire";
   const desc=active?.description||"Préparez efficacement votre examen avec un accompagnement adapté.";
-  const url=egeAdSafeURL(active?.destination_url);
-  const action=url
-    ?'<a class="ege-ad-link" target="_blank" rel="noopener noreferrer" href="'+esc(url)+'">Plus d’informations <span aria-hidden="true">›</span></a>'
-    :'<button class="ege-ad-link" type="button" data-act="ad-info" data-id="'+esc(active?.id||"")+'">Plus d’informations <span aria-hidden="true">›</span></button>';
+  const action='<a class="ege-ad-link" href="./annonces.html">Plus d’informations <span aria-hidden="true">›</span></a>';
   return '<aside class="ege-ad-banner ege-ad-banner--'+esc(place)+'" aria-label="Annonce pédagogique">'
    +'<div class="ege-ad-art"><img src="./ad-learning.svg" alt="" loading="lazy"></div>'
    +'<div class="ege-ad-copy"><span class="ege-ad-label">'+(active?"Annonce pédagogique":"Espace d’annonce · Exemple")+'</span>'
    +'<strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p></div>'
    +'<div class="ege-ad-action">'+action+'</div></aside>';
 }
+
+function egeAdRank(a,b){
+ const premium=Number(Boolean(b.is_premium))-Number(Boolean(a.is_premium));
+ if(premium)return premium;
+ const rank=Number(b.priority||0)-Number(a.priority||0);
+ if(rank)return rank;
+ return new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime();
+}
+function egeTeacherAdCard(ad){
+ const url=egeAdSafeURL(ad.destination_url);
+ const cta=url
+  ?'<a class="ege-directory-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Contacter / Plus d’informations '+I("arrow")+'</a>'
+  :'<button type="button" class="ege-directory-link" data-act="ad-info" data-id="'+esc(ad.id)+'">Voir les détails '+I("arrow")+'</button>';
+ return '<article class="ege-directory-card">'
+  +'<div class="ege-directory-icon"><img src="./ad-learning.svg" width="94" height="80" alt="" loading="lazy"></div>'
+  +'<div class="ege-directory-content"><div class="ege-directory-overline">'
+  +(ad.is_premium?'<span class="ege-premium-pill">Premium</span>':'<span>Annonce pédagogique</span>')
+  +'</div><h3>'+esc(ad.title)+'</h3><p>'+esc(ad.description)+'</p>'
+  +'<div class="ege-directory-actions">'+cta+'</div></div></article>';
+}
+function egeAdsDirectory(){
+ const ads=(st.ads||[]).filter(egeAdLive).sort(egeAdRank);
+ const premium=ads.filter(a=>a.is_premium),standard=ads.filter(a=>!a.is_premium);
+ const block=(name,caption,rows)=>rows.length?
+  '<section class="ege-directory-section"><div class="ege-directory-section-head"><h2>'+name+'</h2><span>'+caption+'</span></div>'
+  +'<div class="ege-directory-grid">'+rows.map(egeTeacherAdCard).join("")+'</div></section>':'';
+ const empty=st.adError
+  ?'<div class="ege-directory-empty" role="status"><h2>Annonces momentanément indisponibles</h2><p>La liste n’a pas pu être chargée. Réessayez en actualisant la page.</p><button type="button" data-act="refresh-ads" class="btn primary">Actualiser</button></div>'
+  :'<div class="ege-directory-empty"><div class="ege-directory-empty-icon">'+I("cap")+'</div><h2>Aucune annonce publiée pour le moment</h2>'
+   +'<p>Les annonces des enseignants apparaîtront ici après validation de l’administration.</p></div>';
+ return '<div class="ege-directory-page"><div class="ege-directory-top"><a class="ege-directory-back" href="./">'+I("left")+' Retour à l’accueil</a>'
+  +'<span class="ege-directory-top-label">Soutien scolaire et accompagnement</span>'
+  +'<h1>Annonces des enseignants</h1>'
+  +'<p>Retrouvez les annonces pédagogiques approuvées. Les annonces Premium apparaissent en premier.</p></div>'
+  +(ads.length?block('Annonces Premium','En tête des résultats',premium)+block('Autres annonces','Toutes les annonces approuvées',standard):empty)
+  +'</div>';
+}
+
 function egeAdDialogHTML(){
   return '<dialog id="egeAdDialog" class="ege-ad-info-dialog" aria-labelledby="egeAdDialogTitle">'
     +'<div class="ege-ad-dialog-head"><h2 id="egeAdDialogTitle">Annonce pédagogique</h2>'
@@ -92,10 +127,12 @@ function egeAdminAdPanel(){
   +'<label class="field"><span>Informations complémentaires</span><textarea class="textarea" maxlength="1200" id="egeAdAdminDetails"></textarea></label>'
   +egeAdField("egeAdAdminURL","Lien externe HTTPS (facultatif)","https://...")
   +'<p class="small" style="font-weight:700">Afficher à ces emplacements</p>'+egeAdPlacesChecks("new",["home"])
+  +'<label class="ege-ad-premium-choice"><input id="egeAdAdminPremium" type="checkbox"> Mettre en Premium (affiché en premier)</label>'
   +'<button class="btn primary" type="submit">Créer et publier</button></form></details>'
   +(records.length?records.map(a=>{
     const tag=a.status==="approved"?"Publiée":a.status==="pending"?"À valider":a.status==="paused"?"Suspendue":"Refusée";
     return '<div class="ege-ad-admin-entry"><div class="card-head"><div><strong>'+esc(a.title)+'</strong><p class="small muted">'+esc(a.description)+'</p></div>'+badge(tag,a.status==="approved"?"green":"orange")+'</div>'
+     +'<label class="ege-ad-premium-choice"><input type="checkbox" data-ad-premium="'+esc(a.id)+'" '+(a.is_premium?'checked':'')+'> Afficher en Premium (avant les annonces classiques)</label>'
      +'<p class="small" style="font-weight:700;margin:13px 0 7px">Emplacements de diffusion</p>'
      +egeAdPlacesChecks(a.id,Array.isArray(a.placements)?a.placements:["home"])
      +'<div class="ege-ad-schedule"><label>Début (facultatif)<input type="datetime-local" data-ad-start="'+esc(a.id)+'" value="'+egeAdLocalTime(a.start_at)+'"></label>'
@@ -136,7 +173,7 @@ async function egeSubmitTeacherAd(){
  const url=egeAdSafeURL(rawURL);
  if(rawURL&&!url)throw Error("L'adresse doit commencer par https://.");
  const {error}=await st.db.from("ege2027_ads").insert({
-  submitted_by:st.user.id,title,description,details,destination_url:url||null,status:"pending",placements:["home"]
+  submitted_by:st.user.id,title,description,details,destination_url:url||null,status:"pending",is_premium:false,placements:["home"]
  });
  if(error)throw error;
  await loadAds();toast("Annonce envoyée à l’administrateur pour validation.");render();
@@ -154,7 +191,7 @@ async function egeAdminCreateAd(){
  if(rawURL&&!url)throw Error("Seules les adresses HTTPS sont acceptées.");
  const {error}=await st.db.from("ege2027_ads").insert({
   submitted_by:st.user.id,title,description,details,destination_url:url||null,
-  status:"approved",approved_by:st.user.id,placements
+  status:"approved",approved_by:st.user.id,is_premium:Boolean(document.getElementById("egeAdAdminPremium")?.checked),placements
  });
  if(error)throw error;
  await loadAds();toast("Annonce créée et publiée.");render();
@@ -168,7 +205,8 @@ async function egeAdminUpdateAd(id,action){
  const start_at=egeAdDate(id,"start"),end_at=egeAdDate(id,"end");
  if(start_at&&end_at&&new Date(start_at)>=new Date(end_at))throw Error("La date de fin doit être après le début.");
  const priority=Number(document.querySelector('[data-ad-priority="'+CSS.escape(id)+'"]')?.value||"0");
- const changes={placements,start_at,end_at,priority,updated_at:new Date().toISOString()};
+ const is_premium=Boolean([...document.querySelectorAll("[data-ad-premium]")].find(x=>x.dataset.adPremium===id)?.checked);
+ const changes={placements,start_at,end_at,priority,is_premium,updated_at:new Date().toISOString()};
  if(action==="approve"){changes.status="approved";changes.approved_by=st.user.id}
  if(action==="pause"||action==="reject"){
   if(!confirm((action==="pause"?"Suspendre":"Refuser")+" cette annonce ?"))return;
