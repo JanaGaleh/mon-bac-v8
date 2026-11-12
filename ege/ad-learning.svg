@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 180" role="img" aria-label="Livres et diplôme">
+<defs><linearGradient id="paper" x2="0" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#fff8f5"/></linearGradient><linearGradient id="crimson"><stop stop-color="#e52642"/><stop offset="1" stop-color="#a9001a"/></linearGradient></defs>
+<ellipse cx="127" cy="153" rx="105" ry="13" fill="#71152c" opacity=".09"/>
+<g transform="translate(25 89) rotate(-7 92 40)"><rect x="8" y="39" width="199" height="25" rx="6" fill="#163960"/><rect x="21" y="43" width="166" height="17" rx="3" fill="url(#paper)"/><rect x="8" y="37" width="200" height="6" rx="3" fill="#316399"/><path d="M19 61h175" stroke="#a3b2c4" stroke-width="1"/></g>
+<g transform="translate(27 52) rotate(5 94 40)"><rect x="3" y="66" width="195" height="26" rx="6" fill="#d82840"/><rect x="15" y="70" width="166" height="17" rx="4" fill="url(#paper)"/><path d="M15 85h167" stroke="#e8d7d7"/><rect x="3" y="64" width="196" height="7" rx="3" fill="#ac0822"/></g>
+<g transform="translate(49 44) rotate(-4 81 40)"><rect x="8" y="36" width="164" height="29" rx="5" fill="#e7a62b"/><rect x="21" y="41" width="137" height="18" rx="3" fill="url(#paper)"/><rect x="8" y="36" width="164" height="7" rx="4" fill="#bf7520"/></g>
+<g transform="translate(44 -3)"><path d="M20 66 112 25 211 66 112 111Z" fill="#222b48"/><path d="M45 85v26c48 37 109 37 139-1V84l-72 33Z" fill="#303b5c"/><path d="M211 66v51" stroke="#e5a936" stroke-width="4" stroke-linecap="round"/><circle cx="211" cy="121" r="8" fill="#e5a936"/><path d="M210 124c-2 7-5 18-5 24h15c0-8-4-19-6-24Z" fill="#e5a936"/></g>
+</svg>
