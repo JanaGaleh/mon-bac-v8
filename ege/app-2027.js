@@ -410,7 +410,7 @@ async function dispatchClick(e){
    await createDoc();return
   }
   if(a==="opendoc"){await selectAndGoDoc(id,el.dataset.to||"student-wizard");return}
-  if(a==="annex"){st.annex=Number(el.dataset.n);render();return}
+  if(a==="annex"){st.annex=Number(el.dataset.n)||1;if(st.screen!=="student-annex")st.screen="student-annex";render();return}
   if(a==="legacy"){await legacyEditor();return}
   if(a==="archive"){await archiveDoc(id);return}
   if(a==="wizard"){st.wizardStep=Number(el.dataset.n)||1;render();return}
