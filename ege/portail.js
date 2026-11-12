@@ -100,6 +100,7 @@ async function boot(){
  $('resetForm').addEventListener('submit',reset);
  if(!window.supabase?.createClient){notice('Connexion impossible. Vérifiez votre accès à Internet.');return}
  api=window.supabase.createClient(PROJECT,PUBLIC_KEY);
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('./service-worker-ege-2027.js').catch(()=>{});
  api.auth.onAuthStateChange(event=>{if(event==='PASSWORD_RECOVERY')panel('reset');});
  if(new URLSearchParams(location.hash.slice(1)).get('type')==='recovery')panel('reset');
  await refresh({auto:true});
