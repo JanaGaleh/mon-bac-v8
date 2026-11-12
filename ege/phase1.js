@@ -179,10 +179,10 @@ async function renameDossier(row){
  if(value===null)return;
  const title=str(value).slice(0,100);
  if(!title){status('Le nom ne peut pas être vide.',true);return}
- const {error}=await egeSupabaseClient.from('ege2027_dossiers').update({title,updated_at:new Date().toISOString()})
-   .eq('id',row.id).eq('owner_id',egeCloudUser.id);
+ const {data:changed,error}=await egeSupabaseClient.from('ege2027_dossiers').update({title,updated_at:new Date().toISOString()})
+   .eq('id',row.id).eq('owner_id',egeCloudUser.id).select('updated_at').maybeSingle();
  if(error){status('Renommage impossible : '+error.message,true);return}
- if(currentId===row.id){currentTitle=title;store();notifyCurrent()}
+ if(currentId===row.id){currentTitle=title;currentRevision=changed?.updated_at||null;store();notifyCurrent()}
  status('Dossier renommé.');await fetchList();
 }
 async function archiveDossier(row,archive){
@@ -191,7 +191,7 @@ async function archiveDossier(row,archive){
   .update({archived_at:archive?new Date().toISOString():null,updated_at:new Date().toISOString()})
   .eq('id',row.id).eq('owner_id',egeCloudUser.id);
  if(error){status('Modification impossible : '+error.message,true);return}
- if(archive&&row.id===currentId){currentId=null;currentTitle='';store();notifyCurrent()}
+ if(archive&&row.id===currentId){currentId=null;currentTitle='';currentRevision=null;lastSyncedJson='';autoCreate=false;store();notifyCurrent()}
  status(archive?'Dossier archivé, sans suppression.':'Dossier réactivé.');
  await fetchList();
 }
@@ -338,7 +338,16 @@ function installGroupJoinUI(){
    if(error)throw error;
    const response=await egeSupabaseClient.from('ege2027_teacher_groups').select('name,school').eq('id',groupId).maybeSingle();
    if(response.error)throw response.error;
-   result.textContent='Inscription réussie'+(response.data?.name?' : '+response.data.name:'')+'. Ton professeur peut maintenant suivre tes dossiers enregistrés en ligne.';
+   result.textContent='Groupe rejoint'+(response.data?.name?' : '+response.data.name:'')+'.';
+    if(populated()&&confirm('Associer le dossier EGE ouvert à ce groupe ? Votre enseignant pourra consulter ses modifications futures. Les autres dossiers restent privés.')){
+      let saved=true;
+      if(!currentId)saved=await saveDossier();
+      if(saved&&currentId){
+       const assoc=await egeSupabaseClient.from('ege2027_group_submissions').insert({group_id:groupId,dossier_id:currentId,student_id:egeCloudUser.id});
+       if(assoc.error&&assoc.error.code!=='23505')result.textContent+=' Association du dossier non enregistrée : '+assoc.error.message;
+       else result.textContent+=' Votre dossier est associé au groupe et visible par votre professeur.';
+      }else result.textContent+=' Le dossier n’a pas été associé. Réessayez depuis « Mes groupes ».';
+    }else result.textContent+=' Pour que votre professeur voie votre travail, associez un dossier dans « Mes groupes ».';
    code.value='';cloudMsg('Groupe rejoint avec succès.');
   }catch(err){result.textContent='Inscription impossible : '+(err?.message||String(err))}
   finally{submit.disabled=false}
