@@ -7,7 +7,7 @@ function vGreeting(){
  return first||email.split("@")[0]||"Bienvenue";
 }
 function renderHeader(){
- const intro=st.screen==="welcome"||st.screen==="auth";
+ const intro=st.screen==="welcome"||st.screen==="auth"||st.screen==="ads-directory";
  if(intro)return `<header class="ege-red-hero" aria-label="EGE 2027">
   <div class="ege-hero-actions"><span class="ege-hero-edition">Études de Gestion Encadrées</span>
    <button class="ege-hero-install" type="button" data-act="install">${I("download")} <span>Installer</span></button>
@@ -288,7 +288,7 @@ function profile(){
 }
 function view(){
  switch(st.screen){
-  case"welcome":return welcome();case"auth":return auth();
+  case"welcome":return welcome();case"auth":return auth();case"ads-directory":return egeAdsDirectory();
   case"student-home":return studentHome();case"student-docs":return studentDocs();case"student-wizard":return studentWizard();case"student-annex":return studentAnnex();case"student-group":return studentGroup();
   case"teacher-home":return teacherHome();case"teacher-groups":return teacherGroups();case"teacher-students":return teacherStudents();case"teacher-review":return teacherReview();
   case"admin-home":return adminHome();case"admin-users":return adminUsers();case"admin-groups":return adminGroups();case"admin-monitor":return adminMonitor();case"profile":return profile();
@@ -297,8 +297,8 @@ function view(){
 }
 function render(){
  const host=$("app");if(!host)return;
- host.className="app"+((st.screen==="welcome"||st.screen==="auth")?" ege-intro-app":"");
- const intro=st.screen==="welcome"||st.screen==="auth";
+ host.className="app"+((st.screen==="welcome"||st.screen==="auth"||st.screen==="ads-directory")?" ege-intro-app":"");
+ const intro=st.screen==="welcome"||st.screen==="auth"||st.screen==="ads-directory";
  host.innerHTML=renderHeader()+`<div class="app-body">${intro?"":menu()}<main class="main ${intro?(st.screen==="welcome"?"intro-main":"login-main"):""}" id="content"><section class="screen">${feedback()}${view()}</section></main></div>${intro?"":bottomNav()}
  <dialog id="egeInstallDialog" class="ege-install-dialog" aria-labelledby="egeInstallTitle">
   <div class="ege-install-dialog-head"><h2 id="egeInstallTitle">Installer EGE 2027</h2><button type="button" class="ege-install-close" data-act="close-install" aria-label="Fermer">${I("plus")}</button></div>
