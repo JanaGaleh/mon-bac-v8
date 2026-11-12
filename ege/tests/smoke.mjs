@@ -21,7 +21,7 @@ assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrou
 assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
 const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
 assert.equal(m.theme_color,'#c8102e');
-assert.ok(read('service-worker-ege-2027.js').includes('shell-v15'));
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v16'));
 assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
 assert.ok(read('portail.html').includes('vendor/supabase-2.57.4.js'));
 assert.ok(read('service-worker-ege-2027.js').includes('vendor/supabase-2.57.4.js'));
@@ -67,4 +67,16 @@ assert.ok(logic.includes('"ads-directory"'),'écran public absent');
 assert.ok(logic.includes('location.pathname.endsWith("/annonces.html")'),'navigation directe absente');
 assert.ok(ui.includes('case"ads-directory":return egeAdsDirectory()'),'vue annuaire absente');
 assert.ok(newApp.includes('.ege-directory-card'),'design des annonces manquant');
+// Carrousel Premium et annonces enrichies.
+assert.ok(adJS.includes('EGE_CAROUSEL_DELAY=5000'),'rotation toutes les 5 secondes absente');
+assert.ok(adJS.includes('a.is_premium===true'),'rotation non limitée aux annonces Premium');
+assert.ok(adJS.includes('function egeMoveCarousel'),'boucle manuelle absente');
+assert.ok(adJS.includes('data-act="ad-prev"')&&adJS.includes('data-act="ad-next"'),'contrôles du carrousel absents');
+assert.ok(adJS.includes('data-act="ad-slide"'),'points de navigation absents');
+assert.ok(adJS.includes('prefers-reduced-motion'),'accessibilité animations absente');
+assert.ok(adJS.includes('pointerdown'),'pause sur interaction absente');
+assert.ok(adJS.includes('whatsapp_number')&&adJS.includes('https://wa.me/'),'contact WhatsApp absent');
+assert.ok(adJS.includes('fee_amount')&&adJS.includes('teaching_days'),'détails pédagogiques absents');
+assert.ok(logic.includes('if(a==="ad-next"||a==="ad-prev"||a==="ad-slide")'),'événements de rotation non branchés');
+assert.ok(ui.includes('egeStartAdCarousel();'),'timer non activé');
 console.log('EGE smoke tests : OK');
