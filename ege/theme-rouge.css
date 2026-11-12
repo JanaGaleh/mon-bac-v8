@@ -1,0 +1,36 @@
+/* Identité visuelle unique — EGE GFM 2027 · Prof. Jana Galeh */
+:root{--red:#c91b2c;--red-dark:#a71222;--red-pale:#fff2f3;--blue:#c91b2c;--navy:#8a1725;--bluelight:#fff1f3;--bg:#fff;--ink:#25272d;--muted:#6c6c73;--line:#ecdde0;--shadow:0 8px 25px rgba(72,22,30,.055)}
+body:not(.ege-portal){background:#fff;color:#28292f}
+body:not(.ege-portal) .topbar,body:not(.ege-portal) header{background:#fff;border-bottom-color:#f0e0e3}
+body:not(.ege-portal) .topbar .brandlogo,body:not(.ege-portal) .logo,body:not(.ege-portal) .head .brand .logo,body:not(.ege-portal) .mark{background:#c91b2c!important;color:#fff!important}
+body:not(.ege-portal) .hero-kicker,body:not(.ege-portal) .eyebrow,body:not(.ege-portal) .stepcount,body:not(.ege-portal) .minihead .minor{color:#a81d2b}
+body:not(.ege-portal) .btn-primary,body:not(.ege-portal) .btn.primary,body:not(.ege-portal) .ege-cloud-primary,body:not(.ege-portal) button.primary{background:#c91b2c!important;border-color:#c91b2c!important;color:#fff!important}
+body:not(.ege-portal) .btn-primary:hover,body:not(.ege-portal) .btn.primary:hover{background:#a71222!important;border-color:#a71222!important}
+body:not(.ege-portal) .btn-outline,body:not(.ege-portal) .btn:not(.primary):not(.btn-primary),body:not(.ege-portal) .btn-quiet{border-color:#e7cbd0;color:#9e202d;background:#fff}
+body:not(.ege-portal) a{color:#af1828}
+body:not(.ege-portal) .textbutton,body:not(.ege-portal) .smalllink{color:#b31b2c}
+body:not(.ege-portal) .card,body:not(.ege-portal) .questionbox,body:not(.ege-portal) .dlcard,body:not(.ege-portal) .choice,body:not(.ege-portal) .panel{border-color:#eedfe1;background:#fff;box-shadow:0 5px 18px #63132407}
+body:not(.ege-portal) .choice.selected{border-color:#d33948;background:#fff2f3}
+body:not(.ege-portal) .sourcecheck{background:#fff9f9;border-color:#e9cfd4}
+body:not(.ege-portal) .notice,body:not(.ege-portal) .sujetinfo{background:#fff8f8;border-color:#f0e1e2}
+body:not(.ege-portal) input:focus-visible,body:not(.ege-portal) textarea:focus-visible,body:not(.ege-portal) button:focus-visible,body:not(.ege-portal) select:focus-visible{outline:3px solid #f1a9b1;outline-offset:2px}
+body:not(.ege-portal) .field:focus,body:not(.ege-portal) .area:focus{border-color:#c91b2c}
+body:not(.ege-portal) .ege-bottom-nav{background:#fff;border-top:1px solid #f0e0e3;box-shadow:0 -4px 18px #88273307}
+body:not(.ege-portal) .ege-bottom-item.is-current,body:not(.ege-portal) .ege-bottom-item[aria-current="page"]{color:#c91b2c;background:#fff2f3}
+body:not(.ege-portal) .ege-bottom-item.is-current svg{color:#c91b2c;stroke:#c91b2c}
+body:not(.ege-portal) .progressbar>div,body:not(.ege-portal) #progressLine,body:not(.ege-portal) .progress-line{background:#c91b2c}
+body:not(.ege-portal) .tag,body:not(.ege-portal) .badge{background:#fff0f2;color:#ad2030}
+body:not(.ege-portal) .tag.approved{background:#edf8f1;color:#147548}
+body:not(.ege-portal) .tag.pending{background:#fff5df;color:#8a651e}
+body:not(.ege-portal) .ege-annex-preview{background:#fff7f8;border-color:#eedbde}
+body:not(.ege-portal) .ege-annex-preview>summary{color:#ad2230}
+body:not(.ege-portal) .ege-annex-paper{box-shadow:0 5px 16px #6819270c}
+body:not(.ege-portal) .paper{background:#fff}
+body:not(.ege-portal) dialog{border-color:#e9d5d9}
+body:not(.ege-portal) .identity .mark{background:#c91b2c}
+@media(max-width:680px){
+body:not(.ege-portal) .topright .pill{display:none}
+body:not(.ege-portal) .questionbox,body:not(.ege-portal) .card{border-radius:14px}
+body:not(.ege-portal) button,body:not(.ege-portal) a{touch-action:manipulation}
+body:not(.ege-portal) .topbar{padding:10px 12px}
+}
