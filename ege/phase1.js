@@ -4,7 +4,8 @@
 (function(){
 'use strict';
 const id=n=>document.getElementById(n);
-let accountId=null, currentId=null, currentTitle='', list=[], showArchived=false, busy=false;
+let accountId=null, currentId=null, currentTitle='', currentRevision=null, list=[], showArchived=false, busy=false;
+let syncTimer=null,lastSyncedJson='',autoCreate=false,conflict=false;
 const nameOf=row=>String(row?.title||row?.student||'Mon dossier EGE').trim();
 const str=x=>String(x??'').trim();
 const date=s=>{try{return new Date(s).toLocaleString('fr-FR')}catch{return '—'}};
@@ -16,17 +17,17 @@ const populated=()=>!!(data?.student||data?.problem||Object.values(data?.annexes
 function status(text,bad=false){let e=id('egeDossierStatus');if(e){e.textContent=text;e.classList.toggle('error',bad)}cloudMsg(text)}
 function getStored(){
  if(!accountId)return;
- try{const v=JSON.parse(localStorage.getItem(key(accountId))||'null');currentId=v?.id||null;currentTitle=v?.title||''}
+ try{const v=JSON.parse(localStorage.getItem(key(accountId))||'null');currentId=v?.id||null;currentTitle=v?.title||'';currentRevision=v?.updated_at||null}
  catch{currentId=null;currentTitle=''}
 }
 function store(){
  if(!accountId)return;
- try{if(currentId)localStorage.setItem(key(accountId),JSON.stringify({id:currentId,title:currentTitle}));else localStorage.removeItem(key(accountId))}catch{}
+ try{if(currentId)localStorage.setItem(key(accountId),JSON.stringify({id:currentId,title:currentTitle,updated_at:currentRevision}));else localStorage.removeItem(key(accountId))}catch{}
 }
 function onAuthChanged(user){
  const now=user?.id||null;
  if(now===accountId)return;
- accountId=now;currentId=null;currentTitle='';list=[];getStored();
+ accountId=now;currentId=null;currentTitle='';currentRevision=null;autoCreate=false;conflict=false;lastSyncedJson='';list=[];getStored();
  const b=id('egeDossierCurrent');
  if(b)b.textContent=accountId?(currentTitle||'Dossier local non associé'):'Connexion nécessaire';
 }
@@ -92,10 +93,12 @@ function renderList(){
   card.append(heading,buttons);host.append(card);
  }
 }
-async function saveDossier(){
+async function saveDossier(options={}){
+ const automatic=options.automatic===true;
+ if(automatic&&(!cloud()||conflict||(!currentId&&!autoCreate)||!navigator.onLine))return false;
  if(!cloud()){if(typeof egeCloudOpen==='function')egeCloudOpen(true);cloudMsg('Connecte-toi pour enregistrer plusieurs dossiers en ligne. Le brouillon reste sur ton appareil.');return false}
  if(busy)return false;
- busy=true;status('Enregistrement en ligne…');
+ busy=true;setSyncBadge('Enregistrement…');status('Enregistrement en ligne…');
  try{
   const json=JSON.parse(JSON.stringify(data));
   const student=str(data.student||'').slice(0,140);
@@ -103,19 +106,40 @@ async function saveDossier(){
   let row=null,error=null;
   const payload={student,title,payload:json,updated_at:new Date().toISOString()};
   if(currentId){
+   if(!currentRevision){
+    const probe=await egeSupabaseClient.from('ege2027_dossiers').select('payload,updated_at').eq('owner_id',egeCloudUser.id).eq('id',currentId).maybeSingle();
+    if(probe.error)throw probe.error;
+    if(!probe.data)throw Error('Dossier introuvable ou inaccessible.');
+    if(JSON.stringify(probe.data.payload)===JSON.stringify(json)){
+     currentRevision=probe.data.updated_at;lastSyncedJson=JSON.stringify(json);store();setSyncBadge('Enregistré en ligne');return true;
+    }
+    conflict=true;
+    throw Error('Conflit entre versions. Exporte ton brouillon JSON avant de recharger le dossier depuis « Mes dossiers ».');
+   }
    ({data:row,error}=await egeSupabaseClient.from('ege2027_dossiers')
-     .update(payload).eq('owner_id',egeCloudUser.id).eq('id',currentId).select('id,title,updated_at').maybeSingle());
-   if(!error&&!row)throw Error('Ce dossier n’existe plus ou n’appartient pas à ce compte. Ouvre « Mes dossiers » avant de réessayer.');
+     .update(payload).eq('owner_id',egeCloudUser.id).eq('id',currentId).eq('updated_at',currentRevision).select('id,title,updated_at').maybeSingle());
+   if(!error&&!row){conflict=true;throw Error('Dossier modifié sur un autre appareil. Le brouillon local est conservé : exporte-le en JSON avant de recharger.');}
   }else{
    ({data:row,error}=await egeSupabaseClient.from('ege2027_dossiers')
      .insert({...payload,owner_id:egeCloudUser.id}).select('id,title,updated_at').single());
   }
   if(error)throw error;
-  currentId=row.id;currentTitle=row.title;store();notifyCurrent();
+  currentId=row.id;currentTitle=row.title;currentRevision=row.updated_at;autoCreate=true;lastSyncedJson=JSON.stringify(json);conflict=false;store();notifyCurrent();setSyncBadge('Enregistré en ligne');
   status('Dossier sauvegardé. Une version précédente pourra être restaurée depuis « Versions ».');
   return true;
- }catch(e){status('Sauvegarde impossible : '+(e?.message||String(e))+'. Ton travail reste sur cet appareil.',true);return false}
- finally{busy=false}
+ }catch(e){setSyncBadge(conflict?'Conflit à résoudre':navigator.onLine?'Échec de synchronisation':'Hors connexion');status('Sauvegarde impossible : '+(e?.message||String(e))+'. Ton travail reste sur cet appareil.',true);return false}
+ finally{busy=false;if(!conflict&&cloud()&&currentId&&JSON.stringify(data)!==lastSyncedJson)scheduleSync();}
+}
+function setSyncBadge(txt){const e=id('egeCloudBadge');if(e)e.textContent=txt}
+function scheduleSync(){
+ if(!cloud()){setSyncBadge('Sur cet appareil');return}
+ if(!navigator.onLine){setSyncBadge('Hors connexion');return}
+ if(conflict){setSyncBadge('Conflit à résoudre');return}
+ if(!currentId&&!autoCreate){setSyncBadge('Sur cet appareil');return}
+ if(!populated())return;
+ if(JSON.stringify(data)===lastSyncedJson){setSyncBadge('Enregistré en ligne');return}
+ clearTimeout(syncTimer);setSyncBadge('Enregistrement…');
+ syncTimer=setTimeout(()=>{if(busy){scheduleSync();return}saveDossier({automatic:true})},1450);
 }
 async function openDossiers(){
  if(!cloud()){
@@ -135,19 +159,19 @@ async function openDossier(row){
  status('Ouverture du dossier…');
  try{
   const {data:remote,error}=await egeSupabaseClient.from('ege2027_dossiers')
-   .select('id,title,payload').eq('id',row.id).eq('owner_id',egeCloudUser.id).single();
+   .select('id,title,payload,updated_at').eq('id',row.id).eq('owner_id',egeCloudUser.id).single();
   if(error)throw error;
   const draft=cleanPayload(remote.payload);
   const old=data;
   data=draft;
   if(!save()){data=old;throw Error('Impossible d’écrire dans le stockage local : espace insuffisant.')}
-  currentId=remote.id;currentTitle=remote.title;store();render();notifyCurrent();dialog(false);window.scrollTo({top:0,behavior:'smooth'});
+  currentId=remote.id;currentTitle=remote.title;currentRevision=remote.updated_at;lastSyncedJson=JSON.stringify(draft);autoCreate=true;conflict=false;store();render();notifyCurrent();dialog(false);window.scrollTo({top:0,behavior:'smooth'});
   toast('Dossier « '+currentTitle+' » ouvert.');
  }catch(e){status('Ouverture impossible : '+(e?.message||String(e)),true)}
 }
 function newDossier(){
  if(populated()&&!confirm('Créer un nouveau dossier vierge ? Le dossier actuellement ouvert sera remplacé sur cet appareil. Sauvegarde-le d’abord en ligne ou en JSON si nécessaire.'))return;
- data=empty();currentId=null;currentTitle='';store();save();render();dialog(false);window.scrollTo({top:0,behavior:'smooth'});
+ data=empty();currentId=null;currentTitle='';currentRevision=null;lastSyncedJson='';autoCreate=true;conflict=false;store();save();render();dialog(false);window.scrollTo({top:0,behavior:'smooth'});
  toast('Nouveau dossier prêt. Il sera ajouté à ton compte lors de la première sauvegarde en ligne.');
 }
 async function renameDossier(row){
@@ -200,7 +224,7 @@ async function restoreVersion(row,version){
   if(error)throw error;
   const remote=cleanPayload(rev.payload);
   const old=data,oldId=currentId,oldTitle=currentTitle;
-  data=remote;currentId=row.id;currentTitle=row.title;store();
+  data=remote;currentId=row.id;currentTitle=row.title;currentRevision=row.updated_at||null;lastSyncedJson='';conflict=false;store();
   if(!save()){data=old;currentId=oldId;currentTitle=oldTitle;store();throw Error('Impossible de stocker la version localement')}
   const saved=await saveDossier();
   if(!saved){status('La version est restaurée localement, mais son enregistrement en ligne a échoué : utilise « Sauvegarder en ligne ».',true);return}
@@ -347,7 +371,8 @@ function init(){
   setTimeout(()=>{if(typeof egeCloudUser!=='undefined'&&egeCloudUser)showRecovery()},600);
  }
 }
-function detachCurrent(){currentId=null;currentTitle='';store();notifyCurrent()}
-window.EGE2027Phase1={init,onAuthChanged,saveDossier,openDossiers,showReviews,showRecovery,detachCurrent};
+function detachCurrent(){currentId=null;currentTitle='';currentRevision=null;lastSyncedJson='';autoCreate=false;conflict=false;clearTimeout(syncTimer);store();notifyCurrent()}
+window.addEventListener('online',scheduleSync);
+window.EGE2027Phase1={init,onAuthChanged,saveDossier,scheduleSync,openDossiers,showReviews,showRecovery,detachCurrent};
 document.addEventListener('DOMContentLoaded',init);
 })();
