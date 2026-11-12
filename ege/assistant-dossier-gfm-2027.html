@@ -302,7 +302,7 @@ const subject=()=>Number.isInteger(data.theme)&&Number.isInteger(data.subtheme)&
 const theme=()=>Number.isInteger(data.theme)?CATALOG[data.theme]:null;
 function allSteps(){let z=[['welcome',0],['mode',1],['student',1]];if(data.mode==='binome')z.push(['partner',1]);z.push(['className',1],['school',1],['teacher',1],['theme',2],['subtheme',2],['problem',2]);for(let i=1;i<=(data.mode==='binome'?4:3);i++)z.push(['annex'+i,3]);z.push(['company',4],['candidates',4],['finish',5]);return z.map(([id,phase])=>({id,phase}));}
 function activeIndex(){let idx=allSteps().findIndex(x=>x.id===data.step);return idx<0?0:idx;}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){return false}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));window.EGE2027Phase1?.scheduleSync?.();return true}catch(e){return false}}
 function toast(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2900)}
 /* Compléments théoriques pédagogiques pour enrichir les pages A4 sans données de terrain inventées.
    Les explications suivent les six thèmes officiels; le sous-thème conserve son contenu spécifique. */
