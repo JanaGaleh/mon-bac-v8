@@ -20,10 +20,24 @@ assert.ok(read('enseignant.js').includes('ege2027_group_submissions'));
 assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrouillage optimiste manquant');
 assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
 const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
-assert.equal(m.theme_color,'#c91b2c');
-assert.ok(read('service-worker-ege-2027.js').includes('shell-v8'));
+assert.equal(m.theme_color,'#c8102e');
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v9'));
 assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
 assert.ok(read('portail.html').includes('vendor/supabase-2.57.4.js'));
 assert.ok(read('service-worker-ege-2027.js').includes('vendor/supabase-2.57.4.js'));
 assert.ok(existsSync('ege/vendor/supabase-2.57.4.js'));
+// Nouvelle interface, calquée sur la maquette validée.
+for(const path of ['app-2027.js','app-2027-views.js']){assert.ok(existsSync('ege/'+path));new Function(read(path))}
+const newApp=read('app-2027.html'),ui=read('app-2027-views.js'),logic=read('app-2027.js');
+assert.ok(newApp.includes('--red:#c8102e'));
+assert.ok(newApp.includes('app-2027-views.js'));
+assert.ok(newApp.includes('vendor/supabase-2.57.4.js'));
+const screens=['welcome','auth','student-home','student-docs','student-wizard','student-annex','student-group','teacher-home','teacher-groups','teacher-students','teacher-review','admin-home','admin-users','admin-groups','admin-monitor','profile'];
+for(const name of screens)assert.ok(logic.includes('"'+name+'"'),'Écran absent : '+name);
+assert.ok(ui.includes('const official=['),'référentiel officiel absent');
+assert.ok(logic.includes('ege2027_group_submissions'),'partage enseignant absent');
+assert.ok(logic.includes('ege2027_teacher_requests'),'validation enseignant absente');
+assert.ok(logic.includes('.eq("updated_at",d.updated_at)'),'prévention conflits absente');
+assert.ok(!ui.includes('Vous explorez une maquette'),'texte de démonstration persistant');
+assert.ok(read('service-worker-ege-2027.js').includes('app-2027-views.js'));
 console.log('EGE smoke tests : OK');
