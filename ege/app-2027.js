@@ -252,7 +252,8 @@ async function recoverPassword(){
 async function signOut(){
  if(st.db){const {error}=await st.db.auth.signOut();if(error)throw error}
  clearTimeout(st.saveTimer);
- Object.assign(st,{user:null,staff:null,teacher:null,role:"eleve",desired:"eleve",docs:[],groups:[],members:[],shares:[],reviews:[],requests:[],audit:[],selectedDocId:null,selectedGroupId:null,draft:null,screen:"welcome",loaded:false});
+ Object.assign(st,{user:null,staff:null,teacher:null,role:"eleve",desired:"eleve",docs:[],groups:[],members:[],shares:[],reviews:[],requests:[],audit:[],ads:[],selectedDocId:null,selectedGroupId:null,draft:null,screen:"welcome",loaded:false});
+ await loadAds();
  render();
 }
 async function createDoc(){
