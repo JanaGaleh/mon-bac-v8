@@ -21,7 +21,7 @@ assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrou
 assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
 const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
 assert.equal(m.theme_color,'#c8102e');
-assert.ok(read('service-worker-ege-2027.js').includes('shell-v13'));
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v15'));
 assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
 assert.ok(read('portail.html').includes('vendor/supabase-2.57.4.js'));
 assert.ok(read('service-worker-ege-2027.js').includes('vendor/supabase-2.57.4.js'));
@@ -56,4 +56,15 @@ assert.ok(read('service-worker-ege-2027.js').includes('app-2027-ads.js'));
 assert.ok(read('service-worker-ege-2027.js').includes('ad-learning.svg'));
 assert.ok(!newApp.includes('Prof. Jana Galeh'));
 assert.ok(!ui.includes('Prof. Jana Galeh'));
+// Annonces publiques et classement Premium.
+assert.ok(adJS.includes('function egeAdsDirectory()'),'annuaire public manquant');
+assert.ok(adJS.includes('href="./annonces.html"'),'lien de la bannière manquant');
+assert.ok(adJS.includes('function egeAdRank'),'ordre Premium manquant');
+assert.ok(adJS.includes('is_premium:false'),'publication Premium enseignant non verrouillée');
+assert.ok(adJS.includes('egeAdAdminPremium'),'contrôle Premium admin manquant');
+assert.ok(adJS.includes('filter(egeAdLive)'),'filtrage des annonces non approuvées manquant');
+assert.ok(logic.includes('"ads-directory"'),'écran public absent');
+assert.ok(logic.includes('location.pathname.endsWith("/annonces.html")'),'navigation directe absente');
+assert.ok(ui.includes('case"ads-directory":return egeAdsDirectory()'),'vue annuaire absente');
+assert.ok(newApp.includes('.ege-directory-card'),'design des annonces manquant');
 console.log('EGE smoke tests : OK');
