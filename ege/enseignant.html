@@ -63,6 +63,7 @@ dialog::backdrop{background:#102b48ac}#documentBody{white-space:pre-wrap;word-br
 <div id="groups" class="grid" aria-live="polite"></div></section>
 </main>
 <dialog id="dossierDialog" aria-labelledby="dossierTitle"><div class="groupHead"><h2 id="dossierTitle">Dossier EGE</h2><button class="btn sm" id="closeDialog" type="button">Fermer</button></div><div id="documentBody"></div><h3>Historique des corrections</h3><div id="reviewsHistory" class="history"></div>
-<form id="reviewForm"><label for="reviewText">Votre observation (obligatoire pour demander une correction)</label><textarea id="reviewText" rows="3" maxlength="5000"></textarea>
+<form id="reviewForm"><label for="reviewAnnex">Travail concerné</label><select id="reviewAnnex"><option value="">Dossier complet</option><option value="1">Annexe 1</option><option value="2">Annexe 2</option><option value="3">Annexe 3</option><option value="4">Annexe 4 (binôme)</option></select>
+<label for="reviewText">Votre observation (obligatoire pour demander une correction)</label><textarea id="reviewText" rows="3" maxlength="5000"></textarea>
 <div class="row" style="margin-top:12px"><button type="button" class="btn primary" id="approve">Valider le dossier</button><button type="button" class="btn" id="revise">Demander une correction</button></div></form>
 </dialog></body></html>
