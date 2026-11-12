@@ -123,18 +123,85 @@ function egeAdRank(a,b){
  if(rank)return rank;
  return new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime();
 }
+
+function egeAdPracticalFields(prefix){
+ return '<fieldset class="ege-ad-practical"><legend>Informations pratiques</legend>'
+  +egeAdField(prefix+'Subjects','Matières proposées','Ex. Gestion, mathématiques')
+  +'<div class="ege-ad-fields-row">'+egeAdField(prefix+'Fee','Frais en FDJ (facultatif)','Ex. 12000')
+  +'<label class="field"><span>Tarification</span><select class="select" id="'+prefix+'FeePeriod">'
+  +'<option value="mois">Par mois</option><option value="seance">Par séance</option><option value="semaine">Par semaine</option><option value="trimestre">Par trimestre</option></select></label></div>'
+  +'<div class="ege-ad-fields-row">'+egeAdField(prefix+'Days','Jours','Ex. Samedi, lundi')
+  +egeAdField(prefix+'Hours','Heures','Ex. 16h30 – 18h30')+'</div>'
+  +'<label class="field"><span>Modalité des cours</span><select class="select" id="'+prefix+'Mode">'
+  +'<option value="">Non précisé</option><option value="groupe">En groupe</option><option value="domicile">À domicile</option><option value="mixte">Groupe et domicile</option></select></label>'
+  +egeAdField(prefix+'Address','Adresse pour les cours en groupe','Ex. Hayableh, Djibouti')
+  +egeAdField(prefix+'WhatsApp','WhatsApp (indicatif pays inclus)','Ex. +253 77 12 34 56')
+  +egeAdField(prefix+'ImageURL','Lien HTTPS vers une image de cours (facultatif)','https://...')
+  +'<p class="small muted">Ne publiez pas de photos d’élèves sans autorisation. Un lien d’image doit être accessible publiquement.</p></fieldset>';
+}
+function egeAdPracticalPayload(prefix){
+ const value=suffix=>cleaned(document.getElementById(prefix+suffix)?.value);
+ const rawWA=value("WhatsApp");
+ const whatsapp_number=rawWA?rawWA.replace(/[+().\s-]/g,""):null;
+ if(whatsapp_number&&!/^[0-9]{8,15}$/.test(whatsapp_number))
+  throw Error("Le numéro WhatsApp doit inclure l’indicatif pays et compter 8 à 15 chiffres.");
+ const rawFee=value("Fee");
+ const fee_amount=rawFee===""?null:Number(rawFee);
+ if(fee_amount!==null&&(!Number.isInteger(fee_amount)||fee_amount<0||fee_amount>100000000))
+  throw Error("Saisissez des frais valides en FDJ.");
+ const rawImage=value("ImageURL");
+ const image_url=egeAdSafeURL(rawImage);
+ if(rawImage&&!image_url)throw Error("Le lien de l’image doit commencer par https://.");
+ return {
+  whatsapp_number,
+  subjects:value("Subjects")||null,
+  fee_amount,
+  fee_period:fee_amount===null?null:(value("FeePeriod")||"mois"),
+  teaching_days:value("Days")||null,
+  teaching_hours:value("Hours")||null,
+  teaching_mode:value("Mode")||null,
+  course_address:value("Address")||null,
+  image_url:image_url||null
+ };
+}
+function egeAdWhatsAppURL(ad){
+ const number=String(ad?.whatsapp_number||"");
+ if(!/^[0-9]{8,15}$/.test(number))return "";
+ const message="Bonjour, je souhaite des informations sur vos cours : "+String(ad.title||"Soutien scolaire").slice(0,80);
+ return "https://wa.me/"+number+"?text="+encodeURIComponent(message);
+}
+function egeAdFacts(ad){
+ const list=[];
+ if(ad.subjects)list.push(["Matières",ad.subjects]);
+ if(ad.teaching_days)list.push(["Jours",ad.teaching_days]);
+ if(ad.teaching_hours)list.push(["Horaires",ad.teaching_hours]);
+ const mode={groupe:"En groupe",domicile:"À domicile",mixte:"Groupe et domicile"}[ad.teaching_mode];
+ if(mode)list.push(["Mode",mode+(ad.course_address&&ad.teaching_mode!=="domicile"?" · "+ad.course_address:"")]);
+ else if(ad.course_address)list.push(["Adresse",ad.course_address]);
+ const period={seance:"séance",semaine:"semaine",mois:"mois",trimestre:"trimestre"}[ad.fee_period]||"mois";
+ if(ad.fee_amount!==null&&ad.fee_amount!==undefined)list.push(["Frais",new Intl.NumberFormat("fr-FR").format(ad.fee_amount)+" FDJ / "+period]);
+ return list.length?'<dl class="ege-directory-facts">'+list.map(([key,val])=>
+  '<div><dt>'+esc(key)+'</dt><dd>'+esc(val)+'</dd></div>').join("")+'</dl>':"";
+}
+
+
 function egeTeacherAdCard(ad){
  const url=egeAdSafeURL(ad.destination_url);
+ const whatsApp=egeAdWhatsAppURL(ad);
  const cta=url
-  ?'<a class="ege-directory-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Contacter / Plus d’informations '+I("arrow")+'</a>'
+  ?'<a class="ege-directory-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Plus d’informations '+I("arrow")+'</a>'
   :'<button type="button" class="ege-directory-link" data-act="ad-info" data-id="'+esc(ad.id)+'">Voir les détails '+I("arrow")+'</button>';
+ const whatsappButton=whatsApp?'<a class="ege-wa-button" target="_blank" rel="noopener noreferrer" href="'+esc(whatsApp)+'" aria-label="Contacter cet enseignant sur WhatsApp">'
+  +I("message-circle")+' WhatsApp</a>':"";
  return '<article class="ege-directory-card">'
-  +'<div class="ege-directory-icon"><img src="./ad-learning.svg" width="94" height="80" alt="" loading="lazy"></div>'
+  +'<div class="ege-directory-icon"><img src="'+esc(egeAdPhoto(ad))+'" width="94" height="80" alt="" loading="lazy"></div>'
   +'<div class="ege-directory-content"><div class="ege-directory-overline">'
   +(ad.is_premium?'<span class="ege-premium-pill">Premium</span>':'<span>Annonce pédagogique</span>')
   +'</div><h3>'+esc(ad.title)+'</h3><p>'+esc(ad.description)+'</p>'
-  +'<div class="ege-directory-actions">'+cta+'</div></div></article>';
+  +egeAdFacts(ad)
+  +'<div class="ege-directory-actions">'+whatsappButton+cta+'</div></div></article>';
 }
+
 function egeAdsDirectory(){
  const ads=(st.ads||[]).filter(egeAdLive).sort(egeAdRank);
  const premium=ads.filter(a=>a.is_premium),standard=ads.filter(a=>!a.is_premium);
@@ -182,6 +249,7 @@ function teacherAdPanel(){
   +egeAdField("egeAdTeacherTitle","Titre de l’annonce","Ex. Cours de soutien en gestion","",true)
   +'<label class="field"><span>Description courte</span><textarea id="egeAdTeacherDesc" class="textarea" maxlength="180" required placeholder="Une phrase claire sur les cours proposés."></textarea></label>'
   +'<label class="field"><span>Informations complémentaires (facultatif)</span><textarea id="egeAdTeacherDetails" class="textarea" maxlength="1200" placeholder="Niveaux, matières, horaires ou conditions."></textarea></label>'
+  +egeAdPracticalFields("egeAdTeacher")
   +egeAdField("egeAdTeacherURL","Lien HTTPS de contact (facultatif)","https://...")
   +'<button class="btn primary" type="submit">'+I("check")+' Envoyer à l’administration</button></form>'
   +(mine.length?'<h4 style="margin:22px 0 8px">Mes annonces</h4>'+mine.map(a=>'<div class="list-row"><div class="row-content"><strong>'+esc(a.title)+'</strong><small>'+esc(a.description)+'</small></div>'+badge(a.status==="approved"?"Publiée":a.status==="pending"?"En attente":a.status==="paused"?"Suspendue":"Refusée",a.status==="approved"?"green":"orange")+'</div>').join(""):"")
@@ -198,6 +266,7 @@ function egeAdminAdPanel(){
   +egeAdField("egeAdAdminTitle","Titre","Ex. Cours de soutien","",true)
   +'<label class="field"><span>Description courte</span><textarea class="textarea" maxlength="180" required id="egeAdAdminDesc" placeholder="Phrase courte, adaptée aux élèves."></textarea></label>'
   +'<label class="field"><span>Informations complémentaires</span><textarea class="textarea" maxlength="1200" id="egeAdAdminDetails"></textarea></label>'
+  +egeAdPracticalFields("egeAdAdmin")
   +egeAdField("egeAdAdminURL","Lien externe HTTPS (facultatif)","https://...")
   +'<p class="small" style="font-weight:700">Afficher à ces emplacements</p>'+egeAdPlacesChecks("new",["home"])
   +'<label class="ege-ad-premium-choice"><input id="egeAdAdminPremium" type="checkbox"> Mettre en Premium (affiché en premier)</label>'
@@ -206,6 +275,7 @@ function egeAdminAdPanel(){
     const tag=a.status==="approved"?"Publiée":a.status==="pending"?"À valider":a.status==="paused"?"Suspendue":"Refusée";
     return '<div class="ege-ad-admin-entry"><div class="card-head"><div><strong>'+esc(a.title)+'</strong><p class="small muted">'+esc(a.description)+'</p></div>'+badge(tag,a.status==="approved"?"green":"orange")+'</div>'
      +'<label class="ege-ad-premium-choice"><input type="checkbox" data-ad-premium="'+esc(a.id)+'" '+(a.is_premium?'checked':'')+'> Afficher en Premium (avant les annonces classiques)</label>'
+     +'<p class="small muted">Matières : '+esc(a.subjects||"Non renseignées")+' · WhatsApp : '+esc(a.whatsapp_number||"Non renseigné")+'</p>'
      +'<p class="small" style="font-weight:700;margin:13px 0 7px">Emplacements de diffusion</p>'
      +egeAdPlacesChecks(a.id,Array.isArray(a.placements)?a.placements:["home"])
      +'<div class="ege-ad-schedule"><label>Début (facultatif)<input type="datetime-local" data-ad-start="'+esc(a.id)+'" value="'+egeAdLocalTime(a.start_at)+'"></label>'
@@ -246,7 +316,7 @@ async function egeSubmitTeacherAd(){
  const url=egeAdSafeURL(rawURL);
  if(rawURL&&!url)throw Error("L'adresse doit commencer par https://.");
  const {error}=await st.db.from("ege2027_ads").insert({
-  submitted_by:st.user.id,title,description,details,destination_url:url||null,status:"pending",is_premium:false,placements:["home"]
+  submitted_by:st.user.id,title,description,details,destination_url:url||null,status:"pending",is_premium:false,placements:["home"],...egeAdPracticalPayload("egeAdTeacher")
  });
  if(error)throw error;
  await loadAds();toast("Annonce envoyée à l’administrateur pour validation.");render();
@@ -264,7 +334,8 @@ async function egeAdminCreateAd(){
  if(rawURL&&!url)throw Error("Seules les adresses HTTPS sont acceptées.");
  const {error}=await st.db.from("ege2027_ads").insert({
   submitted_by:st.user.id,title,description,details,destination_url:url||null,
-  status:"approved",approved_by:st.user.id,is_premium:Boolean(document.getElementById("egeAdAdminPremium")?.checked),placements
+  status:"approved",approved_by:st.user.id,is_premium:Boolean(document.getElementById("egeAdAdminPremium")?.checked),placements,
+  ...egeAdPracticalPayload("egeAdAdmin")
  });
  if(error)throw error;
  await loadAds();toast("Annonce créée et publiée.");render();
