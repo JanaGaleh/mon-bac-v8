@@ -104,9 +104,17 @@ async function join(e){
  if(!/^[0-9A-F]{12}$/.test(p_code)||p_student_name.length<2){note('Indique ton nom et un code de 12 caractères.',true);return}
  busy=true;const b=$('joinForm').querySelector('[type=submit]');b.disabled=true;
  try{
-  const {error}=await api.rpc('ege2027_join_group',{p_code,p_student_name});
+  const {data:joined,error}=await api.rpc('ege2027_join_group',{p_code,p_student_name});
   if(error)throw error;
-  $('groupCode').value='';await refresh();note('Classe rejointe. Choisis maintenant le dossier à partager avec ton enseignant.');
+  $('groupCode').value='';await refresh();
+  if(joined && memberRows.some(m=>m.group_id===joined))$('groupSelect').value=joined;
+  const suggested=dossiers.length===1?dossiers[0]:null;
+  if(suggested&&joined&&confirm('Associer le dossier « '+(suggested.title||'Mon dossier')+' » à cette classe ? Votre professeur pourra consulter toutes ses prochaines sauvegardes. Vos autres dossiers restent privés.')){
+   const link=await api.from('ege2027_group_submissions').insert({group_id:joined,dossier_id:suggested.id,student_id:user.id});
+   if(link.error&&link.error.code!=='23505'){note('Groupe rejoint, mais association impossible : '+link.error.message,true);return}
+   await refresh();note('Groupe rejoint et dossier associé. Le professeur voit désormais le travail et ses prochaines modifications.');return;
+  }
+  note(dossiers.length?'Groupe rejoint. Choisis le dossier à associer dans le formulaire ci-dessus.':'Groupe rejoint. Crée puis sauvegarde un dossier dans ton espace élève avant de l’associer à ce groupe.');
  }catch(err){note('Impossible de rejoindre ce groupe : '+err.message,true)}
  finally{busy=false;b.disabled=false}
 }
@@ -119,7 +127,7 @@ async function share(e){
  try{
   const {error}=await api.from('ege2027_group_submissions').insert({group_id,dossier_id,student_id:user.id});
   if(error)throw error;
-  await refresh();note('Dossier partagé. Ton enseignant peut maintenant le consulter et faire des observations.');
+  await refresh();note('Dossier associé au groupe. Les prochaines modifications sauvegardées en ligne sont automatiquement accessibles à cet enseignant.');
  }catch(err){note('Partage impossible : '+err.message,true)}
  finally{busy=false;b.disabled=false}
 }
