@@ -158,22 +158,43 @@ async function removePupil(group,pupil){
  await loadGroups();note('Élève retiré du groupe. Ses dossiers sont conservés.');
 }
 async function viewDossier(doc){
- selected=doc;$('dossierTitle').textContent=doc.student||doc.payload?.student||'Dossier EGE';
- const d=doc.payload||{},annexes=d.annexes||{},text=[
-  'Titre : '+(doc.title||'—'),
-  'Candidat : '+(doc.student||d.student||'—'),
-  'Binôme : '+(d.partner||'—'),
-  'Classe : '+(d.className||'—'),
-  'Établissement : '+(d.school||'—'),
-  'Mode : '+(d.mode||'—'),
-  'Problématique : '+(d.problem||'—'),
-  'Professeur : '+(d.teacher||'—')
+ selected=doc;
+ const d=doc.payload||{},annexes=d.annexes||{},titles=d.annexTitles||{},sources=d.sources||{},sourceChecks=d.sourceChecks||{};
+ $('dossierTitle').textContent=(doc.student||d.student||'Élève')+' · Dossier EGE';
+ const wrap=$('documentBody');wrap.replaceChildren();
+ const header=node('section','dossier-info');
+ for(const [label,value] of [
+  ['Dossier',doc.title||'—'],['Élève',doc.student||d.student||'—'],
+  ['Binôme',d.partner||'—'],['Classe',d.className||'—'],
+  ['Établissement',d.school||'—'],['Problématique',d.problem||'—']
+ ]){
+  const p=node('p','dossier-info-row');
+  p.append(node('strong','',label+' : '),node('span','',String(value)));
+  header.append(p);
+ }
+ wrap.append(header);
+ let count=0;
+ const defaults=[
+  'Les notions générales','Comprendre le sous-thème',
+  'Éléments de réponse à la problématique','Conditions et limites du sujet'
  ];
  for(const [key,value] of Object.entries(annexes).sort(([a],[b])=>Number(a)-Number(b))){
-  if(value)text.push('ANNEXE '+key+'\n'+String(value).slice(0,20000));
+  const n=Number(key);
+  if(!Number.isInteger(n)||n<1||n>4||!String(value||'').trim())continue;
+  count++;
+  const block=node('article','annex-preview-card');
+  block.append(node('div','annex-preview-kicker','ANNEXE '+n));
+  block.append(node('h3','annex-preview-title',String(titles[n]||defaults[n-1]).trim()));
+  block.append(node('div','annex-preview-content',String(value).slice(0,40000)));
+  const src=node('div','annex-preview-source');
+  src.append(node('strong','','Source : '),node('span','',String(sources[n]||'Non renseignée')));
+  block.append(src);
+  block.append(node('small','annex-preview-status',sourceChecks[n]?'Source déclarée vérifiée par l’élève.':'Référence documentaire à vérifier.'));
+  wrap.append(block);
  }
- $('documentBody').textContent=text.join('\n\n');
- $('reviewText').value='';$('dossierDialog').showModal();
+ if(!count)wrap.append(node('p','muted','Aucune annexe rédigée dans ce dossier.'));
+ $('reviewText').value='';
+ $('dossierDialog').showModal();
  await loadReviews();
 }
 async function loadReviews(){
