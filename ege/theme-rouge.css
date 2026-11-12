@@ -52,3 +52,5 @@ body:not(.ege-portal) .ege-phase-modal .ege-phase-header small{color:#ae1e2d!imp
  .ege-teacher-bottom a,.ege-admin-bottom a{flex:1;text-decoration:none;color:#aa1e2d;text-align:center;font:700 12px/1.4 system-ui,sans-serif;padding:8px 3px;border-radius:9px;min-height:38px}
  body:has(.ege-teacher-bottom),body:has(.ege-admin-bottom){padding-bottom:75px}
 }
+
+@media(max-width:700px){.ege-admin-bottom button{flex:1;text-decoration:none;color:#aa1e2d;text-align:center;font:700 12px/1.4 system-ui,sans-serif;padding:8px 3px;border:0;background:transparent;border-radius:9px;min-height:38px;cursor:pointer}}
