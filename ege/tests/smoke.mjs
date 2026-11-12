@@ -21,7 +21,7 @@ assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrou
 assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
 const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
 assert.equal(m.theme_color,'#c8102e');
-assert.ok(read('service-worker-ege-2027.js').includes('shell-v9'));
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v13'));
 assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
 assert.ok(read('portail.html').includes('vendor/supabase-2.57.4.js'));
 assert.ok(read('service-worker-ege-2027.js').includes('vendor/supabase-2.57.4.js'));
@@ -40,4 +40,20 @@ assert.ok(logic.includes('ege2027_teacher_requests'),'validation enseignant abse
 assert.ok(logic.includes('.eq("updated_at",d.updated_at)'),'prévention conflits absente');
 assert.ok(!ui.includes('Vous explorez une maquette'),'texte de démonstration persistant');
 assert.ok(read('service-worker-ege-2027.js').includes('app-2027-views.js'));
+// Accueil et publicité EGE 2027 — nouveaux parcours.
+const adJS=read('app-2027-ads.js');
+new Function(adJS);
+assert.equal(m.name,'EGE 2027');
+assert.ok(newApp.includes('.ege-red-hero'), 'bandeau rouge manquant');
+assert.ok(newApp.includes('./app-2027-ads.js'), 'gestionnaire de publicité non chargé');
+assert.ok(ui.includes('adBanner("home")'), 'bannière sur accueil manquante');
+assert.ok(ui.includes('adBanner("auth")'), 'bannière sur authentification manquante');
+assert.ok(ui.includes('egeAdminAdPanel()'), 'emplacements admin manquants');
+assert.ok(ui.includes('teacherAdPanel()'), 'dépôt annonce enseignant manquant');
+assert.ok(adJS.includes('status!=="approved"'), 'vérification des annonces validées manquante');
+assert.ok(existsSync('ege/ad-learning.svg'), 'illustration de la publicité manquante');
+assert.ok(read('service-worker-ege-2027.js').includes('app-2027-ads.js'));
+assert.ok(read('service-worker-ege-2027.js').includes('ad-learning.svg'));
+assert.ok(!newApp.includes('Prof. Jana Galeh'));
+assert.ok(!ui.includes('Prof. Jana Galeh'));
 console.log('EGE smoke tests : OK');
