@@ -216,20 +216,13 @@ body:has(.word-import-overlay:not([hidden])) .ege-bottom-nav{display:none!import
 .ege-annex-paper-state{font:11px/1.5 system-ui,sans-serif;color:#68788c;margin-top:8px}
 </style>
 <link rel="stylesheet" href="./theme-rouge.css"></head><body>
-<header class="topbar"><a class="brand" id="brand"><span class="brandlogo">EGE</span><span><b>Mon dossier EGE</b><small>Gestion Financière & Mercatique · 2027</small></span></a><div class="topright"><span class="pill">RÉFÉRENTIEL OFFICIEL · 51 SOUS-THÈMES</span><button type="button" class="textbutton ege-install-button" id="egeInstallButton" title="Installer EGE 2027 sur cet appareil"><span aria-hidden="true">↓ </span><span>Installer l’app</span></button><a class="textbutton" href="./mes-groupes.html" title="Rejoindre une classe et partager mes dossiers avec mon enseignant">Mes groupes</a><a class="textbutton" href="./enseignant.html" title="Espace enseignant EGE">Enseignants</a><a class="textbutton ege-admin-link" id="egeAdminPageLink" href="./admin.html" hidden title="Accéder aux paramètres et à l’administration EGE">Administration</a><button type="button" class="textbutton" id="egeCloudOpen" title="Compte EGE et sauvegarde Supabase"><span id="egeCloudBadge">☁ En ligne</span></button><button type="button" class="textbutton" id="backupTop" title="Sauvegarder le projet en fichier JSON">↓ Sauvegarder</button></div></header>
-<nav class="ege-bottom-nav" id="egeBottomNav" aria-label="Navigation rapide EGE">
- <button type="button" id="egeNavHome" class="ege-bottom-item is-current" aria-label="Retour à l'accueil" aria-current="page">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-7H9v7H3z"/></svg><span>Accueil</span>
- </button>
- <button type="button" id="egeNavSave" class="ege-bottom-item" aria-label="Sauvegarder mon dossier">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M5 15v5h14v-5"/></svg><span>Sauvegarder</span>
- </button>
- <button type="button" id="egeNavFiles" class="ege-bottom-item" aria-label="Accéder à mes dossiers et corrections">
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h7l2 2h9v12H3zM3 8V5a1 1 0 0 1 1-1h6"/></svg><span>Dossiers</span>
- </button>
- <a id="egeNavAdmin" class="ege-bottom-item" href="./admin.html" aria-label="Administration EGE" hidden>
-  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 8 4v6c0 5-3 8-8 10-5-2-8-5-8-10V6zM9 12l2 2 4-4"/></svg><span>Admin</span>
- </a>
+<header class="topbar"><a class="brand" id="brand"><span class="brandlogo">EGE</span><span><b>Mon dossier EGE</b><small>Gestion Financière & Mercatique · 2027</small></span></a><div class="topright"><span class="pill">RÉFÉRENTIEL OFFICIEL · 51 SOUS-THÈMES</span><button type="button" class="textbutton ege-install-button" id="egeInstallButton" title="Installer EGE 2027 sur cet appareil"><span aria-hidden="true">↓ </span><span>Installer l’app</span></button><a class="textbutton" href="./mes-groupes.html" title="Rejoindre une classe et partager mes dossiers avec mon enseignant">Mes groupes</a><a class="textbutton" href="./?choisir=1" title="Choisir un espace utilisateur">Changer d'espace</a><a class="textbutton ege-admin-link" id="egeAdminPageLink" href="./admin.html" hidden title="Accéder aux paramètres et à l’administration EGE">Administration</a><button type="button" class="textbutton" id="egeCloudOpen" title="Compte EGE et sauvegarde Supabase"><span id="egeCloudBadge">☁ En ligne</span></button><button type="button" class="textbutton" id="backupTop" title="Sauvegarder le projet en fichier JSON">↓ Sauvegarder</button></div></header>
+<nav class="ege-bottom-nav" id="egeBottomNav" aria-label="Navigation élève">
+<button type="button" id="egeNavHome" class="ege-bottom-item is-current" aria-label="Accueil élève"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-7H9v7H3z"/></svg><span>Accueil</span></button>
+<button type="button" id="egeNavFiles" class="ege-bottom-item" aria-label="Mes dossiers"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h7l2 2h9v12H3z"/></svg><span>Dossiers</span></button>
+<a id="egeNavGroup" class="ege-bottom-item" href="./mes-groupes.html" aria-label="Mon groupe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20v-3c0-2 2-3 5-3m6 0c3 0 5 1 5 3v3M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg><span>Groupe</span></a>
+<button type="button" id="egeNavSave" class="ege-bottom-item" aria-label="Mon profil et ma sauvegarde"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4 21c0-5 3-7 8-7s8 2 8 7"/></svg><span>Profil</span></button>
+<a id="egeNavAdmin" class="ege-bottom-item" href="./admin.html" aria-label="Administration" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 8 4v6c0 5-3 8-8 10-5-2-8-5-8-10V6z"/></svg><span>Admin</span></a>
 </nav>
 <aside class="ege-student-note" id="egeStudentNotice" hidden><strong>Information EGE</strong><span id="egeStudentNoticeText"></span></aside><main class="bodygrid"><aside class="rail"><div class="sidebox"><div class="railtitle">Mon parcours</div><div id="railList"></div><div class="railfoot"><p>Enregistrement automatique sur cet appareil.</p><button class="textbutton" id="importBtn">↥ Importer Word / JSON</button><button class="textbutton" id="resetBtn">↺ Nouveau dossier</button></div></div></aside><section class="workspace"><div class="phaseprogress"><div class="phasehead"><span class="phaselabel" id="phaseName">Mon dossier</span><span class="progresspct" id="progressText">0 %</span></div><div class="progressbar"><span id="progressLine" style="width:0%"></span></div></div><div id="content"></div></section><aside class="aside"><div class="paperbox"><div class="asidehead"><h3>Aperçu du dossier</h3><span class="pill" id="draftLabel">BROUILLON</span></div><div class="paper" id="paper"></div><div class="statuscard" id="statusPanel"></div></div></aside></main><div class="bottomnotice">Recherche documentaire en ligne disponible avec Internet · Sources à vérifier par le candidat · Aucun fait de terrain n’est inventé · Données conservées localement sur cet appareil.</div><input type="file" id="importFile" hidden accept=".json,.docx,application/json,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
@@ -1158,6 +1151,7 @@ async function egeCloudLoadPublicSettings(){
 function egeMobileNavUpdate(){
  const admin=egeCloud('egeNavAdmin');
  if(admin)admin.hidden=!(egeCloudUser && egeCloudStaff?.role==='admin');
+ const group=egeCloud('egeNavGroup');if(group)group.hidden=!!(egeCloudUser&&egeCloudStaff?.role==='admin');
 }
 function egeMobileNavInit(){
  const home=egeCloud('egeNavHome'),saveButton=egeCloud('egeNavSave'),files=egeCloud('egeNavFiles');
@@ -1169,16 +1163,7 @@ function egeMobileNavInit(){
   window.scrollTo({top:0,behavior:'smooth'});
   home.classList.add('is-current');
  });
- saveButton.addEventListener('click',async()=>{
-  save(); /* L'enregistrement local est conservé même sans réseau. */
-  if(!egeCloudUser||!egeSupabaseClient){
-   egeCloudOpen(true);
-   egeCloudMsg('Ton travail est enregistré sur cet appareil. Connecte-toi pour le sauvegarder aussi en ligne.');
-   return;
-  }
-  egeCloudOpen(true);
-  await egeCloudSave();
- });
+ saveButton.addEventListener('click',()=>{save();egeCloudOpen(true);if(!egeCloudUser)egeCloudMsg('Connecte-toi pour synchroniser ton dossier en ligne.');});
  files.addEventListener('click',()=>window.EGE2027Phase1?.openDossiers());
  document.addEventListener('focusin',ev=>{
   if(ev.target?.matches?.('input:not([type=checkbox]):not([type=radio]),textarea,select,[contenteditable=true]'))document.body.classList.add('ege-keyboard-open');
