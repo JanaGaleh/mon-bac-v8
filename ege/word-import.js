@@ -73,7 +73,7 @@ function parseAnnexes(parts){
   let body=parts.slice(m.i+1,last);
   // Table of annexes inside the study sheet: ignore inventory content.
   if(body[0]&&normal(body[0])==='titre')continue;
-  let source='';
+  let source='',title='';
   let lines=[];
   for(let i=0;i<body.length;i++){
    const raw=body[i],v=normal(raw);
@@ -83,14 +83,15 @@ function parseAnnexes(parts){
     if(val&&!/r[eé]f[eé]rence documentaire [aà] renseigner|[aà] compl[eé]ter|source non v[eé]rifi[eé]e/i.test(val))source=val.slice(0,1000);
     continue;
    }
-   if(v==='titre'){i++;continue;}
-   if(!lines.length&&raw.length<=165&&(!/[.!?]$/.test(raw)||/notions|comprendre|element|reponse/i.test(raw)))continue;
+   if(v==='titre'){title=trim(body[i+1]||'').slice(0,190);i++;continue;}
+    if(/^titre\s*[:：]/i.test(raw)){title=trim(raw.replace(/^titre\s*[:：]\s*/i,'')).slice(0,190);continue;}
+   if(!lines.length&&raw.length<=165&&(!/[.!?]$/.test(raw)||/notions|comprendre|element|reponse/i.test(raw))){title=title||raw.slice(0,190);continue;}
    if(/^\d+$/.test(raw)&&raw.length<=2)continue;
    lines.push(raw);
   }
   const text=lines.join('\n\n').trim().slice(0,30000);
   const score=text.length;
-  if(score>0&&(!best[m.n]||score>best[m.n].score))best[m.n]={text,source,score};
+  if(score>0&&(!best[m.n]||score>best[m.n].score))best[m.n]={text,source,title,score};
  }
  return best;
 }
@@ -149,7 +150,8 @@ function openPreview(doc,file){
  CATALOG.forEach((item,i)=>addOption(theme,i,item.title));theme.value=doc.themeIndex<0?'':String(doc.themeIndex);
  updateSubjectOptions(doc.subthemeIndex);
  for(let i=1;i<=4;i++){
-  field('wordImportAnnex'+i,doc.annexes[i]?.text||'');
+  field('wordImportTitle'+i,doc.annexes[i]?.title||'');
+   field('wordImportAnnex'+i,doc.annexes[i]?.text||'');
   field('wordImportSource'+i,doc.annexes[i]?.source||'');
   const box=ui('wordImportAnnexBox'+i);
   if(box){box.open=!!doc.annexes[i]?.text;box.hidden=i===4&&doc.mode==='individuel';}
@@ -191,7 +193,9 @@ function applyImport(){
  for(let i=1;i<=(imported.mode==='binome'?4:3);i++){
   let text=ui('wordImportAnnex'+i).value.trim();
   let source=ui('wordImportSource'+i).value.trim();
-  if(text)imported.annexes[i]=text.slice(0,30000);
+  let title=ui('wordImportTitle'+i)?.value.trim();
+   if(title)imported.annexTitles[i]=title.slice(0,190);
+   if(text)imported.annexes[i]=text.slice(0,30000);
   if(source)imported.sources[i]=source.slice(0,1500);
   // Checking sources is a human action; imports must not mark them as verified.
   imported.sourceChecks[i]=false;
