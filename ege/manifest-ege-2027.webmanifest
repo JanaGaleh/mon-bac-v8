@@ -1,8 +1,8 @@
 {
   "id": "./assistant-dossier-gfm-2027.html",
-  "name": "EGE GFM 2027 · Prof. Jana Galeh",
-  "short_name": "EGE GFM 2027",
-  "description": "Assistant de préparation des Études de Gestion Encadrées — terminale GFM, Djibouti.",
+  "name": "EGE 2027",
+  "short_name": "EGE 2027",
+  "description": "Études de Gestion Encadrées — accompagnement pédagogique pour toutes les séries, Djibouti.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "./",
