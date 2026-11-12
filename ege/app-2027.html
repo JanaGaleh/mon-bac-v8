@@ -72,6 +72,23 @@ html,body{min-height:100%;background:#fff}
 .password-toggle:hover{background:#fff1f3}
 .password-toggle:focus-visible{outline:3px solid #e68c9c;outline-offset:-2px}
 .password-toggle svg{height:21px;width:21px;pointer-events:none}
+
+/* Installation PWA : action visible, sobre, mobile-first */
+.ege-install-entry{text-align:center;margin:27px auto 5px;max-width:380px}
+.ege-install-entry .ege-install-button{min-height:49px;padding:13px 22px;font-size:15px;width:100%}
+.ege-install-entry .small{line-height:1.5;margin:9px 0 0}
+.ege-install-header{min-height:38px;padding:7px 12px;gap:6px;font-size:12px;border-color:#f0cfd5;background:#fff9fa;color:#a8122b}
+.ege-install-header svg{width:17px;height:17px}
+.ege-install-dialog{border:1px solid #f0d8dd;border-radius:19px;padding:25px;background:#fff;color:var(--ink);box-shadow:0 25px 90px #1c243133;max-width:min(440px,calc(100vw - 30px));width:100%;line-height:1.55}
+.ege-install-dialog::backdrop{background:rgba(20,27,42,.48)}
+.ege-install-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.ege-install-dialog h2{font-size:20px;line-height:1.3;margin:0}
+.ege-install-instructions{font-size:14px;margin:16px 0 24px;color:#566171}
+.ege-install-close{width:36px;height:36px;min-width:36px;display:grid;place-items:center;border:0;background:#fff3f5;border-radius:10px;color:#9d1529;cursor:pointer}
+.ege-install-close svg{width:19px;height:19px;transform:rotate(45deg)}
+.ege-install-dialog .btn.full{width:100%}
+[data-act="install"][hidden]{display:none!important}
+@media(max-width:810px){.ege-install-header{min-height:42px;padding:8px 9px}.ege-install-header span{display:none}.ege-install-header svg{width:21px;height:21px}.header-right{gap:6px}.ege-install-entry{margin-top:19px}}
 </style>
 <script defer src="./vendor/supabase-2.57.4.js"></script>
 <script defer src="./app-2027.js"></script>
