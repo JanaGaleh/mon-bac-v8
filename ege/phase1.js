@@ -294,7 +294,7 @@ function installGroupJoinUI(){
  const actionsRow=el('div','ege-tools');actionsRow.append(submit,close);
  const result=el('p','ege-group-join-note','');result.id='egeGroupJoinMessage';result.setAttribute('role','status');
  form.append(labelCode,code,labelName,name,actionsRow,result);panel.append(form);root.append(panel);document.body.append(root);
- btn?.addEventListener('click',()=>{
+ id('egeGroupJoinOpen')?.addEventListener('click',()=>{
   if(!cloud()){if(typeof egeCloudOpen==='function')egeCloudOpen(true);cloudMsg('Connecte-toi pour rejoindre la classe de ton professeur.');return}
   if(typeof egeCloudOpen==='function')egeCloudOpen(false);
   result.textContent='';
