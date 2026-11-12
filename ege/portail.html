@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c91b2c"><meta name="description" content="EGE GFM 2027, dossiers élèves, groupes enseignants et administration pédagogique.">
+<title>EGE GFM 2027 — Prof. Jana Galeh</title><link rel="manifest" href="./manifest-ege-2027.webmanifest"><link rel="icon" href="./icon-ege-192.png">
+<link rel="stylesheet" href="./theme-rouge.css">
+<style>
+.ege-portal{min-height:100dvh;display:flex;flex-direction:column;background:#fff;color:#242931;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+.ege-portal *{box-sizing:border-box}
+.ege-portal header{padding:17px 20px;border-bottom:1px solid #f0e3e5;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ege-portal .brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.35px;color:#281c20;text-decoration:none}
+.ege-portal .logo{display:grid;place-items:center;background:#c91b2c;color:#fff;border-radius:12px;font-weight:850;font-size:17px;width:44px;height:44px}
+.ege-portal .brand small{display:block;font-weight:500;font-size:11px;color:#776c70;letter-spacing:0}
+.ege-portal main{margin:0 auto;max-width:950px;width:100%;padding:48px 18px 70px;flex:1}
+.ege-portal .topline{color:#b62030;font-size:12px;font-weight:800;letter-spacing:1.15px;text-transform:uppercase}
+.ege-portal h1{font-size:clamp(28px,5vw,43px);letter-spacing:-1.3px;line-height:1.2;margin:8px 0 13px;color:#29242a}
+.ege-portal .lead{max-width:620px;color:#66636a;margin:0 auto 33px;font-size:15px}
+.ege-portal .hero{text-align:center;max-width:750px;margin:auto}
+.ege-portal .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.ege-portal .role-card{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:12px;padding:26px 20px;background:#fff;border:1px solid #ebdfe2;border-radius:18px;min-height:206px;color:#29242a;cursor:pointer;box-shadow:0 6px 20px #52263006;transition:border-color .2s,transform .2s}
+.ege-portal .role-card:focus-visible{outline:3px solid #ecb0b6;outline-offset:3px}
+.ege-portal .role-card:hover{border-color:#d73948;transform:translateY(-2px)}
+.ege-portal .role-card svg{width:29px;height:29px;stroke:#c91b2c;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ege-portal .role-card b{font-size:18px}
+.ege-portal .role-card span{font-size:13px;color:#716b72}
+.ege-portal .role-card .go{margin-top:auto;font-size:12px;font-weight:800;color:#b51c2b}
+.ege-portal .auth-panel{max-width:435px;margin:0 auto;background:#fff;border:1px solid #eadfe2;border-radius:19px;padding:25px;box-shadow:0 12px 32px #4e1d2410}
+.ege-portal .back{font-size:13px;border:0;background:none;color:#b52030;cursor:pointer;padding:0;margin-bottom:15px;font-weight:700}
+.ege-portal h2{font-size:23px;letter-spacing:-.5px;margin:0 0 8px}
+.ege-portal .help{font-size:13px;color:#756d71;margin:0 0 20px}
+.ege-portal label{display:block;margin:15px 0 6px;font-size:13px;font-weight:750}
+.ege-portal input{width:100%;font:inherit;border:1px solid #d9ced1;border-radius:10px;padding:11px 13px;min-height:46px;background:#fff;color:#2d2327}
+.ege-portal .passrow{display:flex;align-items:stretch;gap:5px}
+.ege-portal .passrow input{flex:1;min-width:0}
+.ege-portal .eye{border:1px solid #e0d0d3;background:#fff;color:#ae2030;border-radius:10px;padding:0 12px;font-weight:750}
+.ege-portal .cta{display:block;width:100%;border:1px solid #c91b2c;background:#c91b2c;color:#fff;font:700 15px system-ui,sans-serif;min-height:47px;border-radius:11px;padding:11px 15px;margin-top:19px;cursor:pointer}
+.ege-portal .cta:hover{background:#aa1022}.ege-portal .cta:disabled{opacity:.55;cursor:wait}
+.ege-portal .secondary{display:inline-block;border:none;background:none;color:#b41d2a;font-weight:750;padding:8px 0;cursor:pointer;font:700 13px system-ui,sans-serif}
+.ege-portal .actions{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:13px}
+.ege-portal #notice{margin:0 auto 17px;max-width:600px;text-align:center;color:#9f2633;font-size:13px;min-height:12px}
+.ege-portal #notice.ok{color:#19714b}
+.ege-portal footer{border-top:1px solid #f1e5e7;padding:16px 20px;text-align:center;color:#7b7175;font-size:12px}
+[hidden]{display:none!important}
+@media(max-width:670px){.ege-portal main{padding-top:28px}.ege-portal .cards{grid-template-columns:1fr;max-width:470px;margin:auto;gap:11px}.ege-portal .role-card{min-height:0;padding:17px 17px 15px;display:grid;grid-template-columns:39px 1fr;column-gap:13px;row-gap:2px}.ege-portal .role-card svg{grid-row:1 / span 3}.ege-portal .role-card b{font-size:16px}.ege-portal .role-card span{font-size:12px}.ege-portal .role-card .go{margin:3px 0 0}.ege-portal .lead{margin-bottom:23px}.ege-portal .auth-panel{padding:19px}}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script><script defer src="./portail.js"></script></head>
+<body class="ege-portal"><header><a class="brand" href="./"><span class="logo">EGE</span><span>EGE GFM 2027<small>Prof. Jana Galeh · Djibouti</small></span></a><span style="font-size:12px;color:#8b7680">Session 2026–2027</span></header>
+<main><div id="notice" role="status" aria-live="polite"></div>
+<section id="choose" aria-labelledby="welcomeTitle"><div class="hero"><div class="topline">Votre espace pédagogique</div><h1 id="welcomeTitle">Bienvenue sur EGE GFM 2027</h1><p class="lead">Un espace pour préparer, suivre et corriger les études de gestion. Choisissez votre profil.</p></div>
+<div class="cards">
+<button class="role-card" data-role="eleve" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5c3.5-1.5 6-1.5 9 0v15c-3-1.5-5.5-1.5-9 0zm18 0c-3.5-1.5-6-1.5-9 0v15c3-1.5 5.5-1.5 9 0z"/></svg><b>Je suis élève</b><span>Mes dossiers, mon groupe et mes corrections</span><strong class="go">Accéder à mon espace</strong></button>
+<button class="role-card" data-role="enseignant" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m2 9 10-5 10 5-10 5-10-5zm5 3v5c3 2.3 7 2.3 10 0v-5m5-3v7"/></svg><b>Je suis enseignant</b><span>Mes groupes, mes élèves et leurs travaux</span><strong class="go">Accéder à mon espace</strong></button>
+<button class="role-card" data-role="admin" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3 8.3 8 10 5-1.7 8-5 8-10V6zm-4 10 3 3 5-6"/></svg><b>Administration</b><span>Utilisateurs, paramètres et suivi général</span><strong class="go">Accéder à mon espace</strong></button>
+</div></section>
+<section id="loginPanel" class="auth-panel" hidden aria-labelledby="loginTitle"><button type="button" class="back" id="goBack">← Choisir un autre espace</button>
+<h2 id="loginTitle">Connexion</h2><p id="loginHelp" class="help">Retrouvez votre travail.</p>
+<form id="loginForm"><label for="userEmail">Adresse e-mail</label><input type="email" id="userEmail" required autocomplete="username" placeholder="votre@email.com">
+<label for="userPassword">Mot de passe</label><div class="passrow"><input id="userPassword" type="password" minlength="12" required autocomplete="current-password" placeholder="Votre mot de passe"><button type="button" class="eye" id="eye">Voir</button></div>
+<button id="submitLogin" type="submit" class="cta">Se connecter</button></form>
+<div class="actions"><button type="button" class="secondary" id="signup">Créer un compte</button><button type="button" class="secondary" id="forgot">Mot de passe oublié ?</button></div>
+<p id="teacherNotice" class="help" hidden>La création d'un compte enseignant nécessite une validation administrative avant l'accès aux groupes.</p>
+</section>
+<section id="resetPanel" class="auth-panel" hidden><h2>Choisir un nouveau mot de passe</h2><p class="help">Utilisez au moins 12 caractères.</p><form id="resetForm"><label for="newPassword">Nouveau mot de passe</label><input id="newPassword" type="password" minlength="12" required autocomplete="new-password"><button class="cta" type="submit">Enregistrer le mot de passe</button></form></section>
+</main><footer>Prof. Jana Galeh · EGE GFM 2027 — Un accompagnement pour chaque élève</footer></body></html>
