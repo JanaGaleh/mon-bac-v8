@@ -189,6 +189,13 @@ async function initApp(){
   st.user=data.user||null;
   if(st.user){
    st.role=await resolveRole();
+   if(st.role==="enseignant"&&!st.teacher){
+    const m=st.user.user_metadata||{};
+    if(m.full_name&&m.school){
+     const {error:reqError}=await st.db.from("ege2027_teacher_requests").insert({user_id:st.user.id,full_name:m.full_name,school:m.school,status:"pending"});
+     if(reqError)throw reqError;st.role=await resolveRole();
+    }
+   }
    if(new URLSearchParams(location.search).get("choisir")==="1"){st.screen="welcome";}
    else if(new URLSearchParams(location.hash.slice(1)).get("type")==="recovery"){st.pendingPasswordReset=true;st.screen="auth";}
    else st.screen=homes[st.role];
@@ -389,7 +396,7 @@ async function dispatchClick(e){
  try{
   if(a==="goto"){go(el.dataset.to);return}
   if(a==="role"){choiceRole(el.dataset.role);return}
-  if(a==="mode"){st.mode=mode;render();return}
+  if(a==="mode"){st.mode=mode;if(st.screen==="profile"){st.screen="auth";st.desired=st.role}render();return}
   if(a==="refresh"){await loadAll();toast("Données actualisées.");return}
   if(a==="logout"){await signOut();return}
   if(a==="newdoc"){await createDoc();return}
@@ -405,13 +412,15 @@ async function dispatchClick(e){
   if(a==="join"){await joinGroup();return}
   if(a==="associate"){await associateDoc();return}
   if(a==="leave"){await leaveGroup(id);return}
-  if(a==="teacher-create"){st.teacherOpen=!st.teacherOpen;render();return}
+  if(a==="teacher-create"){st.teacherOpen=!st.teacherOpen;if(st.screen!=="teacher-groups"){st.screen="teacher-groups"}render();return}
   if(a==="teacher-select"){st.selectedGroupId=id;go("teacher-students");return}
   if(a==="teacher-review"){st.selectedDocId=id;st.reviewAnnex=1;go("teacher-review");return}
+  if(a==="teacher-annex"){st.reviewAnnex=Number(el.dataset.n)||1;render();return}
   if(a==="remove-student"){await removeStudent(el.dataset.group,id);return}
   if(a==="group-rename"||a==="group-toggle"){await changeGroup(id,a==="group-rename"?"rename":"toggle");return}
   if(a==="copy"){const code=el.dataset.code;if(!code)return;if(navigator.clipboard?.writeText)await navigator.clipboard.writeText(code);toast("Code copié : "+code);return}
   if(a==="request-status"){await approveTeacher(id,el.dataset.status);return}
+  if(a==="review"){await teacherDecision(id,el.dataset.decision);return}
   if(a==="admin-create"){st.adminOpen=!st.adminOpen;render();return}
   if(a==="admin-group"){st.selectedGroupId=id;go("admin-groups");return}
   if(a==="admin-tab"){st.adminTab=mode;render();return}
@@ -456,7 +465,8 @@ document.addEventListener("change",e=>{
  const el=e.target;
  if(el.id==="annexTab"){st.annex=Number(el.value);render()}
  if(el.id==="groupSelect"){st.selectedGroupId=el.value;render()}
- if(el.id==="dTheme"){setDraftField("dTheme",el.value);render()}
+ if(el.id==="dTheme"){render()}
+ if(el.dataset.field==="dMode"){render()}
 });
 window.addEventListener("online",()=>{if(st.role==="eleve"&&st.draft&&st.saveBadge!=="Enregistré en ligne")saveDoc({silent:true}).then(()=>render())});
 document.addEventListener("DOMContentLoaded",()=>initApp());
