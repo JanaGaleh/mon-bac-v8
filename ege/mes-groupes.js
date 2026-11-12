@@ -36,7 +36,7 @@ function render(){
    line.append(name,make('small','','Partagé le '+date(s.submitted_at)));
    if(feedback){
     const status=feedback.decision==='valide'?'Dossier validé':'Correction demandée';
-    line.append(make('p','mini',status+' : '+(feedback.observation||'Sans observation')));
+    line.append(make('p','mini',status+(feedback.annex_number?' · Annexe '+feedback.annex_number:'')+' : '+(feedback.observation||'Sans observation')));
    }
    const actions=make('div','row');actions.append(button('Ne plus partager',()=>unshare(s),'btn danger small'));line.append(actions);box.append(line);
   }
@@ -70,7 +70,7 @@ async function refresh(){
   }
   const dossierIds=[...new Set(shares.map(s=>s.dossier_id))];
   if(dossierIds.length){
-   const q=await api.from('ege2027_reviews').select('dossier_id,decision,observation,created_at').in('dossier_id',dossierIds).order('created_at',{ascending:false}).limit(300);
+   const q=await api.from('ege2027_reviews').select('dossier_id,decision,observation,annex_number,created_at').in('dossier_id',dossierIds).order('created_at',{ascending:false}).limit(300);
    if(q.error)throw q.error;
    reviews=q.data||[];
   }
