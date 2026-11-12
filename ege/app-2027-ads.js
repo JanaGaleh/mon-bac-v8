@@ -78,7 +78,7 @@ function egeReplaceBanner(place){
  template.innerHTML=markup;
  old.replaceWith(template.content.firstElementChild);
 }
-function egeMoveCarousel(place,step,index=null,manual=false){
+function egeMoveCarousel(place,step,index=null,manual=false,focusControl=false){
  const list=egePremiumSlides(place);
  if(list.length<2)return;
  const current=Number(egeCarouselIndex[place]||0);
@@ -86,7 +86,7 @@ function egeMoveCarousel(place,step,index=null,manual=false){
   ((current+step+list.length)%list.length);
  if(manual)egeCarouselPausedUntil[place]=Date.now()+12000;
  egeReplaceBanner(place);
- if(manual){
+ if(manual&&focusControl){
   const btn=document.querySelector('[data-ege-ad-slot="'+place+'"] [data-act="'+(step<0?'ad-prev':index!==null?'ad-slide':'ad-next')+'"]');
   btn?.focus?.({preventScroll:true});
  }
@@ -192,7 +192,7 @@ function egeTeacherAdCard(ad){
   ?'<a class="ege-directory-link" href="'+esc(url)+'" target="_blank" rel="noopener noreferrer">Plus d’informations '+I("arrow")+'</a>'
   :'<button type="button" class="ege-directory-link" data-act="ad-info" data-id="'+esc(ad.id)+'">Voir les détails '+I("arrow")+'</button>';
  const whatsappButton=whatsApp?'<a class="ege-wa-button" target="_blank" rel="noopener noreferrer" href="'+esc(whatsApp)+'" aria-label="Contacter cet enseignant sur WhatsApp">'
-  +I("message-circle")+' WhatsApp</a>':"";
+  +I("chat")+' WhatsApp</a>':"";
  return '<article class="ege-directory-card">'
   +'<div class="ege-directory-icon"><img src="'+esc(egeAdPhoto(ad))+'" width="94" height="80" alt="" loading="lazy"></div>'
   +'<div class="ege-directory-content"><div class="ege-directory-overline">'
