@@ -27,7 +27,7 @@ async function refreshAll(){
  if(!user||member?.role!=='admin')return;
  const [dossiers,reviews,settings]=await Promise.all([
  client.from('ege2027_dossiers').select('id,owner_id,student,created_at,updated_at,payload').order('updated_at',{ascending:false}).limit(100),
- client.from('ege2027_reviews').select('id,dossier_id,decision,observation,created_at').order('created_at',{ascending:false}).limit(200),
+ client.from('ege2027_reviews').select('id,dossier_id,decision,observation,annex_number,created_at').order('created_at',{ascending:false}).limit(200),
  client.from('ege2027_settings').select('id,app_title,academic_year,student_message,updated_at').eq('id',1).single()
  ]);
  if(dossiers.error||reviews.error||settings.error){message('Erreur de chargement : '+(dossiers.error||reviews.error||settings.error).message,'error');return}
@@ -90,7 +90,7 @@ function renderSelected(history){
  const historyDiv=$('reviewHistory');historyDiv.replaceChildren();
  if(!history.length)historyDiv.append(node('p','muted','Aucune correction enregistrée.'));
  for(const rev of history){
-  const e=node('div','entry review'),title=node('b','',rev.decision==='valide'?'Dossier validé':'Correction demandée');
+  const e=node('div','entry review'),title=node('b','',(rev.decision==='valide'?'Validé':'À corriger')+(rev.annex_number?' · Annexe '+rev.annex_number:' · Dossier complet'));
   e.append(title,node('small','',date(rev.created_at)),node('p','',rev.observation||'Aucune observation'));
   historyDiv.append(e);
  }
@@ -102,7 +102,7 @@ async function sendReview(decision){
  if(decision==='valide'&&!confirm('Confirmer la validation de ce dossier ?'))return;
  const buttons=[$('markApproved'),$('markRevision')];buttons.forEach(b=>b.disabled=true);
  try{
-  const {error}=await client.from('ege2027_reviews').insert({dossier_id:selected.id,staff_id:user.id,decision,observation});
+  const {error}=await client.from('ege2027_reviews').insert({dossier_id:selected.id,staff_id:user.id,decision,observation,annex_number:$('adminReviewAnnex').value?Number($('adminReviewAnnex').value):null});
   if(error)throw error;
   $('observation').value='';
   message(decision==='valide'?'Validation enregistrée.':'Demande de correction enregistrée.','ok');
