@@ -19,9 +19,18 @@
 - Administration : validation enseignant, création/modification des groupes, retrait d'élèves, journalisation.
 - PWA : accueil par rôle et cache de version `v8`, SDK Supabase local (version vendored).
 - Courriels HTML de confirmation et de récupération de marque `Prof. Jana Galeh` préparés dans `ege/emails` **mais non encore configurés dans Supabase**.
-- Tests statiques de syntaxe et de structure : **22/22 contrôles passent** au moment de la publication. Workflow `.github/workflows/ege-smoke.yml` ajouté ; son exécution distante reste à vérifier.
+- Tests statiques de syntaxe et de structure : **22/22 contrôles passent** sur le code des parcours au moment de la publication. Workflow `.github/workflows/ege-smoke.yml` ajouté ; son exécution distante reste à vérifier.
 - Tests SQL transactionnels : élève propriétaire voit son dossier, enseignant sans partage ne le voit pas, enseignant après partage le voit, visiteur extérieur ne le voit pas, accès retiré après départ, création d'un avis par annexe, administration des groupes et audit. Tests annulés par `ROLLBACK`, données de production conservées.
 - Cloudflare Worker : déploiement à 100 % confirmé. Test de rendu de l'accueil via Browser Rendering : titre, trois rôles et couleur attendue visibles.
+
+## Vérifications supplémentaires réalisées
+- Après publication, 18 fichiers (écrans, JS, CSS, PWA, SDK local) ont été relus et compilés sans erreur de syntaxe relevée.
+- Le dernier déploiement Cloudflare Worker a été constaté à **100 %**. La route du SDK local `/vendor/supabase-2.57.4.js` est présente.
+- L'ancienne connexion de comptes avec mot de passe de 6 à 11 caractères reste possible ; **les nouveaux comptes exigent 12 caractères**.
+- Les policies d'administration des groupes et de retrait des membres ont été réunies, sans multiplier les droits permissifs, et trois index manquants ont été ajoutés.
+- Tests SQL transactionnels complémentaires après optimisation : enseignant approuvé peut consulter son groupe et le dossier associé ; administrateur peut éditer un groupe. Opérations annulées après vérification.
+- Le navigateur Cloudflare a confirmé que l'accueil affiche les trois rôles et l'identité rouge, et qu'une page enseignant répond avec son HTML. Les tests de navigateur supplémentaires ont rencontré un quota HTTP 429 ; ils ne sont **pas considérés comme réussis**.
+- Le site reste disponible techniquement pour un pilote ; cette disponibilité ne constitue pas une validation de lancement public.
 
 ## Bloquants avant ouverture publique
 1. **Supabase Authentication > URL Configuration** : configurer `Site URL` à `https://ege-gfm-2027.janakaleh.workers.dev/` et autoriser `https://ege-gfm-2027.janakaleh.workers.dev/**` dans Redirect URLs. Supprimer `localhost:3000` des paramètres de production après vérification. Aucun outil connecté ne permet ici de modifier ces paramètres.
