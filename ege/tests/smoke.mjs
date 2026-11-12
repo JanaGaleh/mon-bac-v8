@@ -21,6 +21,9 @@ assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrou
 assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
 const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
 assert.equal(m.theme_color,'#c91b2c');
-assert.ok(read('service-worker-ege-2027.js').includes('shell-v7'));
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v8'));
 assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
+assert.ok(read('portail.html').includes('vendor/supabase-2.57.4.js'));
+assert.ok(read('service-worker-ege-2027.js').includes('vendor/supabase-2.57.4.js'));
+assert.ok(existsSync('ege/vendor/supabase-2.57.4.js'));
 console.log('EGE smoke tests : OK');
