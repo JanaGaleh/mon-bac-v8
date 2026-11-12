@@ -7,11 +7,20 @@ function vGreeting(){
  return first||email.split("@")[0]||"Bienvenue";
 }
 function renderHeader(){
- const account=st.user;
- const roleText={eleve:"Élève",enseignant:"Enseignant",admin:"Administration"}[st.role];
- return `<header class="app-header"><a class="brand" href="./" aria-label="Accueil EGE GFM 2027" style="text-decoration:none">
- <img class="brandmark ege-brand-icon" src="./icon-ege-2027.svg" width="43" height="43" alt="Logo EGE"><span><span class="brandname">EGE GFM 2027</span><br><span class="brand-sub">Prof. Jana Galeh · ${account?roleText:"Encadrement pédagogique"}</span></span></a>
- <div class="header-right"><button type="button" class="btn ege-install-header" data-act="install" aria-label="Installer EGE GFM 2027">${I("download")}<span>Installer</span></button><span class="version-pill">2026–2027</span>${account?`<button class="header-icon" data-act="refresh" aria-label="Actualiser">${I("clock")}</button><button class="avatar" data-act="goto" data-to="profile" aria-label="Ouvrir mon profil">${esc((vGreeting()||"U").charAt(0).toUpperCase())}</button>`:badge("Bienvenue","red")}</div></header>`
+ const intro=st.screen==="welcome"||st.screen==="auth";
+ if(intro)return `<header class="ege-red-hero" aria-label="EGE 2027">
+  <div class="ege-hero-actions"><span class="ege-hero-edition">Études de Gestion Encadrées</span>
+   <button class="ege-hero-install" type="button" data-act="install">${I("download")} <span>Installer</span></button>
+  </div>
+  <div class="ege-hero-brand"><div class="ege-hero-symbol" aria-hidden="true">${I("cap")}${I("book")}</div>
+   <h1>EGE 2027</h1><p>Votre espace pédagogique</p></div>
+  <svg class="ege-hero-wave" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true">
+   <path d="M0 53 C160 -5 325 101 520 78 S875 0 1000 40 L1000 100 L0 100Z" fill="#ffffff"/>
+  </svg></header>`;
+ const role={eleve:"Élève",enseignant:"Enseignant",admin:"Administration"}[st.role];
+ return `<header class="app-header"><a class="brand" href="./" aria-label="Accueil EGE 2027" style="text-decoration:none">
+ <img class="brandmark ege-brand-icon" src="./icon-ege-2027.svg" width="43" height="43" alt="EGE 2027"><span><span class="brandname">EGE 2027</span><br><span class="brand-sub">Encadrement pédagogique · ${role}</span></span></a>
+ <div class="header-right"><button type="button" class="btn ege-install-header" data-act="install" aria-label="Installer EGE 2027">${I("download")}<span>Installer</span></button><span class="version-pill">2026–2027</span>${st.user?`<button class="header-icon" data-act="refresh" aria-label="Actualiser">${I("clock")}</button><button class="avatar" data-act="goto" data-to="profile" aria-label="Ouvrir mon profil">${esc((vGreeting()||"U").charAt(0).toUpperCase())}</button>`:badge("Bienvenue","red")}</div></header>`;
 }
 function menu(){
  const items=navs[st.role]||[],active=st.screen;
@@ -32,18 +41,28 @@ function feedback(){
  return "";
 }
 function welcome(){
- const roles=[["eleve","Élève","Préparer et retrouver mes dossiers EGE.","cap"],["enseignant","Enseignant","Suivre mes classes et corriger les travaux.","users"],["admin","Administration","Gérer les comptes et superviser la plateforme.","shield"]];
- return `<div class="onboard"><div class="onboard-top"><img class="onboard-logo ege-brand-icon" src="./icon-ege-2027.svg" width="76" height="76" alt="Icône EGE GFM 2027"><div class="page-eyebrow">EGE GFM 2027 · Prof. Jana Galeh</div><h1>Votre étude de gestion, plus simple à chaque étape.</h1><p class="onlead">Un espace adapté à chacun, sans menus compliqués. Choisissez votre profil pour continuer.</p></div>
- <div class="rolecards">${roles.map(([id,name,desc,icon])=>`<button class="rolecard" data-act="role" data-role="${id}"><span class="roleicon">${I(icon)}</span><h3>${name}</h3><p>${desc}</p><span class="rolelink">Accéder à mon espace ${I("arrow")}</span></button>`).join("")}</div>
- <div class="ege-install-entry"><button type="button" class="btn primary ege-install-button" data-act="install">${I("download")} Installer l'application</button><p class="small muted">Accédez plus rapidement à vos dossiers depuis l'écran d'accueil de votre appareil.</p></div>
- <div class="onboard-bottom">Connexion sécurisée · Travail personnalisé · Suivi pédagogique</div>
+ const roles=[
+  ["eleve","Élève","Mes dossiers et mes corrections","cap"],
+  ["enseignant","Enseignant","Mes groupes et mes élèves","users"],
+  ["admin","Administrateur","Gestion de la plateforme","shield"]
+ ];
+ return `<div class="onboard ege-onboard-new">
+  <div class="onboard-top"><h2>Choisissez votre espace</h2><p class="onlead">Un accès simple pour préparer, suivre et encadrer les études de gestion.</p></div>
+  <div class="rolecards">
+   ${roles.map(([id,name,desc,icon])=>`<button type="button" class="rolecard" data-act="role" data-role="${id}" aria-label="Accéder à l'espace ${esc(name)}">
+     <span class="roleicon">${I(icon)}</span><h3>${name}</h3><p>${desc}</p>
+   </button>`).join("")}
+  </div>
+  ${adBanner("home")}
+  <div class="ege-install-entry"><button type="button" class="btn primary ege-install-button" data-act="install">${I("download")} Installer l’application</button></div>
+  <div class="onboard-bottom">Connexion sécurisée · Confidentialité des dossiers · Accompagnement scolaire</div>
  </div>`;
 }
 function auth(){
  const role={eleve:"élève",enseignant:"enseignant",admin:"administrateur"}[st.desired]||"élève";
  const isSign=st.mode==="signup",isForgot=st.mode==="forgot";
- return `<div class="login-card"><button class="backbtn" data-act="goto" data-to="welcome">${I("left")} Changer d’espace</button>
- <span class="login-badge">${esc(role.toUpperCase())}</span><h1>${st.pendingPasswordReset?"Changer votre mot de passe":isSign?"Créer mon compte":isForgot?"Récupérer mon compte":"Me connecter"}</h1>
+ return `<div class="ege-auth-stage"><div class="login-card"><button class="backbtn" data-act="goto" data-to="welcome">${I("left")} Changer d’espace</button>
+ <span class="login-badge">${esc(role.toUpperCase())}</span><h1>${st.pendingPasswordReset?"Changer votre mot de passe":isSign?"Créer mon compte":isForgot?"Récupérer mon compte":"Connexion"}</h1>
  <p class="muted small">${st.pendingPasswordReset?"Définissez un nouveau mot de passe pour votre compte.":isForgot?"Recevez un lien de réinitialisation par e-mail.":"Retrouvez vos dossiers, classes et corrections."}</p>
  ${st.pendingPasswordReset?`<div class="field"><label class="password-label" for="newPassword">Nouveau mot de passe</label><div class="password-wrap"><input id="newPassword" class="input" type="password" minlength="12" autocomplete="new-password" placeholder="12 caractères minimum"><button class="password-toggle" type="button" data-act="toggle-password" data-target="newPassword" aria-label="Afficher le mot de passe" aria-pressed="false" title="Afficher le mot de passe">${I("eye")}</button></div></div>${btn("Enregistrer le nouveau mot de passe","reset-password","btn primary full","check")}`:
  `<form id="authForm" class="ege-forms">
@@ -55,7 +74,7 @@ function auth(){
  ${st.desired!=="admin"?btn(isSign||isForgot?"Déjà inscrit ?":"Créer un compte","mode","btn ghost smol","",`data-mode="${isSign||isForgot?"login":"signup"}"`):""}
  ${btn(isForgot?"Retour":"Mot de passe oublié ?","mode","btn ghost smol","",`data-mode="${isForgot?"login":"forgot"}"`)}
  </div>${st.desired==="enseignant"?`<p class="form-note">Votre compte enseignant sera actif après validation par l'administrateur.</p>`:""}`}
- </div>`;
+ </div><div class="ege-auth-ad">${adBanner("auth")}</div></div>`;
 }
 function stat(label,num,icon){return `<div class="stat"><div class="stat-row"><span class="stat-label">${esc(label)}</span><span class="stat-icon">${I(icon)}</span></div><div class="stat-num">${csvCount(num)}</div></div>`}
 function tile(name,sub,icon,screen){return `<button class="tile" data-act="goto" data-to="${screen}"><span class="tile-icon">${I(icon)}</span><span><span class="tile-title">${esc(name)}</span><br><span class="tile-sub">${esc(sub)}</span></span></button>`}
@@ -75,7 +94,8 @@ function studentHome(){
  <div class="grid3">${tile("Mes dossiers",st.docs.length+" dossier(s) enregistré(s)","folder","student-docs")}${tile("Mon groupe",group?.name||"Rejoindre une classe","users","student-group")}${tile("Mes annexes",d?"Rédiger et vérifier":"Commencer un dossier","edit",d?"student-annex":"student-docs")}</div></div>
  <div class="section-stack"><section class="card"><div class="card-head"><h3>Dernières corrections</h3>${badge(rev.length+" avis","red")}</div>${reviewList(rev.slice(0,3))}
  ${btn("Voir mes corrections","goto","btn ghost smol","arrow",'data-to="student-group"')}</section>
- <div class="notice info">${I("cloud")}<span><strong>Synchronisation :</strong> ${esc(st.saveBadge)}. ${st.warning?"Attention : "+esc(st.warning):"Votre dossier personnel reste privé tant que vous ne l'associez pas à un groupe."}</span></div></div></div>`;
+ <div class="notice info">${I("cloud")}<span><strong>Synchronisation :</strong> ${esc(st.saveBadge)}. ${st.warning?"Attention : "+esc(st.warning):"Votre dossier personnel reste privé tant que vous ne l'associez pas à un groupe."}</span></div></div></div>
+ ${adBanner("student_home")}`;
 }
 function docRows(){
  const docs=st.docs.filter(d=>docTitle(d).toLowerCase().includes(st.filter.toLowerCase()));
@@ -86,7 +106,8 @@ function docRows(){
 function studentDocs(){
  return `${title("Mes documents","Mes dossiers EGE","Ouvrez, continuez ou créez un dossier sans perdre les travaux existants.",btn("Nouveau dossier","newdoc","btn primary","plus"))}
  <div class="card"><div class="mini-filter"><div class="search">${I("search")}<input id="docSearch" class="input" placeholder="Rechercher un dossier" value="${esc(st.filter)}" aria-label="Rechercher un dossier"></div>${badge(st.docs.length+" dossier(s)")}</div><div id="docsList">${docRows()}</div></div>
- <p class="form-note">Seuls les dossiers volontairement associés à un groupe sont accessibles à l'enseignant de ce groupe.</p>`;
+ <p class="form-note">Seuls les dossiers volontairement associés à un groupe sont accessibles à l'enseignant de ce groupe.</p>
+ ${adBanner("student_docs")}`;
 }
 function teacherPending(){
  return `${title("Espace enseignant","Validation du compte","L'accès aux classes nécessite l'approbation administrative.")}
@@ -153,7 +174,8 @@ function studentGroup(){
  ${groups.length&&docs.length?`<div class="card"><h3>Associer un dossier à une classe</h3><p class="small muted">Cette association se fait avec votre accord initial et reste active pour les sauvegardes futures.</p>
  <form id="groupShareForm"><label class="field"><span>Groupe</span><select class="select" id="shareGroup">${groups.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join("")}</select></label>
  <label class="field"><span>Dossier</span><select class="select" id="shareDoc">${docs.map(d=>`<option value="${d.id}">${esc(docTitle(d))}</option>`).join("")}</select></label><button type="submit" class="btn primary">${I("check")} Associer ce dossier</button></form></div>`:""}
- </div><div class="card"><div class="card-head"><h3>Corrections reçues</h3>${badge(rows.length+" avis")}</div>${reviewList(rows)}</div></div>`;
+ </div><div class="card"><div class="card-head"><h3>Corrections reçues</h3>${badge(rows.length+" avis")}</div>${reviewList(rows)}</div></div>
+ ${adBanner("student_group")}`;
 }
 function teacherHome(){
  if(st.teacher?.status!=="approved")return teacherPending();
@@ -162,7 +184,8 @@ function teacherHome(){
  <div class="grid3" style="margin-bottom:18px">${stat("Groupes actifs",st.groups.filter(g=>g.active).length,"users")}${stat("Élèves inscrits",count,"cap")}${stat("Dossiers associés",assigned,"file")}</div>
  <div class="layout-side"><div class="card"><div class="card-head"><h3>Mes classes</h3>${badge(st.groups.length+" groupe(s)")}</div>${st.groups.length?st.groups.map(g=>`<div class="list-row"><span class="row-icon red">${I("users")}</span><div class="row-content"><strong>${esc(g.name)}</strong><small>${esc(g.school)} · ${st.members.filter(m=>m.group_id===g.id).length} élève(s)</small></div>${btn("Ouvrir","teacher-select","btn smol","arrow",`data-id="${g.id}"`)}</div>`).join(""):emptyCard("Aucun groupe : créez une classe pour commencer.")}
  <div class="form-footer">${btn("Créer un groupe","teacher-create","btn primary","plus")}</div></div>
- <div class="card"><div class="card-head"><h3>Derniers avis</h3>${badge(st.reviews.length+" correction(s)")}</div>${reviewList(st.reviews.slice(0,5))}</div></div>`;
+ <div class="card"><div class="card-head"><h3>Derniers avis</h3>${badge(st.reviews.length+" correction(s)")}</div>${reviewList(st.reviews.slice(0,5))}</div></div>
+ ${teacherAdPanel()}`;
 }
 function teacherGroups(){
  if(st.teacher?.status!=="approved")return teacherPending();
@@ -240,11 +263,11 @@ function adminGroups(){
 function adminMonitor(){
  const tab=st.adminTab;
  return `${title("Supervision","Dossiers, statistiques et sécurité","Contrôlez les travaux et les paramètres généraux.",badge("Accès administrateur","red"))}
- <div class="tabset">${[["dossiers","Dossiers"],["stats","Statistiques"],["security","Sécurité"],["preview","Lire un dossier"]].map(([id,label])=>`<button class="tab ${tab===id?"active":""}" data-act="admin-tab" data-mode="${id}">${label}</button>`).join("")}</div>
+ <div class="tabset">${[["dossiers","Dossiers"],["stats","Statistiques"],["security","Sécurité"],["ads","Publicités"],["preview","Lire un dossier"]].map(([id,label])=>`<button class="tab ${tab===id?"active":""}" data-act="admin-tab" data-mode="${id}">${label}</button>`).join("")}</div>
  ${tab==="dossiers"?`<div class="card"><div class="card-head"><h3>Dossiers enregistrés</h3>${badge(st.docs.length+" dossier(s)")}</div>
  ${st.docs.length?st.docs.map(d=>`<div class="list-row"><span class="row-icon red">${I("file")}</span><div class="row-content"><strong>${esc(docTitle(d))}</strong><small>${esc(displayStudent(d))} · ${shortDate(d.updated_at)}</small></div>${btn("Consulter","admin-read","btn primary smol","eye",`data-id="${d.id}"`)}</div>`).join(""):emptyCard("Aucun dossier.")}</div>`:tab==="stats"?`<div class="grid3">${stat("Dossiers",st.docs.length,"file")}${stat("Élèves en groupe",new Set(st.members.map(m=>m.student_id)).size,"users")}${stat("Enseignants",st.requests.length,"cap")}</div><div class="card" style="margin-top:15px"><h3>Statistiques réelles</h3><p class="muted small">Comptages calculés à partir des lignes visibles à l'administrateur (pagination limitée).</p></div>`:tab==="security"?`<div class="layout-side">
  <div class="card"><h3>Paramètres généraux</h3><label class="field"><span>Année scolaire</span><input class="input" id="settingsYear" value="${esc(st.settings?.academic_year||"2026–2027")}"></label><label class="field"><span>Message aux élèves</span><textarea class="textarea" id="settingsMessage">${esc(st.settings?.student_message||"")}</textarea></label>${btn("Enregistrer les paramètres","save-settings","btn primary","check")}</div>
- <div class="card"><h3>Historique des actions</h3>${st.audit.length?st.audit.map(a=>`<div class="list-row"><span class="row-icon">${I("clock")}</span><div class="row-content"><strong>${esc(a.action+" · "+a.entity_type.replace("ege2027_",""))}</strong><small>${longDate(a.created_at)}</small></div></div>`).join(""):emptyCard("Aucune opération enregistrée.")}</div></div>`:
+ <div class="card"><h3>Historique des actions</h3>${st.audit.length?st.audit.map(a=>`<div class="list-row"><span class="row-icon">${I("clock")}</span><div class="row-content"><strong>${esc(a.action+" · "+a.entity_type.replace("ege2027_",""))}</strong><small>${longDate(a.created_at)}</small></div></div>`).join(""):emptyCard("Aucune opération enregistrée.")}</div></div>`:tab==="ads"?egeAdminAdPanel():
  (()=>{const d=currentDoc();if(!d)return box(emptyCard("Sélectionnez un dossier dans l'onglet Dossiers."));
  const p=d.payload||{},len=p.mode==="binome"?4:3;
  return `<div class="card"><h3>${esc(docTitle(d))} · ${esc(displayStudent(d))}</h3>${p.problem?`<p>${esc(p.problem)}</p>`:""}
@@ -274,13 +297,13 @@ function view(){
 }
 function render(){
  const host=$("app");if(!host)return;
- host.className="app";
+ host.className="app"+((st.screen==="welcome"||st.screen==="auth")?" ege-intro-app":"");
  const intro=st.screen==="welcome"||st.screen==="auth";
  host.innerHTML=renderHeader()+`<div class="app-body">${intro?"":menu()}<main class="main ${intro?(st.screen==="welcome"?"intro-main":"login-main"):""}" id="content"><section class="screen">${feedback()}${view()}</section></main></div>${intro?"":bottomNav()}
  <dialog id="egeInstallDialog" class="ege-install-dialog" aria-labelledby="egeInstallTitle">
-  <div class="ege-install-dialog-head"><h2 id="egeInstallTitle">Installer EGE GFM 2027</h2><button type="button" class="ege-install-close" data-act="close-install" aria-label="Fermer">${I("plus")}</button></div>
+  <div class="ege-install-dialog-head"><h2 id="egeInstallTitle">Installer EGE 2027</h2><button type="button" class="ege-install-close" data-act="close-install" aria-label="Fermer">${I("plus")}</button></div>
   <p id="egeInstallInstructions" class="ege-install-instructions"></p>
   <button type="button" class="btn primary full" data-act="close-install">Compris</button>
- </dialog>`;
+ </dialog>${egeAdDialogHTML()}`;
  refreshInstallButtons();
 }
