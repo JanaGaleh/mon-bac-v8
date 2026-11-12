@@ -299,6 +299,9 @@ async function archiveDoc(id){
  if(st.selectedDocId===id){st.selectedDocId=null;st.draft=null}await loadAll();toast("Dossier archivé.");
 }
 async function selectAndGoDoc(id,screen="student-wizard"){
+ if(st.draft&&st.selectedDocId!==id&&st.saveBadge!=="Enregistré en ligne"){
+  const ok=await saveDoc({silent:true});if(!ok)throw Error("Le brouillon précédent n'est pas synchronisé. Sauvegardez-le avant de changer de dossier.");
+ }
  selectDoc(id);go(screen);
 }
 async function legacyEditor(){
@@ -399,8 +402,13 @@ async function dispatchClick(e){
   if(a==="mode"){st.mode=mode;if(st.screen==="profile"){st.screen="auth";st.desired=st.role}render();return}
   if(a==="refresh"){await loadAll();toast("Données actualisées.");return}
   if(a==="logout"){await signOut();return}
-  if(a==="newdoc"){await createDoc();return}
-  if(a==="opendoc"){selectAndGoDoc(id,el.dataset.to||"student-wizard");return}
+  if(a==="newdoc"){
+   if(st.draft&&st.saveBadge!=="Enregistré en ligne"){
+    const done=await saveDoc({silent:true});if(!done)throw Error("Votre brouillon actuel n'est pas synchronisé. Sauvegardez-le avant de créer un autre dossier.");
+   }
+   await createDoc();return
+  }
+  if(a==="opendoc"){await selectAndGoDoc(id,el.dataset.to||"student-wizard");return}
   if(a==="annex"){st.annex=Number(el.dataset.n);render();return}
   if(a==="legacy"){await legacyEditor();return}
   if(a==="archive"){await archiveDoc(id);return}
