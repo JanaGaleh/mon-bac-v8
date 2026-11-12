@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#163e68"><meta name="robots" content="noindex,nofollow">
+<title>Mes groupes EGE | EGE GFM 2027</title><link rel="icon" href="./icon-ege-192.png">
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#18344f;background:#f4f7fb;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom)}[hidden]{display:none!important}
+button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:wait;opacity:.55}a{color:#1e5cbd}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9ecbff;outline-offset:3px}
+header{background:#fff;border-bottom:1px solid #dfe8f3}.head{max-width:1040px;margin:auto;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#173b62;font-weight:800}.brand span{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#1761c1;color:#fff}.head nav{display:flex;align-items:center;flex-wrap:wrap;gap:13px;font-size:13px}
+main{max-width:1040px;margin:26px auto;padding:0 16px 48px}.eyebrow{color:#1f62b7;font-size:11px;font-weight:800;letter-spacing:1.2px}
+h1{font-size:clamp(26px,4vw,36px);letter-spacing:-.8px;margin:5px 0 8px}h2{font-size:19px;margin:0 0 9px}.lead,.muted{color:#607891}.lead{margin:0 0 23px}
+.card{border:1px solid #dfe7f2;border-radius:18px;background:#fff;padding:23px;margin:15px 0;box-shadow:0 5px 20px #12345b07}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.grid .card{margin:0}label{font-size:13px;font-weight:750;display:block;margin:13px 0 5px}
+input,select{width:100%;min-height:45px;border:1px solid #c7d8e9;background:#fff;border-radius:10px;padding:10px 12px;color:#18344f}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;border:1px solid #c8daee;background:#f1f6fc;color:#1f588c;font-weight:750;border-radius:10px;padding:10px 16px}
+.btn.primary{background:#205fc0;color:#fff;border-color:#205fc0}.btn.danger{background:#fff6f5;color:#a23e3e;border-color:#efc4bd}
+.btn.small{min-height:36px;font-size:12px;padding:7px 11px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px}
+.entry{border-top:1px solid #e5edf6;padding:13px 0}.entry:last-child{padding-bottom:0}
+.entry strong{display:block}.entry small{color:#70869e}.entry .row{margin-top:7px}
+.tag{display:inline-block;padding:5px 9px;border-radius:9px;background:#ebf4ff;color:#1d59a7;font-size:12px;font-weight:750}
+#flash{max-width:1040px;margin:auto;min-height:22px;padding:9px 17px;color:#185b94;white-space:pre-wrap}
+#flash.error{color:#a13b35}
+#groupList .card{margin:0}.mini{font-size:13px;color:#627a90;margin:7px 0}
+@media(max-width:640px){main{margin-top:18px}.card{padding:17px;border-radius:14px}.head nav{gap:8px}}
+</style>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0/dist/umd/supabase.min.js"></script>
+<script defer src="./mes-groupes.js"></script></head><body>
+<header><div class="head"><a class="brand" href="./assistant-dossier-gfm-2027.html"><span>EGE</span><div>EGE GFM 2027<div class="muted" style="font-size:12px;font-weight:500">Mes groupes d'encadrement</div></div></a>
+<nav><a href="./assistant-dossier-gfm-2027.html">Mon dossier</a><a href="./enseignant.html">Espace enseignant</a><button id="signOut" class="btn small" hidden>Déconnexion</button></nav></div></header>
+<div id="flash" role="status" aria-live="polite"></div>
+<main><div class="eyebrow">ESPACE ÉLÈVE</div><h1>Mes groupes et mes dossiers</h1><p class="lead">Rejoins la classe de ton enseignant avec son code. Choisis ensuite les dossiers que tu veux lui transmettre.</p>
+<section class="card" id="authArea" hidden><h2>Connexion EGE</h2><p class="muted">Utilise le compte de tes dossiers EGE. Tu peux aussi <a href="./assistant-dossier-gfm-2027.html">créer un compte depuis l'application</a>.</p>
+<label for="email">Adresse e-mail</label><input id="email" type="email" autocomplete="username" placeholder="votre@email.com">
+<label for="password">Mot de passe</label><input id="password" type="password" autocomplete="current-password">
+<div class="row"><button id="login" type="button" class="btn primary">Se connecter</button><button id="recover" type="button" class="btn">Mot de passe oublié ?</button></div></section>
+<div id="privateArea" hidden>
+<div class="grid">
+<section class="card"><h2>Rejoindre un groupe</h2><p class="mini">Demande le code de 12 caractères à ton enseignant.</p>
+<form id="joinForm"><label for="studentName">Ton nom et prénom</label><input id="studentName" required maxlength="140" minlength="2" autocomplete="name" placeholder="Ex. Ahmed Ali">
+<label for="groupCode">Code donné par l'enseignant</label><input id="groupCode" required maxlength="12" minlength="12" pattern="[0-9a-fA-F]{12}" autocapitalize="characters" autocomplete="off" placeholder="12 caractères">
+<button type="submit" class="btn primary" style="margin-top:16px">Rejoindre la classe</button></form></section>
+<section class="card"><h2>Partager un dossier</h2><p class="mini">Ton professeur ne voit que les dossiers que tu sélectionnes.</p>
+<form id="shareForm"><label for="groupSelect">Groupe</label><select id="groupSelect" required></select>
+<label for="dossierSelect">Mon dossier EGE</label><select id="dossierSelect" required></select>
+<button type="submit" class="btn primary" style="margin-top:16px">Partager avec mon enseignant</button></form>
+<p class="mini" id="noDossier" hidden>Tu n'as aucun dossier en ligne. <a href="./assistant-dossier-gfm-2027.html">Crée et sauvegarde d'abord un dossier.</a></p></section>
+</div>
+<section style="margin-top:26px"><div class="row" style="justify-content:space-between"><h2>Mes classes</h2><button id="reload" class="btn small">Actualiser</button></div><div id="groupList" class="grid" aria-live="polite"></div></section>
+</div></main></body></html>
