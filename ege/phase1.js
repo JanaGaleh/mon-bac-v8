@@ -235,11 +235,11 @@ async function showReviews(){
  if(!cloud()){if(typeof egeCloudOpen==='function')egeCloudOpen(true);cloudMsg('Connecte-toi pour consulter les corrections.');return}
  if(!currentId){await openDossiers();status('Ouvre d’abord un dossier pour voir ses corrections.');return}
  const {data:reviews,error}=await egeSupabaseClient.from('ege2027_reviews')
- .select('decision,observation,created_at').eq('dossier_id',currentId).order('created_at',{ascending:false}).limit(10);
+ .select('decision,observation,annex_number,created_at').eq('dossier_id',currentId).order('created_at',{ascending:false}).limit(10);
  if(error){cloudMsg('Corrections indisponibles : '+error.message);return}
  if(typeof egeCloudOpen==='function')egeCloudOpen(true);
  cloudMsg(!reviews?.length?'Pas encore de correction pour ce dossier.':reviews.map(x=>
-  (x.decision==='valide'?'Validé':'À corriger')+' ('+date(x.created_at)+') : '+x.observation).join('\n\n'));
+  (x.decision==='valide'?'Validé':'À corriger')+(x.annex_number?' · Annexe '+x.annex_number:' · Dossier')+' ('+date(x.created_at)+') : '+x.observation).join('\n\n'));
 }
 async function forgotPassword(){
  if(!egeSupabaseClient)return;
