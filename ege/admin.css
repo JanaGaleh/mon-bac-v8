@@ -17,3 +17,12 @@
  body.admin-keyboard-open #reviewPanel .actions{position:static}
 }
 @media print{.admin-bottom-nav{display:none!important}body{padding-bottom:0}}
+
+
+/* Présentation des annexes envoyées par les élèves */
+.admin-annex-card{border:1px solid #dce5f0;border-radius:12px;padding:22px 18px;margin:16px 0;background:#fff}
+.admin-annex-label{display:block;color:#667d95;font-weight:750;letter-spacing:1.2px;text-align:center}
+.admin-annex-title{text-align:center;font:700 18px/1.45 Georgia,'Times New Roman',serif;color:#203950;margin:12px 0 17px}
+.admin-annex-content{font:15px/1.65 Georgia,'Times New Roman',serif;white-space:pre-wrap;word-break:break-word}
+.admin-annex-source{border-top:1px solid #dde7f2;padding-top:12px;margin-top:20px;font:13px/1.5 system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-annex-check{display:block;color:#687f95;margin-top:7px;font-size:12px}
