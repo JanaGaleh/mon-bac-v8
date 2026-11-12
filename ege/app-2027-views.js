@@ -306,4 +306,5 @@ function render(){
   <button type="button" class="btn primary full" data-act="close-install">Compris</button>
  </dialog>${egeAdDialogHTML()}`;
  refreshInstallButtons();
+ egeStartAdCarousel();
 }
