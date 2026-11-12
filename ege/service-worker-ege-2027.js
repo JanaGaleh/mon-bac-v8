@@ -1,5 +1,5 @@
 /* EGE GFM 2027: cache limité aux fichiers publics de l'application, jamais aux dossiers Supabase. */
-const CACHE='ege-gfm-2027-shell-v3';
+const CACHE='ege-gfm-2027-shell-v4';
 const PAGE=new URL('./assistant-dossier-gfm-2027.html',self.registration.scope).href;
 const ASSETS=['./assistant-dossier-gfm-2027.html','./manifest-ege-2027.webmanifest','./icon-ege-192.png','./icon-ege-512.png','./word-import.js','./phase1.js'].map(p=>new URL(p,self.registration.scope).href);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
