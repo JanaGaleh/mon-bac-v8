@@ -199,11 +199,11 @@ async function viewDossier(doc){
 }
 async function loadReviews(){
  if(!selected)return;
- const {data,error}=await api.from('ege2027_reviews').select('decision,observation,created_at').eq('dossier_id',selected.id).order('created_at',{ascending:false}).limit(30);
+ const {data,error}=await api.from('ege2027_reviews').select('decision,observation,annex_number,created_at').eq('dossier_id',selected.id).order('created_at',{ascending:false}).limit(30);
  const host=$('reviewsHistory');host.replaceChildren();
  if(error){host.append(node('p','',error.message));return}
  if(!data?.length){host.append(node('p','','Pas encore de correction.'));return}
- for(const r of data)host.append(node('p','',(r.decision==='valide'?'Validé':'À corriger')+' · '+date(r.created_at)+' : '+(r.observation||'Sans commentaire')));
+ for(const r of data)host.append(node('p','',(r.decision==='valide'?'Validé':'À corriger')+(r.annex_number?' · Annexe '+r.annex_number:' · Dossier')+' · '+date(r.created_at)+' : '+(r.observation||'Sans commentaire')));
 }
 async function sendReview(decision){
  if(!selected||!user||request?.status!=='approved')return;
@@ -212,9 +212,9 @@ async function sendReview(decision){
  if(decision==='valide'&&!confirm('Valider le dossier de cet élève ?'))return;
  for(const n of ['approve','revise'])$(n).disabled=true;
  try{
-  const {error}=await api.from('ege2027_reviews').insert({dossier_id:selected.id,staff_id:user.id,decision,observation});
+  const {error}=await api.from('ege2027_reviews').insert({dossier_id:selected.id,staff_id:user.id,decision,observation,annex_number:val('reviewAnnex')?Number(val('reviewAnnex')):null});
   if(error)throw error;
-  $('reviewText').value='';await loadReviews();note(decision==='valide'?'Dossier validé.':'Correction demandée. L’élève verra votre observation.');
+  $('reviewText').value='';$('reviewAnnex').value='';await loadReviews();note(decision==='valide'?'Dossier validé.':'Correction demandée. L’élève verra votre observation.');
  }catch(e){note('Avis non enregistré : '+e.message,true)}
  finally{for(const n of ['approve','revise'])$(n).disabled=false}
 }
