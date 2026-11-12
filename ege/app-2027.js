@@ -185,8 +185,9 @@ async function initApp(){
  st.db=factory(DB_URL,DB_PUBLIC);
  st.db.auth.onAuthStateChange((event)=>{if(event==="PASSWORD_RECOVERY"){st.pendingPasswordReset=true;st.screen="auth";render()}});
  try{
-  const {data,error}=await st.db.auth.getUser();if(error)throw error;
-  st.user=data.user||null;
+  const {data,error}=await st.db.auth.getUser();
+  if(error&&error.name!=="AuthSessionMissingError"&&!/auth session missing/i.test(error.message||""))throw error;
+  st.user=data?.user||null;
   if(st.user){
    st.role=await resolveRole();
    if(st.role==="enseignant"&&!st.teacher){
