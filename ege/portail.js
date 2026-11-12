@@ -19,7 +19,7 @@ async function resolveRole(){
  const teacher=await api.from('ege2027_teacher_requests').select('status').eq('user_id',user.id).maybeSingle();
  if(teacher.error)throw teacher.error;
  if(teacher.data||admin.data?.role==='enseignant')return 'enseignant';
- return (safeRead()==='enseignant'?'enseignant':'eleve');
+ return (user.user_metadata?.requested_role==='enseignant'||safeRead()==='enseignant')?'enseignant':'eleve';
 }
 function openRole(role){
  requested=role;
@@ -69,7 +69,7 @@ async function signup(){
  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||password.length<12){notice('Renseignez un e-mail valide et un mot de passe d’au moins 12 caractères.');return}
  busy=true;$('signup').disabled=true;
  try{
-  const {data,error}=await api.auth.signUp({email,password,options:{emailRedirectTo:originUrl}});
+  const {data,error}=await api.auth.signUp({email,password,options:{emailRedirectTo:originUrl,data:{requested_role:requested==='enseignant'?'enseignant':'eleve'}}});
   if(error)throw error;
   if(data.session){user=data.user;go(requested)}
   else notice('Inscription enregistrée. Confirmez votre adresse à l’aide du message de Prof. Jana Galeh puis revenez vous connecter.',true);
