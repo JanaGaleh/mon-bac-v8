@@ -37,7 +37,7 @@ function cleanPayload(source){
  if(!source||typeof source!=='object'||Array.isArray(source))throw Error('Structure du dossier non reconnue');
  const v=empty();
  for(const k of Object.keys(v))if(Object.prototype.hasOwnProperty.call(source,k))v[k]=source[k];
- for(const k of ['annexes','sources','sourceChecks','researchEvidence','annexBackup'])
+ for(const k of ['annexes','annexTitles','sources','sourceChecks','researchEvidence','annexBackup'])
  v[k]=source[k]&&typeof source[k]==='object'&&!Array.isArray(source[k])?source[k]:{};
  v.candidates=Array.isArray(source.candidates)?source.candidates.slice(0,7):Array(7).fill('');
  v.mode=['','individuel','binome'].includes(source.mode)?source.mode:'';
