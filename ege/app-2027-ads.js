@@ -20,27 +20,100 @@ async function loadAds(){
   if(!st.db)return;
   try{
     const {data,error}=await st.db.from("ege2027_ads")
-      .select("id,submitted_by,title,description,details,destination_url,placements,status,is_premium,priority,start_at,end_at,created_at,updated_at")
+      .select("id,submitted_by,title,description,details,destination_url,placements,status,is_premium,priority,start_at,end_at,created_at,updated_at,whatsapp_number,subjects,fee_amount,fee_period,teaching_days,teaching_hours,teaching_mode,course_address,image_url")
       .order("is_premium",{ascending:false}).order("priority",{ascending:false}).order("created_at",{ascending:false}).limit(150);
     if(error)throw error;
     st.ads=data||[];
     st.adError="";
   }catch(e){st.ads=[];st.adError=e.message||"Annonces indisponibles.";}
 }
+
+// Rotation Premium : 1 bannière par emplacement, toutes les 5 secondes.
+// Les publicités classiques restent dans l'annuaire, jamais dans les bannières tournantes.
+const egeCarouselIndex=Object.create(null);
+const egeCarouselPausedUntil=Object.create(null);
+const EGE_CAROUSEL_DELAY=5000;
+let egeCarouselInterval=null;
+let egeCarouselPauseWired=false;
+function egePremiumSlides(place){
+ return (st.ads||[]).filter(a=>egeAdLive(a)&&a.is_premium===true
+  &&Array.isArray(a.placements)&&a.placements.includes(place)).sort(egeAdRank);
+}
+function egeAdPhoto(ad){
+ const url=egeAdSafeURL(ad?.image_url);
+ return url||"./ad-learning.svg";
+}
 function egeAdFor(place){
-  return (st.ads||[]).find(a=>egeAdLive(a)&&Array.isArray(a.placements)&&a.placements.includes(place))||null;
+ const items=egePremiumSlides(place);
+ const current=Number(egeCarouselIndex[place]||0);
+ return items.length?items[((current%items.length)+items.length)%items.length]:null;
 }
 function adBanner(place){
-  const active=egeAdFor(place);
-  if(!active&&place!=="home"&&place!=="auth")return "";
-  const title=active?.title||"Annonces des enseignants";
-  const desc=active?.description||"Découvrez les cours de soutien et les accompagnements proposés par les enseignants.";
-  const action='<a class="ege-ad-link" href="./annonces.html">Plus d’informations <span aria-hidden="true">›</span></a>';
-  return '<aside class="ege-ad-banner ege-ad-banner--'+esc(place)+'" aria-label="Annonce pédagogique">'
-   +'<div class="ege-ad-art"><img src="./ad-learning.svg" alt="" loading="lazy"></div>'
-   +'<div class="ege-ad-copy"><span class="ege-ad-label">'+(active?(active.is_premium?"Annonce Premium":"Annonce pédagogique"):"Espace des enseignants")+'</span>'
-   +'<strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p></div>'
+ const slides=egePremiumSlides(place),active=egeAdFor(place);
+ if(!active&&place!=="home"&&place!=="auth")return "";
+ const title=active?.title||"Annonces des enseignants";
+ const desc=active?.description||"Découvrez les cours de soutien et les accompagnements proposés par les enseignants.";
+ const action='<a class="ege-ad-link" href="./annonces.html">Plus d’informations <span aria-hidden="true">›</span></a>';
+ const count=slides.length,idx=count?(((Number(egeCarouselIndex[place]||0)%count)+count)%count):0;
+ const carouselControls=count>1
+  ?'<nav class="ege-ad-carousel-nav" aria-label="Annonces Premium">'
+    +'<button class="ege-ad-arrow" type="button" data-act="ad-prev" data-slot="'+place+'" aria-label="Annonce précédente">‹</button>'
+    +'<div class="ege-ad-dots">'
+    +slides.map((_,n)=>'<button class="ege-ad-dot '+(n===idx?'active':'')+'" type="button" data-act="ad-slide" data-slot="'+place+'" data-slide="'+n+'" aria-label="Annonce '+(n+1)+' sur '+count+'" aria-current="'+(n===idx?'true':'false')+'"></button>').join("")
+    +'</div>'
+    +'<button class="ege-ad-arrow" type="button" data-act="ad-next" data-slot="'+place+'" aria-label="Annonce suivante">›</button></nav>'
+  :'';
+ return '<aside class="ege-ad-banner ege-ad-banner--'+esc(place)+'" data-ege-ad-slot="'+esc(place)+'" aria-label="'+(count>0?'Annonce Premium':'Annonces des enseignants')+'">'
+   +'<div class="ege-ad-art"><img src="'+esc(egeAdPhoto(active))+'" alt="" loading="lazy"></div>'
+   +'<div class="ege-ad-copy"><span class="ege-ad-label">'+(active?'Premium · '+(idx+1)+' / '+count:'Espace des enseignants')+'</span>'
+   +'<strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p>'+carouselControls+'</div>'
    +'<div class="ege-ad-action">'+action+'</div></aside>';
+}
+function egeReplaceBanner(place){
+ const old=document.querySelector('[data-ege-ad-slot="'+place+'"]');
+ if(!old)return;
+ const markup=adBanner(place);
+ if(!markup){old.remove();return}
+ const template=document.createElement("template");
+ template.innerHTML=markup;
+ old.replaceWith(template.content.firstElementChild);
+}
+function egeMoveCarousel(place,step,index=null,manual=false){
+ const list=egePremiumSlides(place);
+ if(list.length<2)return;
+ const current=Number(egeCarouselIndex[place]||0);
+ egeCarouselIndex[place]=index!==null?((index%list.length)+list.length)%list.length:
+  ((current+step+list.length)%list.length);
+ if(manual)egeCarouselPausedUntil[place]=Date.now()+12000;
+ egeReplaceBanner(place);
+ if(manual){
+  const btn=document.querySelector('[data-ege-ad-slot="'+place+'"] [data-act="'+(step<0?'ad-prev':index!==null?'ad-slide':'ad-next')+'"]');
+  btn?.focus?.({preventScroll:true});
+ }
+}
+function egeStartAdCarousel(){
+ if(egeCarouselPauseWired===false){
+  egeCarouselPauseWired=true;
+  document.addEventListener("pointerdown",e=>{
+   const target=e.target.closest?.("[data-ege-ad-slot]");
+   if(target)egeCarouselPausedUntil[target.dataset.egeAdSlot]=Date.now()+12000;
+  },{passive:true});
+ }
+ if(egeCarouselInterval!==null)return;
+ egeCarouselInterval=window.setInterval(()=>{
+  if(document.visibilityState==="hidden")return;
+  if(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches)return;
+  const pointerHover=window.matchMedia?.("(hover: hover)")?.matches;
+  document.querySelectorAll("[data-ege-ad-slot]").forEach(node=>{
+   const place=node.dataset.egeAdSlot;
+   if(egePremiumSlides(place).length<2)return;
+   if((egeCarouselPausedUntil[place]||0)>Date.now())return;
+   if(pointerHover&&node.matches(":hover"))return;
+   if(node.contains(document.activeElement))return;
+   if(node.getBoundingClientRect().bottom<0||node.getBoundingClientRect().top>innerHeight)return;
+   egeMoveCarousel(place,1);
+  });
+ },EGE_CAROUSEL_DELAY);
 }
 
 function egeAdRank(a,b){
