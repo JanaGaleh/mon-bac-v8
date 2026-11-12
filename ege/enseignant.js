@@ -7,7 +7,7 @@ const $=s=>document.getElementById(s);
 const node=(tag,cls,text)=>{const v=document.createElement(tag);if(cls)v.className=cls;if(text!==undefined)v.textContent=String(text);return v};
 const val=s=>String($(s)?.value||'').trim();
 const date=s=>s?new Date(s).toLocaleDateString('fr-FR'):'—';
-let api=null,user=null,request=null,groups=[],members=[],dossiers=[],selected=null,epoch=0,authBusy=false;
+let api=null,user=null,request=null,groups=[],members=[],submissions=[],dossiers=[],selected=null,epoch=0,authBusy=false;
 function note(m,bad=false){$('flash').textContent=m;$('flash').classList.toggle('error',bad)}
 function show(id,yes){$(id).hidden=!yes}
 function buttonsBusy(b){for(const id of ['login','signup','recover'])$(id).disabled=b}
@@ -80,15 +80,19 @@ async function loadGroups(){
  if(!user||request?.status!=='approved')return;
  const result=await api.from('ege2027_teacher_groups').select('id,name,school,join_code,active,created_at').eq('teacher_id',user.id).order('created_at',{ascending:false}).limit(100);
  if(result.error)throw result.error;
- groups=result.data||[];members=[];dossiers=[];
+ groups=result.data||[];members=[];submissions=[];dossiers=[];
  if(groups.length){
   const ids=groups.map(g=>g.id);
-  const m=await api.from('ege2027_group_members').select('group_id,student_id,student_name,joined_at').in('group_id',ids).order('joined_at',{ascending:true}).limit(2000);
+  const [m,shares]=await Promise.all([
+   api.from('ege2027_group_members').select('group_id,student_id,student_name,joined_at').in('group_id',ids).order('joined_at',{ascending:true}).limit(2000),
+   api.from('ege2027_group_submissions').select('id,group_id,student_id,dossier_id,submitted_at').in('group_id',ids).order('submitted_at',{ascending:false}).limit(2000)
+  ]);
   if(m.error)throw m.error;
-  members=m.data||[];
-  const users=[...new Set(members.map(x=>x.student_id))];
-  if(users.length){
-   const d=await api.from('ege2027_dossiers').select('id,owner_id,title,student,payload,updated_at').in('owner_id',users).is('archived_at',null).order('updated_at',{ascending:false}).limit(400);
+  if(shares.error)throw shares.error;
+  members=m.data||[];submissions=shares.data||[];
+  const dossierIds=[...new Set(submissions.map(x=>x.dossier_id))];
+  if(dossierIds.length){
+   const d=await api.from('ege2027_dossiers').select('id,owner_id,title,student,payload,updated_at').in('id',dossierIds).is('archived_at',null).order('updated_at',{ascending:false}).limit(400);
    if(d.error)throw d.error;
    dossiers=d.data||[];
   }
@@ -112,12 +116,12 @@ function renderGroups(){
   });codebar.append(copy);box.append(codebar);
   const pupils=members.filter(m=>m.group_id===group.id);
   box.append(node('h3','',pupils.length+' élève(s) inscrit(s)'));
-  if(!pupils.length)box.append(node('p','muted','Communiquez ce code à vos élèves. Ils rejoindront le groupe depuis leur application EGE.'));
+  if(!pupils.length)box.append(node('p','muted','Communiquez ce code à vos élèves. Ils utilisent « Mes groupes » pour rejoindre votre classe et partager les dossiers de leur choix.'));
   for(const pupil of pupils){
    const line=node('div','pupil'),left=node('div'),right=node('div','row');
    left.append(node('b','',pupil.student_name),node('small','', 'Inscrit le '+date(pupil.joined_at)));
-   const docs=dossiers.filter(d=>d.owner_id===pupil.student_id);
-   left.append(node('small','',docs.length+' dossier(s) enregistré(s)'));
+   const docs=dossiers.filter(d=>d.owner_id===pupil.student_id && submissions.some(x=>x.dossier_id===d.id && x.group_id===group.id && x.student_id===pupil.student_id));
+   left.append(node('small','',docs.length+' dossier(s) partagé(s) avec ce groupe'));
    for(const doc of docs){
     const b=node('button','btn sm',doc.title||'Ouvrir le dossier');
     b.type='button';b.addEventListener('click',()=>viewDossier(doc));right.append(b);
