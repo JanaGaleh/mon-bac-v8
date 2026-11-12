@@ -140,7 +140,7 @@ function studentWizard(){
  <div class="notice info" style="margin-top:16px;max-width:770px">${I("cloud")}<span id="saveState">${esc(st.saveBadge)}</span></div>`;
 }
 function annexPaper(n,p){
- return `<div class="paper" id="paper"><div class="paper-kicker">EGE GFM 2027 · ANNEXE ${n}</div>
+ return `<div class="paper" id="paper"><div class="paper-kicker">EGE 2027 · ANNEXE ${n}</div>
  <h3 id="paperTitle">${esc(getTitle(n,p))}</h3><div id="paperBody" class="paper-text ege-paper-text">${esc(p.annexes?.[n]||"Le contenu apparaîtra ici.")}</div>
  <div class="paper-source ege-source"><strong>Source : </strong><span id="paperSource">${esc(p.sources?.[n]||"À renseigner")}</span></div>
  <div class="paper-note">Aperçu de lecture · contrôle pédagogique avant l'export Word</div></div>`;
