@@ -45,7 +45,7 @@ const DB_URL="https://nwcatsmfbkcgvgbanwyl.supabase.co";
 const DB_PUBLIC="sb_publishable_vXuRHP_lqGqtV9d1C_oZWw_SetdoY7L";
 const appBase=new URL("./",location.href).href;
 const screenList=[
-["welcome","Accueil"],["auth","Connexion"],["student-home","Accueil élève"],["student-docs","Mes dossiers"],
+["welcome","Accueil"],["auth","Connexion"],["ads-directory","Annonces des enseignants"],["student-home","Accueil élève"],["student-docs","Mes dossiers"],
 ["student-wizard","Parcours guidé"],["student-annex","Mes annexes"],["student-group","Mon groupe"],
 ["teacher-home","Accueil enseignant"],["teacher-groups","Mes groupes"],["teacher-students","Mes élèves"],["teacher-review","Corriger"],
 ["admin-home","Accueil administration"],["admin-users","Utilisateurs"],["admin-groups","Groupes"],["admin-monitor","Dossiers et sécurité"],["profile","Profil"]
@@ -202,9 +202,12 @@ async function initApp(){
    }
    if(new URLSearchParams(location.search).get("choisir")==="1"){st.screen="welcome";}
    else if(new URLSearchParams(location.hash.slice(1)).get("type")==="recovery"){st.pendingPasswordReset=true;st.screen="auth";}
-   else st.screen=homes[st.role];
+   else st.screen=location.pathname.endsWith("/annonces.html")?"ads-directory":homes[st.role];
    await loadAll();
-  } else render();
+  } else {
+   if(location.pathname.endsWith("/annonces.html"))st.screen="ads-directory";
+   render();
+  }
  }catch(e){fail(e);render();}
  if("serviceWorker" in navigator)navigator.serviceWorker.register("./service-worker-ege-2027.js").catch(()=>{});
 }
@@ -472,6 +475,7 @@ async function dispatchClick(e){
    if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");
    return;
   }
+  if(a==="refresh-ads"){await loadAds();render();return}
   if(a==="ad-info"){egeShowAdInfo(id);return}
   if(a==="ad-close"){const dialog=document.getElementById("egeAdDialog");if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");return}
   if(["ad-approve","ad-save-positions","ad-pause","ad-reject"].includes(a)){
