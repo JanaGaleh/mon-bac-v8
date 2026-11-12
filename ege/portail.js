@@ -50,7 +50,7 @@ async function submit(e){
  e.preventDefault();
  if(!api||busy)return;
  const email=$('userEmail').value.trim().toLowerCase(),password=$('userPassword').value;
- if(password.length<12){notice('Utilisez un mot de passe d’au moins 12 caractères.');return}
+ if(password.length<6){notice('Entrez votre mot de passe.');return}
  busy=true;$('submitLogin').disabled=true;notice('Connexion en cours…');
  try{
   const {error}=await api.auth.signInWithPassword({email,password});
