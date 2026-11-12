@@ -475,6 +475,15 @@ async function dispatchClick(e){
    if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");
    return;
   }
+  if(a==="ad-next"||a==="ad-prev"||a==="ad-slide"){
+   const place=el.dataset.slot;
+   if(!EGE_AD_SLOTS.some(item=>item.id===place))return;
+   const step=a==="ad-prev"?-1:1;
+   const ix=a==="ad-slide"?Number(el.dataset.slide):null;
+   if(ix!==null&&!Number.isInteger(ix))return;
+   egeMoveCarousel(place,step,ix,true,e.detail===0);
+   return;
+  }
   if(a==="refresh-ads"){await loadAds();render();return}
   if(a==="ad-info"){egeShowAdInfo(id);return}
   if(a==="ad-close"){const dialog=document.getElementById("egeAdDialog");if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");return}
