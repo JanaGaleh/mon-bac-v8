@@ -395,6 +395,58 @@ function choiceRole(role){
  }else {st.screen="auth";st.mode="login";}
  render();
 }
+// Installation PWA : le prompt natif ne peut être déclenché que par un clic réel.
+let egeInstallPrompt=null;
+let egeInstallInProgress=false;
+const egeIsInstalled=()=>window.matchMedia?.("(display-mode: standalone)")?.matches===true||navigator.standalone===true;
+const egeIsIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1;
+function refreshInstallButtons(){
+ const installed=egeIsInstalled();
+ for(const el of document.querySelectorAll('[data-act="install"]')){
+  el.hidden=installed;
+  el.disabled=egeInstallInProgress;
+ }
+}
+function explainInstall(){
+ const content=document.getElementById("egeInstallInstructions");
+ const dialog=document.getElementById("egeInstallDialog");
+ if(!content||!dialog){toast("Ouvrez cette page dans Safari ou Chrome, puis utilisez le menu du navigateur pour l’ajouter à l’écran d’accueil.");return}
+ if(egeIsIOS()){
+  content.textContent="Sur iPhone ou iPad : ouvrez cette adresse dans Safari, appuyez sur Partager, choisissez « Sur l’écran d’accueil », puis « Ajouter ».";
+ }else if(/Android/i.test(navigator.userAgent)){
+  content.textContent="Sur Android : ouvrez EGE GFM 2027 dans Chrome, appuyez sur le menu ⋮, puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ». Si vous utilisez un navigateur intégré à une autre application, ouvrez d’abord le lien dans Chrome.";
+ }else{
+  content.textContent="Ouvrez EGE GFM 2027 dans un navigateur compatible. Utilisez l’option « Installer l’application » dans la barre d’adresse ou dans le menu du navigateur.";
+ }
+ if(typeof dialog.showModal==="function")dialog.showModal();
+ else dialog.setAttribute("open","");
+}
+async function installEGE(){
+ if(egeIsInstalled()){toast("EGE GFM 2027 est déjà installée sur cet appareil.");refreshInstallButtons();return}
+ if(egeInstallInProgress)return;
+ if(!egeInstallPrompt){explainInstall();return}
+ const prompt=egeInstallPrompt;egeInstallPrompt=null;
+ egeInstallInProgress=true;
+ refreshInstallButtons();
+ try{
+  await prompt.prompt();
+  const result=await prompt.userChoice;
+  if(result?.outcome==="accepted")toast("Installation acceptée. Suivez les indications de votre appareil.");
+  else toast("Installation annulée. Vous pouvez réessayer depuis le navigateur.");
+ }catch(err){egeInstallPrompt=null;explainInstall()}
+ finally{egeInstallInProgress=false;refreshInstallButtons()}
+}
+window.addEventListener("beforeinstallprompt",event=>{
+ event.preventDefault();
+ egeInstallPrompt=event;
+ refreshInstallButtons();
+});
+window.addEventListener("appinstalled",()=>{
+ egeInstallPrompt=null;
+ toast("EGE GFM 2027 est installée.");
+ refreshInstallButtons();
+});
+
 async function dispatchClick(e){
  const el=e.target.closest("[data-act]");if(!el)return;
  e.preventDefault();const a=el.dataset.act,id=el.dataset.id,mode=el.dataset.mode;
@@ -409,6 +461,12 @@ async function dispatchClick(e){
    el.setAttribute("aria-pressed",visible?"true":"false");
    el.innerHTML=I(visible?"eye-off":"eye");
    input.focus({preventScroll:true});
+   return;
+  }
+  if(a==="install"){await installEGE();return}
+  if(a==="close-install"){
+   const dialog=document.getElementById("egeInstallDialog");
+   if(dialog?.close)dialog.close();else dialog?.removeAttribute("open");
    return;
   }
   if(a==="goto"){go(el.dataset.to);return}
