@@ -236,6 +236,56 @@ html,body{min-height:100%;background:#fff}
   text-align:left;
  }
 }
+
+/* Annuaire des enseignants : Premium d'abord, accès public, responsive. */
+.ege-directory-page{padding:18px 8px 58px;max-width:900px;margin:0 auto}
+.ege-directory-top{padding:4px 3px 26px}
+.ege-directory-back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#9d1530;text-decoration:none;margin:4px 0 30px}
+.ege-directory-back svg{width:17px;height:17px}
+.ege-directory-back:hover{text-decoration:underline}
+.ege-directory-top-label{display:block;color:#b20d2c;font-weight:780;font-size:11px;letter-spacing:.8px;text-transform:uppercase;margin-bottom:9px}
+.ege-directory-top h1{font-size:clamp(24px,4vw,35px);line-height:1.2;font-weight:900;letter-spacing:-.8px;color:#202a37;margin:0 0 10px}
+.ege-directory-top p{font-size:14px;line-height:1.6;color:#728093;margin:0;max-width:620px}
+.ege-directory-section{margin-bottom:30px}
+.ege-directory-section-head{display:flex;align-items:baseline;gap:12px;justify-content:space-between;padding:0 3px;margin-bottom:15px}
+.ege-directory-section-head h2{font-size:19px;font-weight:850;margin:0;color:#293747}
+.ege-directory-section-head span{font-size:11px;color:#8a95a3}
+.ege-directory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.ege-directory-card{display:grid;grid-template-columns:100px minmax(0,1fr);align-items:start;gap:13px;min-height:155px;padding:19px 17px;border:0;border-radius:18px;background:#fff;box-shadow:0 7px 26px rgba(35,37,55,.09)}
+.ege-directory-icon{height:105px;width:100px;border-radius:13px;background:#fff4f6;display:grid;place-items:center}
+.ege-directory-icon img{max-width:94px;max-height:80px;object-fit:contain}
+.ege-directory-content{min-width:0}
+.ege-directory-overline{font-size:11px;color:#98a1ad;margin-bottom:8px;min-height:20px}
+.ege-premium-pill{display:inline-flex;align-items:center;padding:4px 9px;border-radius:8px;background:#fff1de;color:#8e5b0d;font-weight:800;font-size:11px}
+.ege-directory-card h3{font-size:17px;line-height:1.35;font-weight:820;color:#253242;margin:0 0 8px;overflow-wrap:break-word}
+.ege-directory-card p{font-size:12px;line-height:1.5;color:#68768a;margin:0 0 13px;overflow-wrap:anywhere;white-space:pre-wrap}
+.ege-directory-actions{margin-top:auto}
+.ege-directory-link{display:inline-flex;align-items:center;gap:6px;color:#b40d2c;background:transparent;border:0;font-size:12px;font-weight:800;text-align:left;text-decoration:none;padding:7px 0;cursor:pointer}
+.ege-directory-link svg{width:15px;height:15px}
+.ege-directory-link:hover{text-decoration:underline}
+.ege-directory-link:focus-visible{outline:3px solid #efadb6;outline-offset:3px}
+.ege-directory-empty{margin:4px auto 0;max-width:620px;text-align:center;border-radius:20px;padding:36px 24px;background:#fff;box-shadow:0 7px 27px rgba(36,37,52,.07)}
+.ege-directory-empty-icon{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 18px;background:#fff0f3;border-radius:18px;color:#bd1030}
+.ege-directory-empty-icon svg{width:38px;height:38px}
+.ege-directory-empty h2{color:#253242;font-size:20px;margin:0 0 9px}
+.ege-directory-empty p{color:#748198;line-height:1.55;font-size:13px;margin:0}
+.ege-ad-premium-choice{display:flex;align-items:center;gap:10px;background:#fff9ee;border-radius:10px;padding:12px 13px;margin:13px 0;color:#76500f;font-size:13px;font-weight:750;cursor:pointer}
+.ege-ad-premium-choice input{accent-color:#b70c2b;width:18px;height:18px;min-width:18px}
+@media(max-width:700px){
+.ege-directory-grid{grid-template-columns:1fr}
+.ege-directory-page{padding:9px 5px 35px}
+.ege-directory-top{padding-bottom:25px}
+.ege-directory-card{grid-template-columns:90px minmax(0,1fr);min-height:136px;padding:16px 13px;gap:12px}
+.ege-directory-icon{width:88px;height:89px}
+.ege-directory-icon img{max-width:84px}
+}
+@media(max-width:380px){
+.ege-directory-card{grid-template-columns:74px minmax(0,1fr);padding:14px 11px;gap:10px}
+.ege-directory-icon{width:73px;height:78px}
+.ege-directory-icon img{width:69px}
+.ege-directory-card h3{font-size:15px}
+.ege-directory-top h1{font-size:24px}
+}
 </style>
 <script defer src="./vendor/supabase-2.57.4.js"></script>
 <script defer src="./app-2027.js"></script>
