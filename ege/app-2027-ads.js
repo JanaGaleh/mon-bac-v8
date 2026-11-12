@@ -33,12 +33,12 @@ function egeAdFor(place){
 function adBanner(place){
   const active=egeAdFor(place);
   if(!active&&place!=="home"&&place!=="auth")return "";
-  const title=active?.title||"Soutien scolaire";
-  const desc=active?.description||"Préparez efficacement votre examen avec un accompagnement adapté.";
+  const title=active?.title||"Annonces des enseignants";
+  const desc=active?.description||"Découvrez les cours de soutien et les accompagnements proposés par les enseignants.";
   const action='<a class="ege-ad-link" href="./annonces.html">Plus d’informations <span aria-hidden="true">›</span></a>';
   return '<aside class="ege-ad-banner ege-ad-banner--'+esc(place)+'" aria-label="Annonce pédagogique">'
    +'<div class="ege-ad-art"><img src="./ad-learning.svg" alt="" loading="lazy"></div>'
-   +'<div class="ege-ad-copy"><span class="ege-ad-label">'+(active?"Annonce pédagogique":"Espace d’annonce · Exemple")+'</span>'
+   +'<div class="ege-ad-copy"><span class="ege-ad-label">'+(active?(active.is_premium?"Annonce Premium":"Annonce pédagogique"):"Espace des enseignants")+'</span>'
    +'<strong>'+esc(title)+'</strong><p>'+esc(desc)+'</p></div>'
    +'<div class="ege-ad-action">'+action+'</div></aside>';
 }
