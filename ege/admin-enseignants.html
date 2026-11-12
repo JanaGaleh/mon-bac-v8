@@ -25,13 +25,25 @@ label{font-size:13px;display:block;margin:12px 0 5px;font-weight:700}input,selec
 <button class="btn primary" type="submit" style="margin-top:14px">Se connecter</button></form></section>
 <section id="adminBox" hidden><div class="row" style="justify-content:space-between"><div class="grid" style="flex:1;max-width:480px"><div class="card stat"><strong id="totalTeachers">—</strong>Demandes enregistrées</div><div class="card stat"><strong id="pendingTeachers">—</strong>En attente</div></div><button id="reload" class="btn">Actualiser</button></div>
 <div class="card"><label for="filter">Filtrer les demandes</label><select id="filter"><option value="">Tous les statuts</option><option value="pending">En attente</option><option value="approved">Approuvés</option><option value="rejected">Refusés</option><option value="suspended">Suspendus</option></select></div>
-<div id="teacherList" class="grid" aria-live="polite"></div></section></main>
+<div id="teacherList" class="grid" aria-live="polite"></div>
+<section class="card" id="groupsAdminSection" style="margin-top:30px">
+ <h2>Groupes et affectations</h2><p class="muted">Créez une classe, adaptez son intitulé ou retirez un élève sans supprimer ses documents.</p>
+ <form id="adminCreateGroup" class="grid">
+  <div><label for="adminTeacher">Enseignant approuvé</label><select id="adminTeacher" required></select></div>
+  <div><label for="adminGroupName">Classe ou groupe</label><input id="adminGroupName" required minlength="2" maxlength="90" placeholder="Ex. TGFM6"></div>
+  <div><label for="adminSchool">Établissement</label><input id="adminSchool" maxlength="160" placeholder="Ex. Lycée d'État"></div>
+  <div class="row" style="align-items:end"><button type="submit" class="btn primary">Créer ce groupe</button></div>
+ </form>
+ <div id="adminGroupsList" class="grid" style="margin-top:20px" aria-live="polite"></div>
+</section>
+<section class="card"><h2>Historique administratif</h2><p class="muted">Décisions importantes et retraits de membres.</p><div id="adminAuditList" aria-live="polite"></div></section>
+</section></main>
 <script>
 (()=>{'use strict';
 const DB='https://nwcatsmfbkcgvgbanwyl.supabase.co',KEY='sb_publishable_vXuRHP_lqGqtV9d1C_oZWw_SetdoY7L';
 const $=id=>document.getElementById(id);
 const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=String(txt);return e};
-let api,user,admin=false,requests=[];
+let api,user,admin=false,requests=[],teacherGroups=[],groupMembers=[];
 function note(s,err=false){$('flash').textContent=s;$('flash').classList.toggle('error',err)}
 function show(id,v){$(id).hidden=!v}
 function date(s){return s?new Date(s).toLocaleDateString('fr-FR'):'—'}
@@ -54,7 +66,7 @@ async function load(){
  requests=r.data||[];
  $('totalTeachers').textContent=requests.length+(requests.length===500?'+':'');
  $('pendingTeachers').textContent=requests.filter(x=>x.status==='pending').length;
- render();note('Demandes des enseignants actualisées.');
+ render();await loadGroupsAdmin();note('Administration actualisée.');
 }
 function action(txt,kind,fn){const b=mk('button','btn small'+(kind?' '+kind:''),txt);b.type='button';b.addEventListener('click',fn);return b}
 function render(){
@@ -94,6 +106,81 @@ async function decide(r,status){
   await load();note('Demande de '+r.full_name+' : '+labels[status]+' — décision enregistrée.');
  }catch(e){note('Modification refusée : '+e.message,true)}
 }
+async function loadGroupsAdmin(){
+ if(!admin)return;
+ const [g,m,a]=await Promise.all([
+  api.from('ege2027_teacher_groups').select('id,teacher_id,name,school,active,join_code,created_at').order('created_at',{ascending:false}).limit(500),
+  api.from('ege2027_group_members').select('group_id,student_id,student_name,joined_at').limit(2500),
+  api.from('ege2027_audit_log').select('action,entity_type,details,created_at').order('created_at',{ascending:false}).limit(35)
+ ]);
+ if(g.error||m.error||a.error){note('Supervision partiellement indisponible : '+(g.error||m.error||a.error).message,true);return}
+ teacherGroups=g.data||[];groupMembers=m.data||[];renderGroupsAdmin(a.data||[]);
+}
+function renderGroupsAdmin(audit){
+ const options=$('adminTeacher');options.replaceChildren();
+ const approved=requests.filter(t=>t.status==='approved');
+ options.add(new Option('Choisir un enseignant',''));
+ approved.forEach(t=>options.add(new Option(t.full_name+' · '+t.school,t.user_id)));
+ const names=new Map(requests.map(t=>[t.user_id,t.full_name]));
+ const host=$('adminGroupsList');host.replaceChildren();
+ if(!teacherGroups.length)host.append(mk('p','muted','Aucun groupe créé.'));
+ for(const group of teacherGroups){
+  const box=mk('article','card');box.style.margin='0';
+  const label=mk('span','tag '+(group.active?'approved':'suspended'),group.active?'Inscriptions ouvertes':'Inscriptions arrêtées');
+  box.append(label,mk('h2','',group.name),mk('p','muted',(group.school||'Établissement à préciser')+' · '+(names.get(group.teacher_id)||'Enseignant')));
+  const members=groupMembers.filter(m=>m.group_id===group.id);
+  box.append(mk('p','stat',members.length+' élève(s) · Code de classe : '+group.join_code));
+  const actions=mk('div','row');
+  actions.append(action('Renommer','',()=>renameGroupAdmin(group)));
+  actions.append(action(group.active?'Suspendre les inscriptions':'Réactiver','',()=>toggleGroupAdmin(group)));
+  box.append(actions);
+  for(const m of members){
+   const line=mk('div','row');line.style.justifyContent='space-between';
+   line.append(mk('span','',m.student_name));
+   line.append(action('Retirer','warn',()=>removeStudentAdmin(group,m)));
+   box.append(line);
+  }
+  host.append(box);
+ }
+ const auditHost=$('adminAuditList');auditHost.replaceChildren();
+ if(!audit.length)auditHost.append(mk('p','muted','Aucune intervention enregistrée pour le moment.'));
+ for(const item of audit){
+  const line=mk('div','entry');
+  const title=item.entity_type==='ege2027_teacher_requests'?'Compte enseignant':item.entity_type==='ege2027_group_members'?'Affectation élève':'Gestion groupe';
+  line.append(mk('strong','',title+' · '+(item.action==='DELETE'?'Retrait':item.action==='UPDATE'?'Modification':'Création')));
+  line.append(mk('small','',date(item.created_at)));
+  auditHost.append(line);
+ }
+}
+async function createGroupAdmin(e){
+ e.preventDefault();if(!admin)return;
+ const teacher_id=$('adminTeacher').value,name=$('adminGroupName').value.trim(),school=$('adminSchool').value.trim();
+ if(!requests.some(r=>r.user_id===teacher_id&&r.status==='approved')||name.length<2){note('Choisissez un enseignant approuvé et une classe.',true);return}
+ const b=e.currentTarget.querySelector('[type=submit]');b.disabled=true;
+ try{const {error}=await api.from('ege2027_teacher_groups').insert({teacher_id,name,school});
+  if(error)throw error;$('adminGroupName').value='';await loadGroupsAdmin();note('Groupe créé. Son code figure dans la liste.')}
+ catch(err){note('Création impossible : '+err.message,true)}finally{b.disabled=false}
+}
+async function renameGroupAdmin(g){
+ const name=prompt('Nouveau nom de la classe :',g.name);if(name===null)return;
+ const next=name.trim();if(next.length<2||next.length>90){note('Le nom doit contenir 2 à 90 caractères.',true);return}
+ const school=prompt('Établissement :',g.school||'');if(school===null)return;
+ const {error}=await api.from('ege2027_teacher_groups').update({name:next,school:school.trim().slice(0,160)}).eq('id',g.id);
+ if(error){note('Modification impossible : '+error.message,true);return}
+ await loadGroupsAdmin();note('Classe mise à jour.');
+}
+async function toggleGroupAdmin(g){
+ if(!confirm((g.active?'Suspendre':'Réactiver')+' les inscriptions de « '+g.name+' » ?'))return;
+ const {error}=await api.from('ege2027_teacher_groups').update({active:!g.active}).eq('id',g.id);
+ if(error){note(error.message,true);return}
+ await loadGroupsAdmin();note('Statut du groupe modifié.');
+}
+async function removeStudentAdmin(g,m){
+ if(!confirm('Retirer « '+m.student_name+' » du groupe « '+g.name+' » ? Le dossier de cet élève sera conservé.'))return;
+ const {error}=await api.from('ege2027_group_members').delete().eq('group_id',g.id).eq('student_id',m.student_id);
+ if(error){note('Retrait impossible : '+error.message,true);return}
+ await loadGroupsAdmin();note('Élève retiré. Ses dossiers restent dans son compte.');
+}
 document.addEventListener('DOMContentLoaded',async()=>{
  if(!window.supabase?.createClient){note('Supabase indisponible. Vérifiez la connexion Internet.',true);return}
  api=window.supabase.createClient(DB,KEY);
@@ -104,6 +191,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
  });
  $('signOut').addEventListener('click',async()=>{await api.auth.signOut();await check()});
  $('reload').addEventListener('click',load);$('filter').addEventListener('change',render);
+ $('adminCreateGroup').addEventListener('submit',createGroupAdmin);
  api.auth.onAuthStateChange(e=>{if(e==='SIGNED_OUT')check()});
  await check();
 });
