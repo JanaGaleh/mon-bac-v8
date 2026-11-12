@@ -1,5 +1,5 @@
 /* EGE 2027 — cache de l'interface seulement, jamais de réponses Supabase, données ou dossiers privés. */
-const CACHE='ege-gfm-2027-shell-v6';
+const CACHE='ege-gfm-2027-shell-v7';
 const ROOT=new URL('./',self.registration.scope).href;
 const PAGE=new URL('./assistant-dossier-gfm-2027.html',self.registration.scope).href;
 const ASSETS=['./','./portail.html','./portail.js','./theme-rouge.css','./assistant-dossier-gfm-2027.html','./manifest-ege-2027.webmanifest','./icon-ege-192.png','./icon-ege-512.png','./word-import.js','./phase1.js','./auth-feedback.js'].map(p=>new URL(p,self.registration.scope).href);
