@@ -2,7 +2,8 @@
 (()=>{'use strict';
 const URL_DB='https://nwcatsmfbkcgvgbanwyl.supabase.co';
 const PUBLIC_KEY='sb_publishable_vXuRHP_lqGqtV9d1C_oZWw_SetdoY7L';
-const REDIRECT='https://ege-gfm-2027.janakaleh.workers.dev/';
+const REDIRECT='https://ege-gfm-2027.janakaleh.workers.dev/enseignant.html';
+const RECOVERY_REDIRECT='https://ege-gfm-2027.janakaleh.workers.dev/';
 const $=s=>document.getElementById(s);
 const node=(tag,cls,text)=>{const v=document.createElement(tag);if(cls)v.className=cls;if(text!==undefined)v.textContent=String(text);return v};
 const val=s=>String($(s)?.value||'').trim();
@@ -58,7 +59,7 @@ async function recover(){
  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){note('Renseignez d’abord votre adresse e-mail.',true);return}
  buttonsBusy(true);
  try{
-  const {error}=await api.auth.resetPasswordForEmail(email,{redirectTo:REDIRECT});
+  const {error}=await api.auth.resetPasswordForEmail(email,{redirectTo:RECOVERY_REDIRECT});
   if(error)throw error;
   note('Si ce compte existe, un lien de réinitialisation a été demandé par e-mail.');
  }catch(e){note('Demande impossible : '+e.message,true)}
