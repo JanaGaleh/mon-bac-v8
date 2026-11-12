@@ -196,6 +196,7 @@ function tab(name){
 }
 async function signOut(){await client.auth.signOut();loginView('Déconnexion effectuée.')}
 async function start(){
+ document.querySelectorAll('[data-open-tab]').forEach(b=>b.addEventListener('click',()=>document.querySelector('[data-tab="'+b.dataset.openTab+'"]')?.click()));
  if(!window.supabase?.createClient){loginView('Bibliothèque Supabase indisponible. Vérifie ta connexion Internet.');return}
  client=window.supabase.createClient(URL_DB,PUBLIC_KEY);
  installTeacherAdminUI();
