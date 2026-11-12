@@ -74,9 +74,18 @@ function renderSelected(history){
  for(const [label,value] of [['Mode',d.mode],['Thème',d.theme],['Sous-thème',d.subtheme],['Problématique',d.problem],['Professeur',d.teacher]]){
   const t=node('h3','',label);const p=node('p','',value===null||value===undefined||value===''?'—':String(value));doc.append(t,p)
  }
- const annexes=d.annexes||{};
+ const annexes=d.annexes||{},titles=d.annexTitles||{},sources=d.sources||{},sourceChecks=d.sourceChecks||{};
+ const defaultTitles=['Les notions générales','Comprendre le sous-thème','Éléments de réponse à la problématique','Conditions et limites'];
  for(const [num,value] of Object.entries(annexes).sort(([a],[b])=>Number(a)-Number(b))){
-  const t=node('h3','','Annexe '+num),p=node('pre','',String(value||'—').slice(0,20000));doc.append(t,p)
+  const n=Number(num);if(!Number.isInteger(n)||n<1||n>4)continue;
+  const article=node('article','admin-annex-card');
+  article.append(node('small','admin-annex-label','ANNEXE '+n));
+  article.append(node('h3','admin-annex-title',String(titles[n]||defaultTitles[n-1])));
+  article.append(node('div','admin-annex-content',String(value||'Non rédigée').slice(0,40000)));
+  const source=node('div','admin-annex-source');
+  source.append(node('strong','','Source : '),node('span','',String(sources[n]||'À renseigner')));
+  article.append(source,node('small','admin-annex-check',sourceChecks[n]?'Source déclarée vérifiée par l’élève':'Source à vérifier'));
+  doc.append(article);
  }
  const historyDiv=$('reviewHistory');historyDiv.replaceChildren();
  if(!history.length)historyDiv.append(node('p','muted','Aucune correction enregistrée.'));
