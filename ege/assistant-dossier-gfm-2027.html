@@ -1051,9 +1051,10 @@ function egeCloudRefresh(){
  egeCloud('egeCloudAdmin')?.toggleAttribute('hidden',!(logged&&egeCloudStaff?.role==='enseignant'));
  egeCloud('egeCloudAdminShortcut')?.toggleAttribute('hidden',!(logged&&egeCloudStaff?.role==='admin'));
  const who=egeCloud('egeCloudWho');if(who)who.textContent=logged?'Compte : '+(egeCloudUser.email||'utilisateur connecté'):'Aucun compte connecté';
- const small=egeCloud('egeCloudBadge');if(small)small.textContent=logged?'☁ Connecté':'☁ En ligne';
+ const small=egeCloud('egeCloudBadge');if(small)small.textContent=logged?'Compte connecté':'Sur cet appareil';
  const adminLink=egeCloud('egeAdminPageLink');if(adminLink)adminLink.hidden=!(logged&&egeCloudStaff?.role==='admin');
  window.EGE2027Phase1?.onAuthChanged(egeCloudUser);
+ if(logged)egeRestorePersonalDraftIfNeeded();
  egeMobileNavUpdate();
 }
 async function egeCloudLoadStaff(){
@@ -1132,9 +1133,30 @@ async function egeCloudReview(decision){
  const {error}=await egeSupabaseClient.from('ege2027_reviews').insert({dossier_id:egeCloudSelected.id,staff_id:egeCloudUser.id,decision,observation});
  egeCloudMsg(error?'Correction non enregistrée : '+error.message:decision==='valide'?'Dossier marqué validé, avis enregistré.':'Demande de correction enregistrée.');
 }
+let egeDraftRestorePrompted='';
 async function egeCloudLogout(){
+ const previousId=egeCloudUser?.id||null;
+ if(previousId)try{localStorage.setItem('ege2027_local_draft_'+previousId,JSON.stringify(data))}catch(_){}
  if(egeSupabaseClient)await egeSupabaseClient.auth.signOut();
- egeCloudUser=null;egeCloudStaff=null;egeCloudRefresh();egeCloudMsg('Déconnecté. Le dossier reste sauvegardé sur cet appareil.');
+ data=empty();try{localStorage.removeItem(KEY)}catch(_){}
+ window.EGE2027Phase1?.detachCurrent();
+ egeCloudUser=null;egeCloudStaff=null;egeCloudRefresh();render();
+ egeCloudMsg('Déconnecté. Les dossiers en ligne restent dans votre compte. Le brouillon local est conservé séparément pour votre prochaine connexion.');
+}
+function egeRestorePersonalDraftIfNeeded(){
+ const uid=egeCloudUser?.id;
+ if(!uid||egeDraftRestorePrompted===uid)return;
+ egeDraftRestorePrompted=uid;
+ const existing=clean(data.student)||clean(data.problem)||Object.values(data.annexes||{}).some(Boolean);
+ if(existing)return;
+ try{
+  const raw=JSON.parse(localStorage.getItem('ege2027_local_draft_'+uid)||'null');
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))return;
+  if(!confirm('Un brouillon conservé sur cet appareil a été retrouvé pour votre compte. Souhaitez-vous le reprendre ?'))return;
+  data={...empty(),...raw,annexes:{...(raw.annexes||{})},annexTitles:{...(raw.annexTitles||{})},sources:{...(raw.sources||{})},sourceChecks:{...(raw.sourceChecks||{})}};
+  save();render();egeCloudMsg('Brouillon local retrouvé. Vérifiez son état de synchronisation avant de quitter.');
+  localStorage.removeItem('ege2027_local_draft_'+uid);
+ }catch(e){egeCloudMsg('Restauration locale indisponible : '+e.message)}
 }
 
 async function egeCloudLoadPublicSettings(){
