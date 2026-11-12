@@ -114,17 +114,82 @@ async function saveSettings(event){
   message('Paramètres enregistrés. Les élèves verront les modifications à l’ouverture de l’application.','ok');
  }catch(e){message('Enregistrement refusé : '+e.message,'error')}finally{$('saveSettings').disabled=false}
 }
+
+/* Validation centrale des enseignants EGE (l'administration seule peut modifier le statut). */
+function installTeacherAdminUI(){
+ if($('teachers'))return;
+ const nav=document.querySelector('#dashboard .tabs');
+ const tabButton=node('button','','Enseignants');tabButton.type='button';tabButton.dataset.tab='teachers';tabButton.setAttribute('aria-pressed','false');nav.append(tabButton);
+ const panel=node('section','tabPanel');panel.id='teachers';panel.hidden=true;
+ const content=node('div','panel');
+ const heading=node('h2','','Validation des enseignants');
+ const lead=node('p','muted','Approuvez les comptes enseignants avant qu’ils puissent créer des groupes ou consulter les dossiers de leurs propres élèves.');
+ const reload=node('button','outline','Actualiser les demandes');reload.type='button';reload.addEventListener('click',loadTeacherRequests);
+ const host=node('div','entries');host.id='egeTeacherRequests';
+ content.append(heading,lead,reload,host);panel.append(content);
+ const dash=$('dashboard');dash.insertBefore(panel,$('adminBottomNav'));
+ const mobile=node('button');mobile.type='button';mobile.dataset.adminBottom='teachers';mobile.setAttribute('aria-pressed','false');
+ mobile.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="7" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M18 9v8m-4-4h8"/></svg><span>Profs</span>';
+ $('adminBottomNav').append(mobile);
+}
+async function loadTeacherRequests(){
+ if(!user||member?.role!=='admin')return;
+ const host=$('egeTeacherRequests');if(!host)return;
+ host.replaceChildren(node('p','muted','Chargement…'));
+ const {data,error}=await client.from('ege2027_teacher_requests')
+  .select('user_id,full_name,school,status,created_at,rejection_reason')
+  .order('created_at',{ascending:false}).limit(200);
+ if(error){host.replaceChildren(node('p','muted','Chargement impossible : '+error.message));return}
+ host.replaceChildren();
+ if(!data?.length){host.append(node('p','muted','Aucune demande pour le moment.'));return}
+ const labels={pending:'En attente',approved:'Approuvé',rejected:'Refusé',suspended:'Suspendu'};
+ for(const t of data){
+  const item=node('article','entry');
+  const info=node('div');
+  info.append(node('b','',t.full_name+' · '+t.school));
+  info.append(node('small','','Statut : '+(labels[t.status]||t.status)+' · Demande du '+date(t.created_at)));
+  if(t.rejection_reason)info.append(node('small','','Observation : '+t.rejection_reason));
+  const buttons=node('div','actions');buttons.style.flexWrap='wrap';
+  const add=(label,status,cls)=>{
+   const b=node('button',cls,label);b.type='button';b.style.minHeight='38px';
+   b.addEventListener('click',()=>decideTeacher(t,status));buttons.append(b);
+  };
+  if(t.status!=='approved')add('Approuver','approved','primary');
+  if(t.status==='pending')add('Refuser','rejected','outline');
+  if(t.status==='approved')add('Suspendre','suspended','outline');
+  item.append(info,buttons);host.append(item);
+ }
+}
+async function decideTeacher(t,status){
+ if(!user||member?.role!=='admin')return;
+ let reason=null;
+ if(status==='approved'){
+  if(!confirm('Autoriser '+t.full_name+' à gérer ses classes et à corriger les dossiers de ses élèves ?'))return;
+ }else{
+  reason=prompt('Motif (visible par l’enseignant) :',status==='suspended'?'Accès temporairement suspendu.':'');
+  if(reason===null)return;
+  if(!reason.trim()){message('Indique un motif pour refuser ou suspendre.','error');return}
+ }
+ const payload={status,reviewed_at:new Date().toISOString(),reviewed_by:user.id,rejection_reason:status==='approved'?null:reason.trim().slice(0,500)};
+ const {error}=await client.from('ege2027_teacher_requests').update(payload).eq('user_id',t.user_id);
+ if(error){message('Décision non enregistrée : '+error.message,'error');return}
+ message(status==='approved'?'Enseignant approuvé.':'Statut enseignant modifié.','ok');
+ await loadTeacherRequests();
+}
+
 function tab(name){
  activeTab=name;
- for(const x of ['overview','dossiers','settings','security'])visible(x,x===name);
+ for(const x of ['overview','dossiers','settings','security','teachers'])visible(x,x===name);
  document.querySelectorAll('[data-tab]').forEach(b=>{const on=b.dataset.tab===name;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
  document.querySelectorAll('[data-admin-bottom]').forEach(b=>{const on=b.dataset.adminBottom===name;b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on))});
  if(name==='dossiers')$('search').focus();
+ if(name==='teachers')loadTeacherRequests();
 }
 async function signOut(){await client.auth.signOut();loginView('Déconnexion effectuée.')}
 async function start(){
  if(!window.supabase?.createClient){loginView('Bibliothèque Supabase indisponible. Vérifie ta connexion Internet.');return}
  client=window.supabase.createClient(URL_DB,PUBLIC_KEY);
+ installTeacherAdminUI();
  const eye=$('togglePassword');
  eye?.addEventListener('click',()=>{
   const field=$('loginPassword');
