@@ -64,6 +64,14 @@ html,body{min-height:100%;background:#fff}
 .rolecards{grid-template-columns:1fr}
 .layout-editor,.layout-side,.grid3{grid-template-columns:1fr}
 }
+/* Champ de mot de passe — visibilité accessible, sans déplacer le curseur ni réinitialiser la saisie */
+.field>.password-label{display:block;color:#465063;font-size:12px;font-weight:750;margin-bottom:7px}
+.password-wrap{position:relative;display:flex;align-items:center;width:100%}
+.password-wrap .input{padding-right:58px}
+.password-toggle{position:absolute;right:3px;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#a71229;cursor:pointer;touch-action:manipulation}
+.password-toggle:hover{background:#fff1f3}
+.password-toggle:focus-visible{outline:3px solid #e68c9c;outline-offset:-2px}
+.password-toggle svg{height:21px;width:21px;pointer-events:none}
 </style>
 <script defer src="./vendor/supabase-2.57.4.js"></script>
 <script defer src="./app-2027.js"></script>
