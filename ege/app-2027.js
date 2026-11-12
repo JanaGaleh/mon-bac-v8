@@ -24,6 +24,7 @@ const paths={
  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l4 3"/>',
  logout:'<path d="M10 4H4v16h6M13 8l4 4-4 4m-8-4h12"/>',
  eye:'<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.6"/>',
+ 'eye-off':'<path d="M3 3l18 18M10.6 6.1A11.8 11.8 0 0 1 12 6c6.5 0 10 6 10 6a14.2 14.2 0 0 1-4.1 4.2M6.1 6.3C3.5 8.1 2 12 2 12s3.5 6 10 6c1.3 0 2.6-.2 3.7-.6"/><path d="M10 10a2.8 2.8 0 0 0 4 4"/>',
  download:'<path d="M12 3v13m-5-5 5 5 5-5M4 20h16"/>',
  more:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
  lock:'<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/>',
@@ -398,6 +399,18 @@ async function dispatchClick(e){
  const el=e.target.closest("[data-act]");if(!el)return;
  e.preventDefault();const a=el.dataset.act,id=el.dataset.id,mode=el.dataset.mode;
  try{
+  if(a==="toggle-password"){
+   const input=$(el.dataset.target);
+   if(!input||!["authPassword","newPassword"].includes(input.id))return;
+   const visible=input.type==="password";
+   input.type=visible?"text":"password";
+   el.setAttribute("aria-label",visible?"Masquer le mot de passe":"Afficher le mot de passe");
+   el.setAttribute("title",visible?"Masquer le mot de passe":"Afficher le mot de passe");
+   el.setAttribute("aria-pressed",visible?"true":"false");
+   el.innerHTML=I(visible?"eye-off":"eye");
+   input.focus({preventScroll:true});
+   return;
+  }
   if(a==="goto"){go(el.dataset.to);return}
   if(a==="role"){choiceRole(el.dataset.role);return}
   if(a==="mode"){st.mode=mode;if(st.screen==="profile"){st.screen="auth";st.desired=st.role}render();return}
