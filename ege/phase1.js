@@ -263,8 +263,67 @@ function buildPhase1UI(){
  if(auth&&pwd){const row=document.createElement('div');row.className='ege-cloud-password-wrap';pwd.parentNode.insertBefore(row,pwd);row.append(pwd);const eye=el('button','','Voir');eye.id='egeCloudPasswordEye';eye.type='button';row.append(eye);const forgot=el('button','','Mot de passe oublié ?');forgot.id='egeCloudForgot';forgot.type='button';auth.append(forgot)}
  const actions=id('egeCloudActions');if(actions){const row=el('div','ege-cloud-buttons');const b=el('button','ege-cloud-primary','Mes dossiers');b.id='egeCloudOpenDossiers';b.type='button';row.append(b);actions.prepend(row)}
 }
+
+/* Encadrement : inscription d'un élève dans un groupe, et accès enseignant. */
+function installGroupJoinUI(){
+ if(id('egeGroupJoinOverlay'))return;
+ const style=el('style');style.textContent='.ege-group-join-help{font-size:12px;color:#687e95}.ege-group-join-grid{display:grid;gap:9px;margin-top:13px}.ege-group-join-grid label{display:block;font-weight:750;font-size:13px}.ege-group-join-grid input{width:100%;min-height:45px;border:1px solid #bfd3e7;padding:11px;border-radius:10px;background:white}.ege-teacher-link{display:inline-block;color:#245bb3;font-weight:750;font-size:13px;margin:8px 0;text-decoration:underline}.ege-group-join-note{font-size:12px;white-space:pre-wrap;color:#215e99}';document.head.append(style);
+ const auth=id('egeCloudAuth');
+ if(auth){
+  const link=el('a','ege-teacher-link','Vous êtes enseignant ? Créer votre espace');
+  link.href='./enseignant.html';auth.append(link);
+ }
+ const actions=id('egeCloudActions');
+ if(actions){
+  const row=el('div','ege-cloud-buttons');
+  const btn=el('button','ege-cloud-primary','Rejoindre mon groupe de classe');btn.type='button';btn.id='egeGroupJoinOpen';
+  row.append(btn);
+  const link=el('a','ege-teacher-link','Espace enseignant');link.href='./enseignant.html';row.append(link);
+  actions.prepend(row);
+ }
+ const root=el('div','ege-phase-overlay');root.id='egeGroupJoinOverlay';root.hidden=true;root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-labelledby','egeGroupJoinTitle');
+ const panel=el('section','ege-phase-modal');panel.style.maxWidth='460px';
+ panel.append(el('h2','', 'Rejoindre mon groupe EGE'),el('p','ege-group-join-help','Demande le code à ton professeur. Tes dossiers ne seront visibles que par les enseignants de tes groupes et l’administrateur.'));
+ const form=el('form','ege-group-join-grid');form.id='egeGroupJoinForm';
+ const labelCode=el('label','','Code donné par le professeur');labelCode.htmlFor='egeGroupJoinCode';
+ const code=el('input');code.id='egeGroupJoinCode';code.maxLength=12;code.minLength=12;code.required=true;code.autocomplete='off';code.placeholder='12 caractères';
+ const labelName=el('label','','Ton nom et prénom');labelName.htmlFor='egeGroupJoinName';
+ const name=el('input');name.id='egeGroupJoinName';name.required=true;name.maxLength=140;name.minLength=2;name.placeholder='Nom complet';
+ const submit=el('button','ege-primary','Rejoindre');submit.type='submit';submit.id='egeGroupJoinSubmit';
+ const close=el('button','','Fermer');close.type='button';close.id='egeGroupJoinClose';
+ const actionsRow=el('div','ege-tools');actionsRow.append(submit,close);
+ const result=el('p','ege-group-join-note','');result.id='egeGroupJoinMessage';result.setAttribute('role','status');
+ form.append(labelCode,code,labelName,name,actionsRow,result);panel.append(form);root.append(panel);document.body.append(root);
+ btn?.addEventListener('click',()=>{
+  if(!cloud()){if(typeof egeCloudOpen==='function')egeCloudOpen(true);cloudMsg('Connecte-toi pour rejoindre la classe de ton professeur.');return}
+  if(typeof egeCloudOpen==='function')egeCloudOpen(false);
+  result.textContent='';
+  name.value=String(data?.student||'').trim().slice(0,140);
+  root.hidden=false;code.focus();
+ });
+ close.addEventListener('click',()=>root.hidden=true);
+ root.addEventListener('click',e=>{if(e.target===root)root.hidden=true});
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!cloud()){result.textContent='Connexion nécessaire.';return}
+  const groupCode=code.value.trim().toUpperCase(),studentName=name.value.trim();
+  if(!/^[A-F0-9]{12}$/.test(groupCode)||studentName.length<2){result.textContent='Vérifie le code (12 caractères) et ton nom complet.';return}
+  submit.disabled=true;result.textContent='Inscription en cours…';
+  try{
+   const {data:groupId,error}=await egeSupabaseClient.rpc('ege2027_join_group',{p_code:groupCode,p_student_name:studentName});
+   if(error)throw error;
+   const response=await egeSupabaseClient.from('ege2027_teacher_groups').select('name,school').eq('id',groupId).maybeSingle();
+   if(response.error)throw response.error;
+   result.textContent='Inscription réussie'+(response.data?.name?' : '+response.data.name:'')+'. Ton professeur peut maintenant suivre tes dossiers enregistrés en ligne.';
+   code.value='';cloudMsg('Groupe rejoint avec succès.');
+  }catch(err){result.textContent='Inscription impossible : '+(err?.message||String(err))}
+  finally{submit.disabled=false}
+ });
+}
+
 function init(){
  buildPhase1UI();
+ installGroupJoinUI();
  id('egeDossierClose')?.addEventListener('click',()=>dialog(false));
  id('egeDossierOverlay')?.addEventListener('click',e=>{if(e.target===id('egeDossierOverlay'))dialog(false)});
  id('egeDossierNew')?.addEventListener('click',newDossier);
