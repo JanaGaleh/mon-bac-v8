@@ -11,7 +11,7 @@ function renderHeader(){
  const roleText={eleve:"Élève",enseignant:"Enseignant",admin:"Administration"}[st.role];
  return `<header class="app-header"><a class="brand" href="./" aria-label="Accueil EGE GFM 2027" style="text-decoration:none">
  <img class="brandmark ege-brand-icon" src="./icon-ege-2027.svg" width="43" height="43" alt="Logo EGE"><span><span class="brandname">EGE GFM 2027</span><br><span class="brand-sub">Prof. Jana Galeh · ${account?roleText:"Encadrement pédagogique"}</span></span></a>
- <div class="header-right"><span class="version-pill">2026–2027</span>${account?`<button class="header-icon" data-act="refresh" aria-label="Actualiser">${I("clock")}</button><button class="avatar" data-act="goto" data-to="profile" aria-label="Ouvrir mon profil">${esc((vGreeting()||"U").charAt(0).toUpperCase())}</button>`:badge("Bienvenue","red")}</div></header>`
+ <div class="header-right"><button type="button" class="btn ege-install-header" data-act="install" aria-label="Installer EGE GFM 2027">${I("download")}<span>Installer</span></button><span class="version-pill">2026–2027</span>${account?`<button class="header-icon" data-act="refresh" aria-label="Actualiser">${I("clock")}</button><button class="avatar" data-act="goto" data-to="profile" aria-label="Ouvrir mon profil">${esc((vGreeting()||"U").charAt(0).toUpperCase())}</button>`:badge("Bienvenue","red")}</div></header>`
 }
 function menu(){
  const items=navs[st.role]||[],active=st.screen;
@@ -35,6 +35,7 @@ function welcome(){
  const roles=[["eleve","Élève","Préparer et retrouver mes dossiers EGE.","cap"],["enseignant","Enseignant","Suivre mes classes et corriger les travaux.","users"],["admin","Administration","Gérer les comptes et superviser la plateforme.","shield"]];
  return `<div class="onboard"><div class="onboard-top"><img class="onboard-logo ege-brand-icon" src="./icon-ege-2027.svg" width="76" height="76" alt="Icône EGE GFM 2027"><div class="page-eyebrow">EGE GFM 2027 · Prof. Jana Galeh</div><h1>Votre étude de gestion, plus simple à chaque étape.</h1><p class="onlead">Un espace adapté à chacun, sans menus compliqués. Choisissez votre profil pour continuer.</p></div>
  <div class="rolecards">${roles.map(([id,name,desc,icon])=>`<button class="rolecard" data-act="role" data-role="${id}"><span class="roleicon">${I(icon)}</span><h3>${name}</h3><p>${desc}</p><span class="rolelink">Accéder à mon espace ${I("arrow")}</span></button>`).join("")}</div>
+ <div class="ege-install-entry"><button type="button" class="btn primary ege-install-button" data-act="install">${I("download")} Installer l'application</button><p class="small muted">Accédez plus rapidement à vos dossiers depuis l'écran d'accueil de votre appareil.</p></div>
  <div class="onboard-bottom">Connexion sécurisée · Travail personnalisé · Suivi pédagogique</div>
  </div>`;
 }
@@ -257,7 +258,7 @@ function profile(){
  <div class="list-row"><span class="avatar">${esc((vGreeting()||"U")[0].toUpperCase())}</span><div class="row-content"><strong>${esc(vGreeting())}</strong><small>${esc(who?.email||"—")}</small></div></div>
  <div class="list-row"><span class="row-icon red">${I("shield")}</span><div class="row-content"><strong>Accès sécurisé</strong><small>Rôle contrôlé par les autorisations Supabase.</small></div></div>
  <div class="inline-actions" style="margin-top:17px">${btn("Se déconnecter","logout","btn primary","logout")}${btn("Actualiser","refresh","btn","clock")}</div></div>
- <div class="card"><h3>Mon travail</h3>${st.role==="eleve"?`<p class="small muted">Synchronisation actuelle : ${esc(st.saveBadge)}</p>${btn("Mes dossiers","goto","btn","folder",'data-to="student-docs"')}${currentDoc()?btn("Exporter / Word","legacy","btn primary","download"):""}`:
+ <div class="card"><h3>Mon travail</h3><div class="ege-actions" style="margin-bottom:14px">${btn("Installer l’application","install","btn primary","download")}</div>${st.role==="eleve"?`<p class="small muted">Synchronisation actuelle : ${esc(st.saveBadge)}</p>${btn("Mes dossiers","goto","btn","folder",'data-to="student-docs"')}${currentDoc()?btn("Exporter / Word","legacy","btn primary","download"):""}`:
  st.role==="enseignant"?`<p class="small muted">${esc(st.teacher?.status==="approved"?"Compte enseignant approuvé.":"Validation en attente.")}</p>${btn("Mes groupes","goto","btn primary","users",'data-to="teacher-groups"')}`:btn("Superviser les comptes","goto","btn primary","users",'data-to="admin-users"')}
  <hr class="subtle-divider"><p class="small muted">Les mots de passe ne sont jamais consultables par l'administrateur. Pour changer votre mot de passe, utilisez le lien de récupération.</p>
  ${btn("Récupération du mot de passe","mode","btn smol","lock",'data-mode="forgot"')}</div></div>`;
@@ -275,5 +276,11 @@ function render(){
  const host=$("app");if(!host)return;
  host.className="app";
  const intro=st.screen==="welcome"||st.screen==="auth";
- host.innerHTML=renderHeader()+`<div class="app-body">${intro?"":menu()}<main class="main ${intro?(st.screen==="welcome"?"intro-main":"login-main"):""}" id="content"><section class="screen">${feedback()}${view()}</section></main></div>${intro?"":bottomNav()}`;
+ host.innerHTML=renderHeader()+`<div class="app-body">${intro?"":menu()}<main class="main ${intro?(st.screen==="welcome"?"intro-main":"login-main"):""}" id="content"><section class="screen">${feedback()}${view()}</section></main></div>${intro?"":bottomNav()}
+ <dialog id="egeInstallDialog" class="ege-install-dialog" aria-labelledby="egeInstallTitle">
+  <div class="ege-install-dialog-head"><h2 id="egeInstallTitle">Installer EGE GFM 2027</h2><button type="button" class="ege-install-close" data-act="close-install" aria-label="Fermer">${I("plus")}</button></div>
+  <p id="egeInstallInstructions" class="ege-install-instructions"></p>
+  <button type="button" class="btn primary full" data-act="close-install">Compris</button>
+ </dialog>`;
+ refreshInstallButtons();
 }
