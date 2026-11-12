@@ -10,7 +10,7 @@ function renderHeader(){
  const account=st.user;
  const roleText={eleve:"Élève",enseignant:"Enseignant",admin:"Administration"}[st.role];
  return `<header class="app-header"><a class="brand" href="./" aria-label="Accueil EGE GFM 2027" style="text-decoration:none">
- <span class="brandmark">EGE</span><span><span class="brandname">EGE GFM 2027</span><br><span class="brand-sub">Prof. Jana Galeh · ${account?roleText:"Encadrement pédagogique"}</span></span></a>
+ <img class="brandmark ege-brand-icon" src="./icon-ege-2027.svg" width="43" height="43" alt="Logo EGE"><span><span class="brandname">EGE GFM 2027</span><br><span class="brand-sub">Prof. Jana Galeh · ${account?roleText:"Encadrement pédagogique"}</span></span></a>
  <div class="header-right"><span class="version-pill">2026–2027</span>${account?`<button class="header-icon" data-act="refresh" aria-label="Actualiser">${I("clock")}</button><button class="avatar" data-act="goto" data-to="profile" aria-label="Ouvrir mon profil">${esc((vGreeting()||"U").charAt(0).toUpperCase())}</button>`:badge("Bienvenue","red")}</div></header>`
 }
 function menu(){
@@ -33,7 +33,7 @@ function feedback(){
 }
 function welcome(){
  const roles=[["eleve","Élève","Préparer et retrouver mes dossiers EGE.","cap"],["enseignant","Enseignant","Suivre mes classes et corriger les travaux.","users"],["admin","Administration","Gérer les comptes et superviser la plateforme.","shield"]];
- return `<div class="onboard"><div class="onboard-top"><div class="onboard-logo">EGE</div><div class="page-eyebrow">EGE GFM 2027 · Prof. Jana Galeh</div><h1>Votre étude de gestion, plus simple à chaque étape.</h1><p class="onlead">Un espace adapté à chacun, sans menus compliqués. Choisissez votre profil pour continuer.</p></div>
+ return `<div class="onboard"><div class="onboard-top"><img class="onboard-logo ege-brand-icon" src="./icon-ege-2027.svg" width="76" height="76" alt="Icône EGE GFM 2027"><div class="page-eyebrow">EGE GFM 2027 · Prof. Jana Galeh</div><h1>Votre étude de gestion, plus simple à chaque étape.</h1><p class="onlead">Un espace adapté à chacun, sans menus compliqués. Choisissez votre profil pour continuer.</p></div>
  <div class="rolecards">${roles.map(([id,name,desc,icon])=>`<button class="rolecard" data-act="role" data-role="${id}"><span class="roleicon">${I(icon)}</span><h3>${name}</h3><p>${desc}</p><span class="rolelink">Accéder à mon espace ${I("arrow")}</span></button>`).join("")}</div>
  <div class="onboard-bottom">Connexion sécurisée · Travail personnalisé · Suivi pédagogique</div>
  </div>`;
