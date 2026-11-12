@@ -1,0 +1,26 @@
+import assert from 'node:assert/strict';
+import {readFileSync,existsSync} from 'node:fs';
+const read=p=>readFileSync('ege/'+p,'utf8');
+const scripts=['portail.js','phase1.js','enseignant.js','mes-groupes.js','admin.js','word-import.js','auth-feedback.js','service-worker-ege-2027.js'];
+for(const file of scripts){assert.ok(existsSync('ege/'+file),file+' absent');new Function(read(file));console.log('JS OK',file)}
+const pages=['portail.html','assistant-dossier-gfm-2027.html','enseignant.html','mes-groupes.html','admin.html','admin-enseignants.html'];
+for(const file of pages){const s=read(file);assert.match(s,/<html\b/i);assert.match(s,/<\/html>/i);assert.ok(s.includes('theme-rouge.css'),file+' theme manquant');console.log('HTML OK',file)}
+const student=read('assistant-dossier-gfm-2027.html');
+assert.ok(student.includes('annexTitles'));
+assert.ok(student.includes('id="annexPreviewBox"'));
+assert.ok(student.includes('id="egeNavGroup"'));
+const inline=/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi;let match,count=0;
+while((match=inline.exec(student))!==null){if(match[1].trim()){new Function(match[1]);count++}}
+assert.ok(count>=2,'scripts embarqués manquants');
+const portal=read('portail.html');
+for(const role of ['eleve','enseignant','admin'])assert.ok(portal.includes('data-role="'+role+'"'));
+assert.ok(read('portail.js').includes('ege2027_staff'), 'contrôle des rôles manquant');
+assert.ok(read('mes-groupes.js').includes('ege2027_group_submissions'));
+assert.ok(read('enseignant.js').includes('ege2027_group_submissions'));
+assert.ok(read('phase1.js').includes("eq('updated_at',currentRevision)"),'verrouillage optimiste manquant');
+assert.ok(read('word-import.js').includes('imported.annexTitles[i]'));
+const m=JSON.parse(read('manifest-ege-2027.webmanifest'));assert.equal(m.start_url,'./');
+assert.equal(m.theme_color,'#c91b2c');
+assert.ok(read('service-worker-ege-2027.js').includes('shell-v7'));
+assert.ok(read('theme-rouge.css').includes('background:#c91b2c'));
+console.log('EGE smoke tests : OK');
