@@ -416,15 +416,15 @@ function explainInstall(){
  if(egeIsIOS()){
   content.textContent="Sur iPhone ou iPad : ouvrez cette adresse dans Safari, appuyez sur Partager, choisissez « Sur l’écran d’accueil », puis « Ajouter ».";
  }else if(/Android/i.test(navigator.userAgent)){
-  content.textContent="Sur Android : ouvrez EGE GFM 2027 dans Chrome, appuyez sur le menu ⋮, puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ». Si vous utilisez un navigateur intégré à une autre application, ouvrez d’abord le lien dans Chrome.";
+  content.textContent="Sur Android : ouvrez EGE 2027 dans Chrome, appuyez sur le menu ⋮, puis choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ». Si vous utilisez un navigateur intégré à une autre application, ouvrez d’abord le lien dans Chrome.";
  }else{
-  content.textContent="Ouvrez EGE GFM 2027 dans un navigateur compatible. Utilisez l’option « Installer l’application » dans la barre d’adresse ou dans le menu du navigateur.";
+  content.textContent="Ouvrez EGE 2027 dans un navigateur compatible. Utilisez l’option « Installer l’application » dans la barre d’adresse ou dans le menu du navigateur.";
  }
  if(typeof dialog.showModal==="function")dialog.showModal();
  else dialog.setAttribute("open","");
 }
 async function installEGE(){
- if(egeIsInstalled()){toast("EGE GFM 2027 est déjà installée sur cet appareil.");refreshInstallButtons();return}
+ if(egeIsInstalled()){toast("EGE 2027 est déjà installée sur cet appareil.");refreshInstallButtons();return}
  if(egeInstallInProgress)return;
  if(!egeInstallPrompt){explainInstall();return}
  const prompt=egeInstallPrompt;egeInstallPrompt=null;
@@ -445,7 +445,7 @@ window.addEventListener("beforeinstallprompt",event=>{
 });
 window.addEventListener("appinstalled",()=>{
  egeInstallPrompt=null;
- toast("EGE GFM 2027 est installée.");
+ toast("EGE 2027 est installée.");
  refreshInstallButtons();
 });
 
