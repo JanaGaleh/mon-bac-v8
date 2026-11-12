@@ -34,3 +34,21 @@ body:not(.ege-portal) .questionbox,body:not(.ege-portal) .card{border-radius:14p
 body:not(.ege-portal) button,body:not(.ege-portal) a{touch-action:manipulation}
 body:not(.ege-portal) .topbar{padding:10px 12px}
 }
+
+/* Ces composants injectent leurs styles après le chargement : forcer la cohérence des boutons. */
+body:not(.ege-portal) .ege-phase-modal button.ege-primary,
+body:not(.ege-portal) .ege-phase-modal button.ege-dossier-primary,
+body:not(.ege-portal) .ege-group-join-actions button[type="submit"],
+body:not(.ege-portal) .ege-cloud-dialog button.ege-cloud-primary{background:#c91b2c!important;border-color:#c91b2c!important;color:#fff!important}
+body:not(.ege-portal) .ege-phase-modal button:not(.ege-primary):not(.ege-dossier-primary),
+body:not(.ege-portal) .ege-cloud-dialog button:not(.ege-cloud-primary){background:#fff;color:#a91828;border-color:#e6cbd0}
+body:not(.ege-portal) .ege-phase-modal .ege-current,
+body:not(.ege-portal) .ege-phase-modal .ege-dossier-history{background:#fff5f5!important}
+body:not(.ege-portal) .ege-phase-modal .ege-dossier-card.is-selected{background:#fff1f3!important;border-color:#cf7581!important}
+body:not(.ege-portal) .ege-phase-modal .ege-phase-header small{color:#ae1e2d!important}
+.ege-student-bottom,.ege-teacher-bottom,.ege-admin-bottom{display:none}
+@media(max-width:700px){
+ .ege-teacher-bottom,.ege-admin-bottom{display:flex;position:fixed;z-index:50;bottom:0;left:0;right:0;gap:5px;justify-content:space-around;align-items:center;padding:7px 8px calc(7px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #eedfe2}
+ .ege-teacher-bottom a,.ege-admin-bottom a{flex:1;text-decoration:none;color:#aa1e2d;text-align:center;font:700 12px/1.4 system-ui,sans-serif;padding:8px 3px;border-radius:9px;min-height:38px}
+ body:has(.ege-teacher-bottom),body:has(.ege-admin-bottom){padding-bottom:75px}
+}
