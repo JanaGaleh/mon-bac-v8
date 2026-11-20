@@ -1,1 +1,132 @@
 :root{font-family:system-ui,Arial,sans-serif;color:#261947;background:#f7f5fc}*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 22px;background:#4c2b8d;color:white}header a{color:white;text-decoration:none}main{max-width:1100px;margin:auto;padding:15px}.intro,section:not(.intro){background:white;border:1px solid #e9e3f2;border-radius:18px;padding:18px;margin:0 0 16px;box-shadow:0 6px 22px #291c5010}.intro{background:linear-gradient(110deg,#563295,#8259bc);color:white}.intro h1{margin:0}.intro p{margin-bottom:0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fields label:last-child{grid-column:1/-1}label{font-size:.9rem;font-weight:600}input,select,textarea{display:block;width:100%;padding:10px;border:1px solid #d4cce6;border-radius:9px;font:inherit;margin-top:4px}.actions{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:12px 0}button,.upload{border:0;border-radius:10px;padding:10px 14px;background:#6240a5;color:white;cursor:pointer;font:inherit}.upload{display:inline-block}.formula{flex:1;min-width:170px}.actions label:not(.formula):not(.upload){width:95px}.gridscroll{overflow:auto;max-width:100%;border:1px solid #ddd5eb;border-radius:10px}table{border-collapse:collapse;min-width:700px;width:100%;table-layout:fixed}td,th{border:1px solid #e1dbea;height:38px;padding:3px}th{background:#f0ecf8;font-size:.8rem}td input{margin:0;border:0;border-radius:0;padding:5px;height:33px;background:transparent}td input:focus{outline:2px solid #6a43b4}td input:read-only{background:#f3f0f7}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eee7f5;padding:11px 0}.item button{flex-shrink:0}.muted{color:#776d8a}#feedback{min-height:22px}button:disabled{opacity:.5;cursor:not-allowed}@media(max-width:650px){header{padding:12px}.fields{grid-template-columns:1fr}.intro,section:not(.intro){padding:12px}.item{align-items:flex-start;flex-direction:column}.actions button{flex:1}}
+
+/* monAvenir : interface tableur mobile, grille prioritaire */
+:root{color:#202739;background:#f6f7fa}
+header{background:#c60038;position:sticky;top:0;z-index:15}
+.intro{display:none}
+main{max-width:none;padding:10px}
+.sheet-editor{padding:10px!important}
+.sheet-editor h2{font-size:1.15rem;margin:4px 0 8px}
+.sheet-editor #task{font-size:.85rem;color:#667085;margin:0 0 8px}
+.sheet-editor .actions{margin:8px 0}
+.sheet-editor .actions label:not(.upload){margin:0}
+.sheet-editor .actions .formula{flex:1}
+.sheet-controls{display:flex;align-items:center;gap:6px;overflow:hidden;margin:8px 0}
+#sheetTabs{display:flex;gap:5px;overflow-x:auto;flex:1;scrollbar-width:thin}
+.sheet-controls button{background:#fff0f4;color:#a80031;border:1px solid #f3cbd7;padding:8px 12px;white-space:nowrap}
+#sheetTabs button.selected{background:#c60038;color:white}
+.format-tools{display:flex;align-items:center;gap:7px;overflow-x:auto;background:#fff;border:1px solid #e6e7eb;border-radius:12px;padding:8px;margin-bottom:8px}
+.format-tools[hidden]{display:none}
+.format-tools button{background:#fff0f4;color:#9c0030;min-width:42px;white-space:nowrap}
+.color-label{font-size:.72rem;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.color-label input{width:30px;height:30px;padding:0;border:0}
+.gridscroll{height:min(65dvh,720px);overflow:auto;overscroll-behavior:contain;border-radius:8px;border:1px solid #d7dbe3;background:white}
+#grid{table-layout:fixed;width:max-content;min-width:0;background:white}
+#grid th,#grid td{min-width:105px;width:105px;height:35px;padding:0;border:1px solid #e5e7eb}
+#grid th{height:34px;position:sticky;top:0;background:#f4f5f8;color:#465063;z-index:2}
+#grid .row-number{position:sticky;left:0;min-width:43px;width:43px;background:#f4f5f8;text-align:center;z-index:3}
+#grid tr:first-child .row-number{z-index:4}
+#grid td input{height:34px;width:100%;padding:5px 7px;font-size:14px;color:#202739;background:#fff;outline-offset:-2px}
+#grid td input:focus{outline:2px solid #c60038;background:#fff8fa}
+button,.upload{background:#c60038;color:white}
+@media(max-width:650px){main{padding:5px}.sheet-editor{padding:7px!important}.sheet-editor .actions button{flex:0 0 auto}.sheet-editor .actions label:not(.formula){width:75px}.gridscroll{height:68dvh}.sheet-editor{border-radius:10px!important}}
+
+/* Fidélité maquette mobile monAvenir : aucun bouton d'import sous la feuille */
+body{background:#fff;color:#202739;overflow:hidden}
+header{height:64px;min-height:64px;padding:8px 15px;background:#c60038;box-shadow:none}
+header strong{font-size:18px}header #role{font-size:13px}.back-app{background:transparent!important;color:white!important;font-size:26px;padding:5px 10px}
+main{height:calc(100dvh - 64px);overflow:hidden;padding:0;max-width:none}
+#feedback{position:fixed;bottom:70px;left:8px;right:8px;z-index:25;min-height:0;pointer-events:none;color:#a80031;background:#fff9fb;font-size:12px;margin:0}
+#feedback:empty{display:none}
+#editor.sheet-editor{height:100%;margin:0!important;padding:0!important;display:flex;flex-direction:column;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+#editor[hidden]{display:none!important}
+#editorTitle,#task{display:none}
+.sheet-top{position:relative;flex-shrink:0;z-index:10;background:#fff;border-bottom:1px solid #e7e8ed;padding:7px 7px 5px}
+.sheet-filebar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 36px;gap:5px;margin-bottom:7px}
+.sheet-filebar button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:#fff;color:#bc0037;border:1px solid #e3e5eb;border-radius:11px;padding:5px 1px;font-size:22px;line-height:1;min-height:53px}
+.sheet-filebar button small{font-size:10px;color:#222b3b;line-height:1.15}
+.sheet-filebar button.accent{background:#c60038;color:#fff;border-color:#c60038}
+.sheet-filebar button.accent small{color:#fff}
+.sheet-filebar #moreTop{font-size:26px}
+.sheet-menu{position:absolute;right:7px;top:62px;background:white;box-shadow:0 12px 30px #17203633;border:1px solid #e1e4ea;border-radius:12px;padding:7px;z-index:30;display:grid;grid-template-columns:1fr 1fr;gap:5px;min-width:230px}
+.sheet-menu[hidden]{display:none}
+.sheet-menu button{font-size:12px;background:#fff1f4;color:#a90033;padding:9px}
+.sheet-formula .actions{display:flex;flex-wrap:nowrap;align-items:center;margin:0 0 6px;gap:6px}
+.sheet-formula .actions label{font-size:0;min-width:0}
+.sheet-formula .actions label:first-child{width:70px;flex:none}
+.sheet-formula .actions .formula{flex:1;min-width:0}
+.sheet-formula input{font-size:14px;height:37px;margin:0;border-radius:8px;padding:6px}
+.format-tools{border:0;border-radius:0;margin:0;padding:4px 0;gap:4px;overflow-x:auto;scrollbar-width:none}
+.format-tools button{min-width:39px;height:36px;padding:5px 9px;background:#fff;border:1px solid #e6e8ed;border-radius:8px;color:#202739;font-size:15px}
+.format-tools .color-label{border:1px solid #e6e8ed;padding:2px 5px;border-radius:8px}
+.format-tools .color-label input{height:28px;width:26px}
+.gridscroll{flex:1;min-height:0;height:auto!important;max-height:none;overflow:auto;border:0;border-radius:0}
+#grid th,#grid td{min-width:110px;width:110px;height:38px}
+#grid td input{height:37px}
+#grid .row-number{min-width:44px;width:44px}
+.sheet-controls{flex-shrink:0;position:sticky;bottom:0;z-index:8;margin:0;padding:8px 7px max(8px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e7e9ed;gap:5px}
+.sheet-controls button{padding:9px 13px;border:0;background:#f4f5f8;color:#202739;border-radius:9px}
+#sheetTabs button.selected{background:#c60038;color:#fff}
+.legacy-actions{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;margin:0!important;padding:0!important}
+#student{display:none!important}
+#teacher{max-height:35dvh;overflow:auto;margin:0!important;border-radius:0!important}
+@media(max-width:650px){main{padding:0}.sheet-editor{padding:0!important}.sheet-top{padding:6px 6px 4px}.sheet-filebar{gap:4px}.sheet-filebar button small{font-size:9px}.gridscroll{height:auto!important}.sheet-controls{margin:0}.format-tools{margin:0}}
+
+/* Tableur avancé : barre de travail permanente, fichiers uniquement dans ⋮ */
+.sheet-filebar{display:flex!important;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px}
+.sheet-title{font-size:14px;font-weight:700;color:#b60035}
+.sheet-filebar #moreTop{border:0;background:#fff0f4;color:#ad0033;width:36px;height:34px;min-height:34px;font-size:23px;border-radius:9px}
+.sheet-menu{top:39px;grid-template-columns:1fr 1fr;max-width:calc(100vw - 14px)}
+.sheet-formula{display:flex;align-items:center;gap:5px}
+.sheet-formula .actions{flex:1;min-width:0}
+.sheet-formula .actions .formula{min-width:0}
+.sheet-formula #formulaAccept{background:#c60038;color:white;padding:7px 11px;min-width:37px;height:37px;border-radius:8px}
+.formula-mark{color:#a80031;font-weight:700;font-size:16px}
+#formatTools{display:flex!important;overflow-x:auto;flex-wrap:nowrap;gap:5px;scrollbar-width:thin;padding:5px 1px}
+#formatTools button{flex:none;min-width:36px;padding:6px;font-size:14px}
+#formatTools .color-label{flex:none}
+#formatTools .color-label input{width:25px}
+#grid td.range-selected{background:#fff0f4!important;box-shadow:inset 0 0 0 1px #d94370}
+#grid td.range-selected input{background:#fff0f4}
+#grid td:has(input:focus){box-shadow:inset 0 0 0 2px #c60038}
+#grid td[hidden]{display:none}
+#grid th{cursor:pointer;user-select:none}
+.selection-hint{position:absolute;right:10px;bottom:55px;background:#fff9fb;color:#ad0032;border:1px solid #efb7c7;border-radius:7px;padding:2px 6px;font-size:11px;z-index:4;pointer-events:none}
+#editor.sheet-editor{position:relative}
+@media(max-width:650px){.sheet-filebar{margin-bottom:3px}.sheet-top{padding:4px 6px}.sheet-menu{top:36px}.format-tools{margin:0}.sheet-formula input{height:34px}.sheet-formula #formulaAccept{height:34px}}
+
+/* Harmonisation avec l'en-tête des espaces connectés monAvenir */
+header.app-header{height:64px;min-height:64px;background:#fff;color:#1c2431;border-bottom:1px solid #e8eaf0;padding:0 14px;box-shadow:none;position:relative}
+.app-header .brand{display:flex;align-items:center;gap:9px;min-width:0}
+.app-header .brandmark{width:38px;height:38px;border-radius:12px;background:#c8102e;color:#fff;display:grid;place-items:center;font-weight:850;font-size:14px}
+.app-header .brand-copy{display:flex;flex-direction:column;min-width:0}
+.app-header .brandname{font-size:15px;letter-spacing:-.3px;white-space:nowrap}
+.app-header .brand-sub{font-size:10px;color:#738093;white-space:nowrap}
+.app-header .back-app{color:#657084!important;background:transparent!important;padding:3px 5px;font-size:22px}
+.app-header .header-right{display:flex;align-items:center;gap:8px;min-width:0}
+.app-header .header-section{font-size:12px;color:#6b7382}
+.app-header .avatar{font-size:11px;border-radius:22px;padding:7px 9px;background:#fbe3e7;color:#b81d32;white-space:nowrap}
+@media(max-width:380px){.app-header .brand-sub,.app-header .header-section{display:none}}
+/* Deux lignes d'outils fixes : aucun balayage horizontal */
+#formatTools{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;overflow:visible!important;padding:4px 0!important;max-height:none}
+#formatTools button,#formatTools .color-label{width:100%;min-width:0!important;min-height:33px;height:33px;padding:3px 1px!important;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:13px}
+#formatTools .color-label{font-size:0;gap:0}
+#formatTools .color-label input{width:24px;height:25px;flex:none}
+#formatTools #sumCell{font-size:0}
+#formatTools #sumCell::first-letter{font-size:15px}
+@media(max-width:390px){#formatTools{grid-template-columns:repeat(8,minmax(0,1fr))}}
+#ref{min-width:0}
+.chart-panel{position:absolute;left:8px;right:8px;top:118px;z-index:24;background:white;border:1px solid #e7e8ed;border-radius:14px;box-shadow:0 12px 38px #17203638;padding:10px;max-height:min(65dvh,460px);overflow:auto}
+.chart-panel[hidden]{display:none}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.chart-head button{background:#fff0f4;color:#a90033;padding:5px 10px}
+.chart-options{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.chart-options select,.chart-options input{width:auto;min-width:100px;flex:1;margin:0;font-size:12px;padding:7px}
+.chart-options button{font-size:12px;padding:8px}
+#chartSvg{width:100%;height:auto;max-height:260px}
+
+/* Mode tableur intégré au laboratoire : aucun second en-tête */
+body.embedded-lab>header.app-header{display:none!important}
+body.embedded-lab>main{padding-top:0!important;margin-top:0!important}
+body.embedded-lab .sheet-editor{border-top:0!important}
+body.embedded-lab .sheet-top{border-top:0!important}
