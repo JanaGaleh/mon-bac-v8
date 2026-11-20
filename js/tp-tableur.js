@@ -62,13 +62,14 @@ $('fillColor').oninput=e=>applyFormat({fill:e.target.value});
 $('sumCell').onclick=()=>{cells[selected]='=SUM(A1:A10)';renderGrid();scheduleSave();notify('Formule SOMME insérée : adaptez la plage.')};
 $('percentCell').onclick=()=>{const n=Number(value(selected));if(Number.isFinite(n))applyFormat({percent:true,currency:false});else notify('Sélectionnez une cellule numérique.')};
 $('clearCell').onclick=()=>{if(mode==='student'&&locked.includes(selected))return notify('Cellule protégée');snapshot();for(const ref of selectionRefs()){if(!locked.includes(ref)){delete cells[ref];delete formats[ref]}}renderGrid();scheduleSave();persistFree()};
-$('addSheet').onclick=()=>{if(mode!=='free')return notify('Les TP attribués utilisent une feuille unique.');sheets[sheetIndex].cells=cells;const n=sheets.length+1;sheets.push({name:'Feuille '+n,cells:{},formats:{},merged:{}});sheetIndex=n-1;cells=sheets[sheetIndex].cells;formats={};merged={};selected='A1';selection={start:'A1',end:'A1'};renderGrid();persistFree()};
+$('addSheet').onclick=()=>{if(mode!=='free')return notify('Les TP attribués utilisent une feuille unique.');sheets[sheetIndex].cells=cells;const n=sheets.length+1;sheets[sheetIndex].formats=formats;sheets[sheetIndex].merged=merged;sheets.push({name:'Feuille '+n,cells:{},formats:{},merged:{}});sheetIndex=n-1;cells=sheets[sheetIndex].cells;formats={};merged={};selected='A1';selection={start:'A1',end:'A1'};renderGrid();persistFree()};
 
 $('backToApp').onclick=()=>{if(document.referrer&&new URL(document.referrer).origin===location.origin&&history.length>1){history.back()}else{location.assign('/app-2027.html')}};
 
 
 let pointerSelecting=false;
 document.addEventListener('pointerup',()=>{pointerSelecting=false});
+$('grid').addEventListener('pointermove',e=>{if(!pointerSelecting||e.pointerType!=='touch')return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('td[data-ref]');if(el){selection.end=el.dataset.ref;refreshSelection()}});
 function refParts(ref){const m=/^([A-Z]+)([1-9][0-9]*)$/.exec(ref||'');if(!m)return null;return {r:Number(m[2])-1,c:letters.indexOf(m[1])}}
 function selectionBounds(){const a=refParts(selection.start),b=refParts(selection.end);if(!a||!b)return {r1:0,r2:0,c1:0,c2:0};return {r1:Math.min(a.r,b.r),r2:Math.max(a.r,b.r),c1:Math.min(a.c,b.c),c2:Math.max(a.c,b.c)}}
 function selectionRefs(){const {r1,r2,c1,c2}=selectionBounds(),refs=[];for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++)refs.push(key(r,c));return refs}
@@ -90,7 +91,7 @@ $('alignTop').onclick=()=>{const current=formats[selected]?.align||'left';applyF
 $('fontSizeTop').onclick=()=>{const n=Number(prompt('Taille de police (8 à 36)',formats[selected]?.fontSize||14));if(n>=8&&n<=36)applyFormat({fontSize:n})};
 $('currencyTop').onclick=()=>applyFormat({currency:!formats[selected]?.currency,percent:false});
 $('copyTop').onclick=()=>{clipboard=selectionRefs().map(ref=>cells[ref]||'');notify(clipboard.length+' cellule(s) copiée(s).')};
-$('pasteTop').onclick=()=>{if(!clipboard?.length)return notify('Copiez des cellules avant de coller.');snapshot();const a=refParts(selected);clipboard.forEach((v,i)=>{const ref=key(a.r+Math.floor(i/Math.max(1,selectionBounds().c2-selectionBounds().c1+1)),a.c+i%Math.max(1,selectionBounds().c2-selectionBounds().c1+1));if(ref&&!locked.includes(ref))cells[ref]=v});renderGrid();persistFree()};
+$('pasteTop').onclick=()=>{if(!clipboard?.length)return notify('Copiez des cellules avant de coller.');snapshot();const a=refParts(selected);clipboard.forEach((v,i)=>{const ref=key(a.r+Math.floor(i/Math.max(1,selectionBounds().c2-selectionBounds().c1+1)),a.c+i%Math.max(1,selectionBounds().c2-selectionBounds().c1+1));if(ref&&refParts(ref)?.r<ROWS&&!locked.includes(ref))cells[ref]=v});renderGrid();persistFree()};
 $('formula').addEventListener('focus',()=>{$('formula').select()});
 
 /* Commandes de la maquette monAvenir : mêmes actions, sans doublons visuels. */
