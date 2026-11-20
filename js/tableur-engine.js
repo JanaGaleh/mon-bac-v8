@@ -87,12 +87,6 @@ JOUR:a=>date(a[0]).getUTCDate(),
 JOURSEM:a=>(date(a[0]).getUTCDay()+(num(a[1]??1)===2?6:0))%7+1,
 JOURS:a=>Math.round((date(a[0])-date(a[1]))/86400000),
 FACT:a=>{const n=num(a[0]);if(n<0||n>170||!Number.isInteger(n))throw Error('Factorielle invalide');let p=1;for(let i=2;i<=n;i++)p*=i;return p},
-PGCD:a=>{let [x,y]=a.map(v=>Math.abs(Math.trunc(num(v))));while(y)[x,y]=[y,x%y];return x},
-PPCM:a=>{const x=Math.abs(Math.trunc(num(a[0]))),y=Math.abs(Math.trunc(num(a[1])));let p=x,q=y;while(q)[p,q]=[q,p%q];return p?x/p*y:0},
-ALEA:()=>Math.random(),
-ALEA.ENTRE.BORNES:a=>{const lo=Math.ceil(num(a[0])),hi=Math.floor(num(a[1]));if(hi<lo)throw Error('Bornes invalides');return lo+Math.floor(Math.random()*(hi-lo+1))},
-COSH:a=>Math.cosh(num(a[0])),
-SINH:a=>Math.sinh(num(a[0])),
 FIN.MOIS:a=>new Date(Date.UTC(date(a[0]).getUTCFullYear(),date(a[0]).getUTCMonth()+num(a[1])+1,0)).toISOString().slice(0,10),
 };
 export const SUPPORTED_FUNCTIONS=Object.freeze(Object.keys(functions));
