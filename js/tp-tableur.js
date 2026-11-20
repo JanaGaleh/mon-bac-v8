@@ -65,3 +65,22 @@ $('clearCell').onclick=()=>{if(mode==='student'&&locked.includes(selected))retur
 $('addSheet').onclick=()=>{if(mode!=='free')return notify('Les TP attribués utilisent une feuille unique.');sheets[sheetIndex].cells=cells;const n=sheets.length+1;sheets.push({name:'Feuille '+n,cells:{}});sheetIndex=n-1;cells=sheets[sheetIndex].cells;selected='A1';renderGrid()};
 
 $('backToApp').onclick=()=>{if(document.referrer&&new URL(document.referrer).origin===location.origin&&history.length>1){history.back()}else{location.assign('/app-2027.html')}};
+
+/* Commandes de la maquette monAvenir : mêmes actions, sans doublons visuels. */
+const sheetMenu=$('sheetMenu');
+function closeSheetMenu(){sheetMenu.hidden=true;$('moreTop').setAttribute('aria-expanded','false')}
+function showSheetMenu(){sheetMenu.hidden=!sheetMenu.hidden;$('moreTop').setAttribute('aria-expanded',String(!sheetMenu.hidden))}
+$('moreTop').onclick=showSheetMenu;
+$('saveTop').onclick=()=>$('save').click();
+$('newWorkbook').onclick=()=>{if(mode==='student'||mode==='teacher'){notify('Utilisez les commandes de votre TP pour créer un nouveau travail.');return}if(Object.keys(cells).length&&!confirm('Créer une nouvelle feuille vierge ?'))return;$('free').click()};
+$('openWorkbook').onclick=()=>{$('xlsxImport').click()};
+$('importTop').onclick=()=>{showSheetMenu()};
+$('exportTop').onclick=()=>{showSheetMenu()};
+$('importCsvTop').onclick=()=>{$('import').click();closeSheetMenu()};
+$('importXlsxTop').onclick=()=>{$('xlsxImport').click();closeSheetMenu()};
+$('exportCsvTop').onclick=()=>{$('export').click();closeSheetMenu()};
+$('exportXlsxTop').onclick=()=>{$('xlsxExport').click();closeSheetMenu()};
+$('trainingTop').onclick=()=>{$('training').click();closeSheetMenu()};
+$('myWorkTop').onclick=()=>{const panel=$('student');panel.style.setProperty('display','block','important');panel.scrollIntoView({behavior:'smooth',block:'start'});closeSheetMenu()};
+$('prevSheet').onclick=()=>{if(sheetIndex>0)$('sheetTabs').children[sheetIndex-1]?.click()};
+$('nextSheet').onclick=()=>{if(sheetIndex<sheets.length-1)$('sheetTabs').children[sheetIndex+1]?.click()};
