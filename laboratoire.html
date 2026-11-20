@@ -43,7 +43,7 @@ header.lab-space-header{background:#fff!important;color:#1c2431!important;min-he
 .lab-space-header .lab-role[hidden]{display:none}
 .lab-space-header .lab-head-menu{color:#a60035;background:#fff0f4;border-radius:9px;font-size:21px;padding:6px 10px}
 @media(max-width:380px){.lab-space-header .lab-brandmark{width:35px;height:35px}.lab-space-header .lab-heading strong{font-size:15px!important}.lab-space-header .lab-role{font-size:10px;padding:5px 6px}.lab-space-header .lab-head-menu{padding:4px 7px}}
-</style><style id="lab-banner-shared">
+<style id="lab-banner-shared">
 header.lab-space-header{display:flex!important;flex-direction:column;align-items:stretch;gap:0!important;margin:10px 12px 0;padding:0!important;background:linear-gradient(120deg,#a9002c,#d40042 60%,#b90037)!important;color:white!important;border:0!important;border-radius:21px!important;overflow:hidden;box-shadow:0 5px 16px #65001e19!important;min-height:0!important}
 .lab-header-first,.lab-header-second{display:flex;align-items:center;gap:8px;padding:9px 13px;min-height:60px}
 .lab-header-first{border-bottom:1px solid #ffffff20}.lab-header-second{min-height:67px}
@@ -56,7 +56,7 @@ header.lab-space-header{display:flex!important;flex-direction:column;align-items
 .lab-profile-link{font-size:30px}.lab-page-heading{font-size:20px;margin:13px 13px 2px;color:#1c2431}
 @media(max-width:420px){.lab-header-first,.lab-header-second{padding-left:9px;padding-right:9px;gap:5px}.lab-brand img{width:30px;height:30px}.lab-brand strong{font-size:16px!important}#labLanguage{max-width:85px;font-size:11px}.lab-head-action{min-width:32px;font-size:19px}}
 @media(max-width:350px){.lab-brand img{display:none}}
-</style></head><body><header class="lab-space-header"><div class="lab-header-first"><button id="backToApp" class="lab-back" aria-label="Retour">←</button><div class="lab-brand"><img src="./monavenir-icon-192.png" alt=""><strong>monAvenir</strong></div><span class="header-spacer"></span><select id="labLanguage" aria-label="Langue"><option>Français</option><option>English</option><option>العربية</option></select><button id="labNotifications" class="lab-head-action" aria-label="Notifications">♧</button><button id="labExit" class="lab-head-action" aria-label="Retour à l'espace">⇥</button></div><div class="lab-header-second"><span id="labUserAvatar" class="lab-user-avatar">◯</span><span class="lab-user-text"><strong id="labUserGreeting">Mon espace</strong><small id="labUserDetails">Laboratoire numérique</small></span><button id="labUserProfile" class="lab-profile-link" aria-label="Profil">›</button></div></header><h1 class="lab-page-heading">Laboratoire numérique</h1>
+</style></style></head><body><header class="lab-space-header"><div class="lab-header-first"><button id="backToApp" class="lab-back" aria-label="Retour">←</button><div class="lab-brand"><img src="./monavenir-icon-192.png" alt=""><strong>monAvenir</strong></div><span class="header-spacer"></span><select id="labLanguage" aria-label="Langue"><option>Français</option><option>English</option><option>العربية</option></select><button id="labNotifications" class="lab-head-action" aria-label="Notifications">♧</button><button id="labExit" class="lab-head-action" aria-label="Retour à l'espace">⇥</button></div><div class="lab-header-second"><span id="labUserAvatar" class="lab-user-avatar">◯</span><span class="lab-user-text"><strong id="labUserGreeting">Mon espace</strong><small id="labUserDetails">Laboratoire numérique</small></span><button id="labUserProfile" class="lab-profile-link" aria-label="Profil">›</button></div></header>
 <main>
 <nav class="tiles" aria-label="Modules"><button class="tile active" data-module="web"><span>⌨</span>Web</button><button class="tile" data-module="algo"><span>◇</span>Algo</button><button class="tile" data-module="python"><span>🐍</span>Python</button><button class="tile" data-module="excel"><span>▦</span>Excel</button><button class="tile" data-module="projects"><span>▣</span>Mes TP</button></nav>
 <div id="notice" class="hint" role="status">Écrivez du HTML, du CSS et du JavaScript, puis cliquez sur Exécuter.</div>
@@ -89,7 +89,50 @@ $('newProject').onclick=()=>{if(!confirm('Créer un nouveau projet ? Le brouillo
 $('projectList').onchange=e=>{const p=storageRead(key,{})[e.target.value];if(!p)return;projectId=e.target.value;files={...defaults(),...p.files};$('projectName').value=p.name;active='html';$('editor').value=files.html;document.querySelectorAll('[data-file]').forEach(b=>b.classList.toggle('selected',b.dataset.file==='html'));persist();run()};
 $('reset').onclick=()=>{if(!confirm('Réinitialiser les trois fichiers du projet en cours ?'))return;files=defaults();active='html';$('editor').value=files.html;persist();run()};
 $('export').onclick=()=>{files[active]=$('editor').value;const blob=new Blob([htmlDoc()],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=($('projectName').value.trim().replace(/[^a-z0-9_-]/gi,'-')||'mon-projet')+'.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
-const exercises={html:{html:'<!doctype html><html><body>\n<!-- Ajoute un titre h1 et un paragraphe p -->\n<script src="./vendor/supabase-2.57.4.js"></script><script type="module">
+const exercises={html:{html:'<!doctype html><html><body>\n<!-- Ajoute un titre h1 et un paragraphe p -->\n</body></html>',css:'',js:''},condition:{html:'<h1>Conditions</h1><p>Regarde la console.</p>',css:'',js:'const note = 12;\n// Complète la condition\nif (note >= 10) {\n  console.log("Admis");\n} else {\n  console.log("Non admis");\n}'},loop:{html:'<h1>Somme des entiers</h1><p>Regarde la console.</p>',css:'',js:'let somme = 0;\nfor (let i = 1; i <= 10; i++) {\n  somme += i;\n}\nconsole.log("Somme =", somme);'}};
+document.querySelectorAll('[data-exercise]').forEach(b=>b.onclick=()=>{if(!confirm('Charger ce TP dans le brouillon actuel ?'))return;files={...exercises[b.dataset.exercise]};projectId='';$('projectName').value='TP '+b.dataset.exercise;active='html';$('editor').value=files.html;document.querySelectorAll('[data-file]').forEach(t=>t.classList.toggle('selected',t.dataset.file==='html'));persist();run();mobile('editor')});
+
+function showExample(text){$('editor').value=text;examplePending=true;$('editor').addEventListener('focus',clearExample,{once:true})}
+function clearExample(){if(!examplePending)return;examplePending=false;$('editor').value='';$('saveStatus').textContent='Commencez à écrire';}
+function setMode(next){document.body.classList.toggle('lab-excel',next==='excel');if(next==='excel'){mode='excel';document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module==='excel'));$('notice').textContent='Tableur intégré : travaillez ici sans quitter le laboratoire.';if(!$('excelFrame').getAttribute('src'))$('excelFrame').src='./tp-tableur.html?embed=lab&v=200';return}if(mode==='web')files[active]=$('editor').value;else if(mode==='algo')algoCode=$('editor').value;else if(mode==='python')pythonCode=$('editor').value;
+ mode=next;document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module===next));
+ const isWeb=next==='web',isCode=next==='algo'||next==='python';
+ document.querySelector('.panel-title .tabs').hidden=!isWeb;
+ $('practice').hidden=!isWeb;$('reset').hidden=!isWeb;$('export').hidden=!isWeb;
+ $('projectName').disabled=!isWeb;$('projectList').disabled=!isWeb;$('save').disabled=!isWeb;
+ $('run').hidden=!isCode&&!isWeb;
+ if(next==='web'){$('notice').textContent='Écrivez du HTML, du CSS et du JavaScript, puis cliquez sur Exécuter.';$('editor').value=files[active];$('preview').hidden=false;view('preview');}
+ if(next==='algo'){$('notice').textContent='Algorithmique : écrivez DEBUT, des affectations (←) et AFFICHER, puis exécutez.';showExample(algoCode);view('console');}
+ if(next==='python'){$('notice').textContent='Python : écrivez un programme puis cliquez sur Exécuter. Le moteur nécessite une connexion au premier lancement.';showExample(pythonCode);view('console');}
+ if(next==='projects'){$('notice').textContent='Mes TP enregistrés sur cet appareil.';$('editor').value='Sélectionnez un projet dans la liste ci-dessus.';view('console');$('console').textContent=Object.values(storageRead(key,{})).map(p=>p.name).join('\n')||'Aucun TP enregistré';}
+ if(isCode){$('run').textContent='▶ Exécuter';$('console').textContent='';}else $('run').textContent='▶ Exécuter / Actualiser';
+ mobile(isCode?'editor':'editor');
+}
+function runAlgo(){algoCode=$('editor').value;const vars={};const out=[];const lines=algoCode.split(/\r?\n/);
+ const evaluate=expression=>{const e=expression.trim().replace(/,/g,'.');if(/^["'].*["']$/.test(e))return e.slice(1,-1);
+ if(!/^[\w\s+\-*\/().\d]+$/.test(e))throw Error('Expression non prise en charge : '+e);
+ const tokens=e.replace(/\b[A-Za-z_]\w*\b/g,v=>{if(!(v in vars))throw Error('Variable inconnue : '+v);return '('+Number(vars[v])+')'});
+ if(!/^[\d\s+\-*\/().]+$/.test(tokens))throw Error('Expression incorrecte');
+ const nums=tokens.match(/\d+(?:\.\d+)?|[()+*/-]/g)||[];let i=0;
+ function atom(){let t=nums[i++];if(t==='('){let v=add();if(nums[i++]!==')')throw Error('Parenthèse incorrecte');return v}if(t==='-')return -atom();if(!t||!(/^\d/.test(t)))throw Error('Nombre attendu');return Number(t)}
+ function mul(){let v=atom();while(nums[i]==='*'||nums[i]==='/'){const op=nums[i++],b=atom();v=op==='*'?v*b:v/b}return v}
+ function add(){let v=mul();while(nums[i]==='+'||nums[i]==='-'){const op=nums[i++],b=mul();v=op==='+'?v+b:v-b}return v}
+ const result=add();if(i!==nums.length)throw Error('Expression incorrecte');return result};
+ try{for(const raw of lines){const line=raw.trim();if(!line||/^(DEBUT|FIN|ALGORITHME\b.*)$/i.test(line)||line.startsWith('//'))continue;
+ let m=line.match(/^AFFICHER\s+(.+)$/i);if(m){out.push(String(evaluate(m[1])));continue}
+ m=line.match(/^([A-Za-z_]\w*)\s*(?:←|<-|:=)\s*(.+)$/);if(m){vars[m[1]]=evaluate(m[2]);continue}
+ throw Error('Instruction non reconnue : '+line)}
+ $('console').textContent=out.join('\n')||'Programme exécuté sans affichage'}catch(e){$('console').textContent='Erreur : '+e.message}
+ view('console');mobile('preview')}
+async function runPython(){pythonCode=$('editor').value;$('console').textContent='Chargement du moteur Python…';view('console');mobile('preview');
+ try{if(!pyodidePromise){pyodidePromise=(async()=>{if(!window.loadPyodide){await new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js';s.onload=resolve;s.onerror=()=>reject(Error('Impossible de charger Python : vérifiez la connexion'));document.head.appendChild(s)})}return window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.27.7/full/'})})().catch(e=>{pyodidePromise=null;throw e})}
+ const py=await pyodidePromise;let output=[];py.setStdout({batched:s=>output.push(s)});py.setStderr({batched:s=>output.push(s)});
+ await py.runPythonAsync(pythonCode);$('console').textContent=output.join('\n')||'Programme exécuté sans affichage';
+ }catch(e){$('console').textContent='Erreur Python : '+String(e.message||e)}}
+document.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{const next=b.dataset.module;setMode(next)});
+$('labExit').onclick=()=>location.assign('./app-2027.html');$('labUserProfile').onclick=()=>location.assign('./app-2027.html');$('labNotifications').onclick=()=>location.assign('./app-2027.html');$('labLanguage').onchange=()=>location.assign('./app-2027.html');window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('excelFrame').contentWindow||event.data?.type!=='monavenir-lab-role')return;const role=event.data.role;if(!['Élève','Enseignant','Administration'].includes(role))return;$('labRole').textContent=role;$('labRole').hidden=false});const draft=storageRead(draftKey,null);if(draft&&draft.files){files={...defaults(),...draft.files};projectId=draft.projectId||'';$('projectName').value=draft.name||'Mon premier site'}$('editor').value=files.html;listProjects();run();
+})();
+</script><script src="./vendor/supabase-2.57.4.js"></script><script type="module">
 import {client} from './js/api.js';
 (async()=>{try{const {data:{user}}=await client.auth.getUser();if(!user)return;const {data:p}=await client.from('profils').select('*').eq('id',user.id).maybeSingle();const first=String(p?.nom||user.user_metadata?.full_name||user.email?.split('@')[0]||'').trim().split(/\s+/)[0];document.getElementById('labUserGreeting').textContent='Bonjour, '+(first||'Utilisateur');const role=({eleve:'Élève',enseignant:'Enseignant',super_admin:'Administration',admin:'Administration'})[p?.role]||'';document.getElementById('labUserDetails').textContent=[p?.niveau,p?.serie].filter(Boolean).join(' ')||role||'Laboratoire numérique';const photo=p?.photo_url||p?.avatar_url||user.user_metadata?.avatar_url;if(photo&&photo.startsWith('https://')){const img=document.createElement('img');img.src=photo;img.alt='';document.getElementById('labUserAvatar').replaceChildren(img)}}catch(e){console.warn(e)}})();
 </script></body></html>',css:'',js:''},condition:{html:'<h1>Conditions</h1><p>Regarde la console.</p>',css:'',js:'const note = 12;\n// Complète la condition\nif (note >= 10) {\n  console.log("Admis");\n} else {\n  console.log("Non admis");\n}'},loop:{html:'<h1>Somme des entiers</h1><p>Regarde la console.</p>',css:'',js:'let somme = 0;\nfor (let i = 1; i <= 10; i++) {\n  somme += i;\n}\nconsole.log("Somme =", somme);'}};
