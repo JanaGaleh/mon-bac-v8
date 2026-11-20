@@ -53,7 +53,7 @@ init();
 $('xlsxExport').onclick=()=>{try{const blob=exportXlsx(cells),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='monavenir-tp.xlsx';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);notify('Fichier Excel exporté.')}catch(e){notify(e.message)}};
 $('xlsxImport').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{const incoming=await importXlsx(file);for(const [ref,value] of Object.entries(incoming)){if(mode!=='student'||!locked.includes(ref))cells[ref]=value}renderGrid();scheduleSave();notify('Feuille Excel importée.')}catch(err){notify('Import impossible : '+err.message)}finally{e.target.value=''}};
 
-$('toggleTools').onclick=()=>{const box=$('formatTools');box.hidden=!box.hidden;$('toggleTools').setAttribute('aria-expanded',String(!box.hidden))};
+
 $('boldCell').onclick=()=>applyFormat({bold:!formats[selected]?.bold});
 $('italicCell').onclick=()=>applyFormat({italic:!formats[selected]?.italic});
 $('underlineCell').onclick=()=>applyFormat({underline:!formats[selected]?.underline});
