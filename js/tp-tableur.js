@@ -22,9 +22,9 @@ function renderGrid(){
  for(let c=0;c<letters.length;c++){const ref=key(r,c),td=document.createElement('td'),input=document.createElement('input');td.dataset.ref=ref;
  input.setAttribute('aria-label',ref);input.dataset.ref=ref;input.value=value(ref);input.readOnly=mode==='student'&&locked.includes(ref);
  if(formats[ref]){const f=formats[ref];input.style.fontWeight=f.bold?'700':'';input.style.fontStyle=f.italic?'italic':'';input.style.textDecoration=f.underline?'underline':'';input.style.color=f.color||'';input.style.backgroundColor=f.fill||'';input.style.textAlign=f.align||'';input.style.fontSize=f.fontSize?f.fontSize+'px':'';td.style.border=f.border?'2px solid '+(f.borderColor||'#c60038'):'';if(f.currency&&input.value&&!isNaN(Number(input.value)))input.value=Number(input.value).toLocaleString('fr-FR')+' FDJ';if(f.percent&&input.value&&!isNaN(Number(input.value)))input.value=(Number(input.value)*100).toLocaleString('fr-FR')+' %'}if(merged[ref]){td.colSpan=merged[ref].cols;td.rowSpan=merged[ref].rows}
- input.addEventListener('focus',()=>{if(!pointerSelecting){selected=ref;selection={start:ref,end:ref};selectionAnchor=ref;}refreshSelection();$('ref').value=selectionLabel();$('formula').value=cells[ref]||''});input.addEventListener('pointerdown',e=>{pointerSelecting=true;selectionAnchor=ref;selected=ref;selection={start:ref,end:ref};refreshSelection();if(e.pointerType==='touch'){clearTimeout(touchSelectionTimer);touchSelectionTimer=setTimeout(()=>{pointerSelecting=true;input.blur();notify('Glissez le doigt pour étendre la sélection.')},350)}});input.addEventListener('pointerenter',()=>{if(pointerSelecting){selection.end=ref;refreshSelection()}});
- input.addEventListener('change',()=>{snapshot();cells[ref]=input.value;renderGrid();scheduleSave();persistFree()});td.append(input);tr.append(td)}frag.append(tr)}
- grid.append(frag);applyMergedCells();refreshSelection();if(scroller){scroller.scrollLeft=left;scroller.scrollTop=top}$('formula').value=cells[selected]||'';renderSheetTabs();
+ input.addEventListener('focus',()=>{if(formulaEditing)return;if(!pointerSelecting){selected=ref;selection={start:ref,end:ref};selectionAnchor=ref;}refreshSelection();$('ref').value=selectionLabel();$('formula').value=cells[ref]||''});input.addEventListener('pointerdown',e=>{if(formulaEditing){e.preventDefault();insertFormulaReference(ref);return}pointerSelecting=true;selectionAnchor=ref;selected=ref;selection={start:ref,end:ref};refreshSelection();if(e.pointerType==='touch'){clearTimeout(touchSelectionTimer);touchSelectionTimer=setTimeout(()=>{pointerSelecting=true;input.blur();notify('Glissez le doigt pour étendre la sélection.')},350)}});input.addEventListener('pointerenter',()=>{if(pointerSelecting){selection.end=ref;refreshSelection()}});
+ input.addEventListener('change',()=>{if(formulaEditing)return;snapshot();cells[ref]=input.value;renderGrid();scheduleSave();persistFree()});td.append(input);tr.append(td)}frag.append(tr)}
+ grid.append(frag);applyMergedCells();refreshSelection();if(scroller){scroller.scrollLeft=left;scroller.scrollTop=top}if(!formulaEditing)$('formula').value=cells[selected]||'';renderSheetTabs();
 }
 function applyFormat(patch){snapshot();for(const ref of selectionRefs()){if(mode==='student'&&locked.includes(ref))continue;formats[ref]={...formats[ref],...patch}}renderGrid();persistFree()}
 
@@ -43,7 +43,7 @@ $('assign').onclick=async()=>{if(!active)return notify('Enregistre le TP avant a
 $('free').onclick=()=>{mode='free';active=null;work=null;cells={};locked=[];openEditor('Feuille vierge','Travail personnel sur cet appareil.')};
 $('training').onclick=()=>{mode='training';active=null;work=null;cells=template();locked=['A1','B1','C1','D1','A2','B2','C2','A3','B3','C3','A4'];openEditor('Entraînement — Chiffre d’affaires','Calcule D2, D3 et D4 avec des formules.')};
 $('mywork').onclick=()=>loadStudent().then(()=>notify('Liste de tes TP actualisée.'));
-$('formula').onchange=e=>{if(mode==='student'&&locked.includes(selected))return notify('Cellule protégée');snapshot();cells[selected]=e.target.value;renderGrid();scheduleSave();persistFree();persistFree()};
+$('formula').onchange=e=>commitFormula();
 $('save').onclick=()=>mode==='teacher'?saveTeacher('brouillon'):mode==='student'?saveStudent():(persistFree(),notify('Classeur sauvegardé sur cet appareil.'));
 $('submit').onclick=()=>{if(confirm('Rendre ce travail à ton enseignant ?'))saveStudent(true)};
 $('check').onclick=()=>{if(mode==='training'){const expected={D2:6000,D3:5600,D4:11600};const n=Object.entries(expected).filter(([k,v])=>String(cells[k]||'').startsWith('=')&&Number(value(k))===v).length;notify(n+'/3 réponses correctes.')}else notify('Vérification réservée aux exercices d’entraînement.')};
@@ -67,7 +67,7 @@ $('addSheet').onclick=()=>{if(mode!=='free')return notify('Les TP attribués uti
 $('backToApp').onclick=()=>{if(document.referrer&&new URL(document.referrer).origin===location.origin&&history.length>1){history.back()}else{location.assign('/app-2027.html')}};
 
 
-let pointerSelecting=false;let touchSelectionTimer=null;
+let pointerSelecting=false;let touchSelectionTimer=null;let formulaEditing=false;let formulaTarget='A1';let formulaCaret=0;
 document.addEventListener('pointerup',()=>{pointerSelecting=false;clearTimeout(touchSelectionTimer)});
 $('grid').addEventListener('pointermove',e=>{if(!pointerSelecting||e.pointerType!=='touch')return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('td[data-ref]');if(el){selection.end=el.dataset.ref;refreshSelection()}});
 function refParts(ref){const m=/^([A-Z]+)([1-9][0-9]*)$/.exec(ref||'');if(!m)return null;return {r:Number(m[2])-1,c:letters.indexOf(m[1])}}
@@ -82,7 +82,7 @@ function persistFree(){if(mode!=='free')return;try{sheets[sheetIndex]={...sheets
 function loadFree(){try{const saved=JSON.parse(localStorage.getItem('monavenir-tableur-classeur-v2')||'null');if(saved?.sheets?.length){sheets=saved.sheets;sheetIndex=Math.min(saved.sheetIndex||0,sheets.length-1);cells=sheets[sheetIndex].cells||{};formats=sheets[sheetIndex].formats||{};merged=sheets[sheetIndex].merged||{};renderGrid()}}catch(e){notify('Impossible de restaurer le classeur local.')}}
 $('grid').addEventListener('click',e=>{const th=e.target.closest('th');if(!th)return;const tr=th.parentElement;if(tr.rowIndex===0){const c=th.cellIndex-1;selection={start:key(0,c<0?0:c),end:key(ROWS-1,c<0?letters.length-1:c)}}else if(th.classList.contains('row-number')){const row=tr.rowIndex-1;selection={start:key(row,0),end:key(row,letters.length-1)}}selected=selection.start;refreshSelection()});
 $('grid').addEventListener('keydown',e=>{if(e.shiftKey&&e.key.startsWith('Arrow')){const p=refParts(selection.end),dr=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0,dc=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;if(dr||dc){e.preventDefault();selection.end=key(Math.max(0,Math.min(ROWS-1,p.r+dr)),Math.max(0,Math.min(letters.length-1,p.c+dc)));refreshSelection()}}});
-$('formulaAccept').onclick=()=>{$('formula').dispatchEvent(new Event('change'))};
+$('formulaAccept').onclick=()=>commitFormula();
 $('undoTop').onclick=()=>{if(!undoStack.length)return;redoStack.push(JSON.stringify({cells,formats,merged}));restoreState(undoStack.pop())};
 $('redoTop').onclick=()=>{if(!redoStack.length)return;undoStack.push(JSON.stringify({cells,formats,merged}));restoreState(redoStack.pop())};
 $('borderTop').onclick=()=>{const kind=prompt('Bordures : toutes / extérieur / aucune','toutes');if(!kind)return;snapshot();const b=selectionBounds();for(const ref of selectionRefs()){const p=refParts(ref);const outer=p.r===b.r1||p.r===b.r2||p.c===b.c1||p.c===b.c2;formats[ref]={...formats[ref],border:kind==='toutes'||kind==='extérieur'&&outer}}renderGrid();persistFree()};
@@ -92,7 +92,7 @@ $('fontSizeTop').onclick=()=>{const n=Number(prompt('Taille de police (8 à 36)'
 $('currencyTop').onclick=()=>applyFormat({currency:!formats[selected]?.currency,percent:false});
 $('copyTop').onclick=()=>{clipboard=selectionRefs().map(ref=>cells[ref]||'');notify(clipboard.length+' cellule(s) copiée(s).')};
 $('pasteTop').onclick=()=>{if(!clipboard?.length)return notify('Copiez des cellules avant de coller.');snapshot();const a=refParts(selected);clipboard.forEach((v,i)=>{const ref=key(a.r+Math.floor(i/Math.max(1,selectionBounds().c2-selectionBounds().c1+1)),a.c+i%Math.max(1,selectionBounds().c2-selectionBounds().c1+1));if(ref&&refParts(ref)?.r<ROWS&&!locked.includes(ref))cells[ref]=v});renderGrid();persistFree()};
-$('formula').addEventListener('focus',()=>{$('formula').select()});
+$('formula').addEventListener('focus',()=>{formulaTarget=selected;formulaEditing=$('formula').value.startsWith('=');formulaCaret=$('formula').selectionStart??$('formula').value.length});$('formula').addEventListener('input',()=>{formulaTarget=selected;formulaEditing=$('formula').value.startsWith('=');formulaCaret=$('formula').selectionStart??$('formula').value.length});$('formula').addEventListener('click',()=>{formulaCaret=$('formula').selectionStart??$('formula').value.length});$('formula').addEventListener('keyup',e=>{formulaCaret=$('formula').selectionStart??$('formula').value.length;if(e.key==='Enter')commitFormula();if(e.key==='Escape')cancelFormula()});
 
 /* Commandes de la maquette monAvenir : mêmes actions, sans doublons visuels. */
 const sheetMenu=$('sheetMenu');
@@ -113,6 +113,10 @@ $('myWorkTop').onclick=()=>{const panel=$('student');panel.style.setProperty('di
 $('prevSheet').onclick=()=>{if(sheetIndex>0)$('sheetTabs').children[sheetIndex-1]?.click()};
 $('nextSheet').onclick=()=>{if(sheetIndex<sheets.length-1)$('sheetTabs').children[sheetIndex+1]?.click()};
 
+/* Édition des formules par sélection directe des cellules, compatible tactile. */
+function insertFormulaReference(ref){if(!formulaEditing)return;const field=$('formula');const val=field.value;const start=Math.max(1,Math.min(formulaCaret,val.length));field.value=val.slice(0,start)+ref+val.slice(start);formulaCaret=start+ref.length;selected=formulaTarget;selection={start:formulaTarget,end:formulaTarget};refreshSelection();field.focus({preventScroll:true});field.setSelectionRange(formulaCaret,formulaCaret);notify('Référence '+ref+' insérée dans la formule.')}
+function commitFormula(){const field=$('formula'),target=formulaEditing?formulaTarget:selected;if(mode==='student'&&locked.includes(target))return notify('Cellule protégée');const formula=field.value;formulaEditing=false;selected=target;selection={start:target,end:target};snapshot();cells[target]=formula;renderGrid();scheduleSave();persistFree();if(formula.startsWith('=')&&value(target)==='#ERREUR')notify('Formule incorrecte : vérifiez les références et les opérateurs.');else notify('Calcul enregistré.')}
+function cancelFormula(){formulaEditing=false;$('formula').value=cells[formulaTarget]||'';selected=formulaTarget;refreshSelection()}
 /* Sélection de plages explicite, gestion des feuilles et graphiques SVG locaux. */
 $('ref').readOnly=false;
 $('ref').addEventListener('change',e=>{const raw=e.target.value.trim().toUpperCase().replace(/\\s/g,'');const m=/^([A-Z]+[1-9]\\d*)(?::([A-Z]+[1-9]\\d*))?$/.exec(raw);if(!m||!refParts(m[1])||m[2]&&!refParts(m[2])){notify('Plage incorrecte : exemple A1:F20');e.target.value=selectionLabel();return}const a=refParts(m[1]),b=refParts(m[2]||m[1]);if(a.r>=ROWS||b.r>=ROWS||a.c<0||b.c<0){notify('Sélection hors de la feuille.');return}selection={start:m[1],end:m[2]||m[1]};selected=m[1];refreshSelection();$('formula').value=cells[selected]||'';const el=$('grid').querySelector('input[data-ref="'+selected+'"]');el?.scrollIntoView({block:'nearest',inline:'nearest'})});
