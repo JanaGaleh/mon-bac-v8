@@ -68,9 +68,9 @@ function setMode(next){if(mode==='web')files[active]=$('editor').value;else if(m
 }
 function runAlgo(){algoCode=$('editor').value;const vars={};const out=[];const lines=algoCode.split(/\r?\n/);
  const evaluate=expression=>{const e=expression.trim().replace(/,/g,'.');if(/^["'].*["']$/.test(e))return e.slice(1,-1);
- if(!/^[\w\s+\-*/().\d]+$/.test(e))throw Error('Expression non prise en charge : '+e);
+ if(!/^[\w\s+\-*\/().\d]+$/.test(e))throw Error('Expression non prise en charge : '+e);
  const tokens=e.replace(/\b[A-Za-z_]\w*\b/g,v=>{if(!(v in vars))throw Error('Variable inconnue : '+v);return '('+Number(vars[v])+')'});
- if(!/^[\d\s+\-*/().]+$/.test(tokens))throw Error('Expression incorrecte');
+ if(!/^[\d\s+\-*\/().]+$/.test(tokens))throw Error('Expression incorrecte');
  const nums=tokens.match(/\d+(?:\.\d+)?|[()+*/-]/g)||[];let i=0;
  function atom(){let t=nums[i++];if(t==='('){let v=add();if(nums[i++]!==')')throw Error('Parenthèse incorrecte');return v}if(t==='-')return -atom();if(!t||!(/^\d/.test(t)))throw Error('Nombre attendu');return Number(t)}
  function mul(){let v=atom();while(nums[i]==='*'||nums[i]==='/'){const op=nums[i++],b=atom();v=op==='*'?v*b:v/b}return v}
