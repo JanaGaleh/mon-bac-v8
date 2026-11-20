@@ -1,1 +1,32 @@
 :root{font-family:system-ui,Arial,sans-serif;color:#261947;background:#f7f5fc}*{box-sizing:border-box}body{margin:0}header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 22px;background:#4c2b8d;color:white}header a{color:white;text-decoration:none}main{max-width:1100px;margin:auto;padding:15px}.intro,section:not(.intro){background:white;border:1px solid #e9e3f2;border-radius:18px;padding:18px;margin:0 0 16px;box-shadow:0 6px 22px #291c5010}.intro{background:linear-gradient(110deg,#563295,#8259bc);color:white}.intro h1{margin:0}.intro p{margin-bottom:0}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fields label:last-child{grid-column:1/-1}label{font-size:.9rem;font-weight:600}input,select,textarea{display:block;width:100%;padding:10px;border:1px solid #d4cce6;border-radius:9px;font:inherit;margin-top:4px}.actions{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:12px 0}button,.upload{border:0;border-radius:10px;padding:10px 14px;background:#6240a5;color:white;cursor:pointer;font:inherit}.upload{display:inline-block}.formula{flex:1;min-width:170px}.actions label:not(.formula):not(.upload){width:95px}.gridscroll{overflow:auto;max-width:100%;border:1px solid #ddd5eb;border-radius:10px}table{border-collapse:collapse;min-width:700px;width:100%;table-layout:fixed}td,th{border:1px solid #e1dbea;height:38px;padding:3px}th{background:#f0ecf8;font-size:.8rem}td input{margin:0;border:0;border-radius:0;padding:5px;height:33px;background:transparent}td input:focus{outline:2px solid #6a43b4}td input:read-only{background:#f3f0f7}.item{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid #eee7f5;padding:11px 0}.item button{flex-shrink:0}.muted{color:#776d8a}#feedback{min-height:22px}button:disabled{opacity:.5;cursor:not-allowed}@media(max-width:650px){header{padding:12px}.fields{grid-template-columns:1fr}.intro,section:not(.intro){padding:12px}.item{align-items:flex-start;flex-direction:column}.actions button{flex:1}}
+
+/* monAvenir : interface tableur mobile, grille prioritaire */
+:root{color:#202739;background:#f6f7fa}
+header{background:#c60038;position:sticky;top:0;z-index:15}
+.intro{display:none}
+main{max-width:none;padding:10px}
+.sheet-editor{padding:10px!important}
+.sheet-editor h2{font-size:1.15rem;margin:4px 0 8px}
+.sheet-editor #task{font-size:.85rem;color:#667085;margin:0 0 8px}
+.sheet-editor .actions{margin:8px 0}
+.sheet-editor .actions label:not(.upload){margin:0}
+.sheet-editor .actions .formula{flex:1}
+.sheet-controls{display:flex;align-items:center;gap:6px;overflow:hidden;margin:8px 0}
+#sheetTabs{display:flex;gap:5px;overflow-x:auto;flex:1;scrollbar-width:thin}
+.sheet-controls button{background:#fff0f4;color:#a80031;border:1px solid #f3cbd7;padding:8px 12px;white-space:nowrap}
+#sheetTabs button.selected{background:#c60038;color:white}
+.format-tools{display:flex;align-items:center;gap:7px;overflow-x:auto;background:#fff;border:1px solid #e6e7eb;border-radius:12px;padding:8px;margin-bottom:8px}
+.format-tools[hidden]{display:none}
+.format-tools button{background:#fff0f4;color:#9c0030;min-width:42px;white-space:nowrap}
+.color-label{font-size:.72rem;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.color-label input{width:30px;height:30px;padding:0;border:0}
+.gridscroll{height:min(65dvh,720px);overflow:auto;overscroll-behavior:contain;border-radius:8px;border:1px solid #d7dbe3;background:white}
+#grid{table-layout:fixed;width:max-content;min-width:0;background:white}
+#grid th,#grid td{min-width:105px;width:105px;height:35px;padding:0;border:1px solid #e5e7eb}
+#grid th{height:34px;position:sticky;top:0;background:#f4f5f8;color:#465063;z-index:2}
+#grid .row-number{position:sticky;left:0;min-width:43px;width:43px;background:#f4f5f8;text-align:center;z-index:3}
+#grid tr:first-child .row-number{z-index:4}
+#grid td input{height:34px;width:100%;padding:5px 7px;font-size:14px;color:#202739;background:#fff;outline-offset:-2px}
+#grid td input:focus{outline:2px solid #c60038;background:#fff8fa}
+button,.upload{background:#c60038;color:white}
+@media(max-width:650px){main{padding:5px}.sheet-editor{padding:7px!important}.sheet-editor .actions button{flex:0 0 auto}.sheet-editor .actions label:not(.formula){width:75px}.gridscroll{height:68dvh}.sheet-editor{border-radius:10px!important}}
