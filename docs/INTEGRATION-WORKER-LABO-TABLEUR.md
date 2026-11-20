@@ -16,7 +16,10 @@ Branche de préparation : `feature/monavenir-labo-tableur-worker`.
 - `/js/tp-tableur.js`
 - `/js/tableur-engine.js`
 - `/js/tableur-xlsx.js`
-- Dépendances du tableur à auditer : `/js/api.js` et ses imports transitifs.
+- **Dépendance obligatoire confirmée :** `/js/api.js` (absente du Worker actuel). Ce module utilise `/vendor/supabase-2.57.4.js` déjà présent sur le Worker.
+- Le tableur utilisait une redirection vers `./mon-bac.html#profil`, page absente du Worker ; corrigée vers `/` dans cette branche.
+- Les liens « Retour » du Laboratoire et du tableur ont été corrigés vers `/`.
+- Vérifier que les tables Supabase `tp_tableur_*` existent et que leurs politiques RLS autorisent les rôles concernés ; ne pas créer de table sans inspection et validation.
 
 Le Laboratoire pointe vers `./tp-tableur.html` pour le tableur complet.
 
