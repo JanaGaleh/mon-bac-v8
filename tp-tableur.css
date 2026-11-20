@@ -124,3 +124,9 @@ header.app-header{height:64px;min-height:64px;background:#fff;color:#1c2431;bord
 .chart-options select,.chart-options input{width:auto;min-width:100px;flex:1;margin:0;font-size:12px;padding:7px}
 .chart-options button{font-size:12px;padding:8px}
 #chartSvg{width:100%;height:auto;max-height:260px}
+
+/* Mode tableur intégré au laboratoire : aucun second en-tête */
+body.embedded-lab>header.app-header{display:none!important}
+body.embedded-lab>main{padding-top:0!important;margin-top:0!important}
+body.embedded-lab .sheet-editor{border-top:0!important}
+body.embedded-lab .sheet-top{border-top:0!important}
