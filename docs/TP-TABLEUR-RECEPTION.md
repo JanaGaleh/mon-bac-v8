@@ -22,3 +22,10 @@
 - Pas de texte coupé ni de défilement horizontal global ; défilement limité à la grille.
 - Les fonctions essentielles sont visibles, les options avancées restent discrètes.
 - Français simple, consignes courtes, autonomie de l'élève, pas de surcharge.
+
+## Avancement du 20 novembre 2026
+- Page authentifiée `tp-tableur.html` et contrôleur `js/tp-tableur.js` ajoutés.
+- Tables `tp_tableur`, `tp_tableur_affectations`, `tp_tableur_travaux` créées dans Supabase, avec RLS activée et contrôlée.
+- Enseignant : brouillon, publication, duplication, affectation aux élèves inscrits, correction manuelle, cellule protégée et réponse attendue.
+- Élève : TP affectés, feuille vierge, entraînement, sauvegarde, remise.
+- **Non validé pour production** : tests automatisés et parcours réels, moteur tableur complet, XLSX, synchronisation du travail libre, correction automatique des TP enseignants, vérification approfondie des politiques RLS.
