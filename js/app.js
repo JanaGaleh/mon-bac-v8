@@ -248,7 +248,7 @@ function render() {
     role = state.profile.role;
   let html = "";
   if (state.tab === "terrainadmin" && role === "super_admin") html = title("Suivi du terrain", "Progression et gestion des accès.") + `<section class="card"><h2>Dépréciation du terrain</h2><p>Consultez les tentatives et ouvrez ou verrouillez les exercices.</p><a class="primary" href="./admin-terrain.html">Ouvrir le tableau de suivi →</a></section>`;
-  if (state.tab === "tableur" && (role === "eleve" || role === "enseignant")) html = title("TP Tableur", "Calculer, pratiquer et progresser.") + `<section class="card"><h2>Laboratoire numérique</h2><p>Ouvre le tableur pour travailler sur des formules, préparer une feuille vierge ou t’entraîner.</p><p class="muted small">Version initiale : les travaux sont sauvegardés uniquement sur cet appareil. Les TP partagés et la synchronisation avec ton enseignant arrivent dans une prochaine étape.</p><a class="primary" href="./tp-tableur-prototype.html">Ouvrir le TP Tableur →</a></section>`;
+  if (state.tab === "tableur" && (role === "eleve" || role === "enseignant")) html = title("TP Tableur", "Calculer, pratiquer et progresser.") + `<section class="card"><h2>Laboratoire numérique</h2><p>Ouvre le tableur pour travailler sur des formules, préparer une feuille vierge ou t’entraîner.</p><p class="muted small">Les enseignants peuvent créer et affecter des TP ; les élèves peuvent enregistrer et rendre leurs travaux.</p><a class="primary" href="./tp-tableur.html">Ouvrir le TP Tableur →</a></section>`;
   else if (state.tab === "profil") {
     html =
       title("Mon profil", "Tes informations et tes accès.") +
