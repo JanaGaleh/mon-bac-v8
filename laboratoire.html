@@ -56,9 +56,40 @@ header.lab-space-header{display:flex!important;flex-direction:column;align-items
 .lab-profile-link{font-size:30px}.lab-page-heading{font-size:20px;margin:13px 13px 2px;color:#1c2431}
 @media(max-width:420px){.lab-header-first,.lab-header-second{padding-left:9px;padding-right:9px;gap:5px}.lab-brand img{width:30px;height:30px}.lab-brand strong{font-size:16px!important}#labLanguage{max-width:85px;font-size:11px}.lab-head-action{min-width:32px;font-size:19px}}
 @media(max-width:350px){.lab-brand img{display:none}}
-</style></style></head><body><header class="lab-space-header"><div class="lab-header-first"><button id="backToApp" class="lab-back" aria-label="Retour">←</button><div class="lab-brand"><img src="./monavenir-icon-192.png" alt=""><strong>monAvenir</strong></div><span class="header-spacer"></span><select id="labLanguage" aria-label="Langue"><option>Français</option><option>English</option><option>العربية</option></select><button id="labNotifications" class="lab-head-action" aria-label="Notifications">♧</button><button id="labExit" class="lab-head-action" aria-label="Retour à l'espace">⇥</button></div><div class="lab-header-second"><span id="labUserAvatar" class="lab-user-avatar">◯</span><span class="lab-user-text"><strong id="labUserGreeting">Mon espace</strong><small id="labUserDetails">Laboratoire numérique</small></span><button id="labUserProfile" class="lab-profile-link" aria-label="Profil">›</button></div></header>
+</style></style><style id="lab-faithful-design">
+/* Approved mobile mockup: shared connected-space banner */
+body{overflow-x:hidden}
+header.lab-space-header{background:linear-gradient(115deg,#ba002c,#d0003d 70%,#ae002e)!important;border-radius:19px!important}
+.lab-header-first{gap:clamp(4px,1.4vw,12px)}
+.lab-brand strong{font-weight:900!important;font-style:italic;letter-spacing:-.8px}
+#labLanguage{width:58px!important;max-width:58px!important;flex:none;text-align:center;font-weight:700;font-size:13px!important;padding:9px 3px}
+.lab-head-action{position:relative}
+.lab-notification-count{position:absolute;top:-7px;right:-5px;background:#fff;color:#c40036;border-radius:20px;padding:2px 5px;font-size:11px;font-weight:800}
+.lab-notification-count[hidden]{display:none}
+.lab-title-section{display:flex;align-items:center;gap:12px;margin:13px 15px 8px;border-left:4px solid #d0003e;padding-left:11px;min-width:0}
+.lab-title-icon{display:grid;place-items:center;width:42px;height:42px;border:2px solid #c90039;border-radius:9px;color:#c90039;font-size:24px;flex:none}
+.lab-title-section h1{margin:0;font-size:clamp(18px,4.6vw,27px);font-weight:800;color:#18243a;line-height:1.2}
+.lab-title-section p{margin:4px 0 0;color:#64708a;font-size:clamp(11px,2.8vw,15px)}
+.tiles{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:clamp(4px,1vw,10px)!important;overflow:visible!important}
+.tiles .tile{min-width:0!important;min-height:84px;border:1px solid #e2e6ef;border-radius:16px!important;box-shadow:0 3px 8px #16213b0b;font-weight:750;font-size:clamp(10px,2.6vw,15px)!important;padding:9px 2px!important;gap:5px}
+.tiles .tile.active{background:#c9003b!important;color:white!important}
+.tiles .tile span{font-size:clamp(19px,5vw,29px)}
+#projectToolbar{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:8px;align-items:center}
+#projectToolbar>*{min-width:0}
+#projectToolbar input,#projectToolbar select{width:100%;max-width:100%;box-sizing:border-box}
+#projectToolbar button{white-space:nowrap}
+.workspace{min-width:0}
+.tabs button{border-radius:10px!important;font-weight:700}
+.tabs button.selected{background:#c9003b!important;color:#fff!important}
+#editor{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;line-height:1.6;tab-size:2;max-width:100%;box-sizing:border-box}
+#webActions button{border-radius:12px}
+@media(min-width:900px){header.lab-space-header,.lab-title-section,main{max-width:1180px;margin-left:auto!important;margin-right:auto!important}main{width:calc(100% - 24px)}.tiles .tile{min-height:100px}}
+@media(max-width:600px){header.lab-space-header{margin:7px 8px 0!important}.lab-header-first,.lab-header-second{padding:8px 9px}.lab-brand img{width:29px;height:29px}.lab-brand strong{font-size:clamp(13px,4vw,19px)!important}.lab-back{min-width:20px!important}.lab-title-section{margin:11px 10px 7px}.tiles .tile{min-height:74px!important}#projectToolbar{grid-template-columns:minmax(0,1fr) minmax(0,.85fr) auto}#projectToolbar button{font-size:12px;padding:9px 7px}main{padding:7px!important}}
+@media(max-width:370px){.lab-brand img{display:none}.lab-head-action{min-width:28px!important;padding:4px!important}#labLanguage{width:47px!important;max-width:47px!important}.tiles .tile{min-height:68px!important}.lab-title-section h1{font-size:17px}#projectToolbar{gap:4px}#projectToolbar button{font-size:11px;padding:8px 4px}}
+</style></head><body><header class="lab-space-header"><div class="lab-header-first"><button id="backToApp" class="lab-back" aria-label="Retour">←</button><div class="lab-brand"><img src="./monavenir-icon-192.png" alt=""><strong>monAvenir</strong></div><span class="header-spacer"></span><select id="labLanguage" aria-label="Langue"><option value="fr">Fr</option><option value="so">As</option><option value="ar">Ae</option></select><button id="labNotifications" class="lab-head-action" aria-label="Notifications">♧<span class="lab-notification-count" id="labNotificationCount" hidden>0</span></button><button id="labExit" class="lab-head-action" aria-label="Retour à l'espace">⇥</button></div><div class="lab-header-second"><span id="labUserAvatar" class="lab-user-avatar">◯</span><span class="lab-user-text"><strong id="labUserGreeting">Mon espace</strong><small id="labUserDetails">Laboratoire numérique</small></span><button id="labUserProfile" class="lab-profile-link" aria-label="Profil">›</button></div></header>
+<div class="lab-title-section"><span class="lab-title-icon" aria-hidden="true">⌨</span><div><h1>Laboratoire numérique</h1><p>Coder · Expérimenter · Créer</p></div></div>
 <main>
-<nav class="tiles" aria-label="Modules"><button class="tile active" data-module="web"><span>⌨</span>Web</button><button class="tile" data-module="algo"><span>◇</span>Algo</button><button class="tile" data-module="python"><span>🐍</span>Python</button><button class="tile" data-module="excel"><span>▦</span>Excel</button><button class="tile" data-module="projects"><span>▣</span>Mes TP</button></nav>
+<nav class="tiles" aria-label="Modules"><button class="tile active" data-module="web"><span>⌨</span>Web</button><button class="tile" data-module="algo"><span>♧</span>Algo</button><button class="tile" data-module="python"><span>🐍</span>Python</button><button class="tile" data-module="excel"><span>▦</span>Excel</button><button class="tile" data-module="projects"><span>📁</span>Mes TP</button></nav>
 <div id="notice" class="hint" role="status">Écrivez du HTML, du CSS et du JavaScript, puis cliquez sur Exécuter.</div>
 <div class="toolbar" id="projectToolbar"><label for="projectName">Projet</label><input id="projectName" maxlength="70" value="Mon premier site" aria-label="Nom du projet"><select id="projectList" aria-label="Projets enregistrés"><option value="">Nouveau projet</option></select><button id="save" class="primary">Enregistrer</button><button id="moreActions" class="light" aria-expanded="false">⋮ Options</button><div id="extraActions" hidden><button id="newProject" class="light">Nouveau</button><button id="export" class="light">Exporter HTML</button></div><span id="saveStatus" class="status" role="status">Non enregistré</span></div>
 <div class="mobile-switch"><button id="showEditor" class="selected">Éditeur</button><button id="showPreview">Aperçu</button></div>
@@ -130,7 +161,7 @@ async function runPython(){pythonCode=$('editor').value;$('console').textContent
  await py.runPythonAsync(pythonCode);$('console').textContent=output.join('\n')||'Programme exécuté sans affichage';
  }catch(e){$('console').textContent='Erreur Python : '+String(e.message||e)}}
 document.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{const next=b.dataset.module;setMode(next)});
-$('labExit').onclick=()=>location.assign('./app-2027.html');$('labUserProfile').onclick=()=>location.assign('./app-2027.html');$('labNotifications').onclick=()=>location.assign('./app-2027.html');$('labLanguage').onchange=()=>location.assign('./app-2027.html');window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('excelFrame').contentWindow||event.data?.type!=='monavenir-lab-role')return;const role=event.data.role;if(!['Élève','Enseignant','Administration'].includes(role))return;$('labRole').textContent=role;$('labRole').hidden=false});const draft=storageRead(draftKey,null);if(draft&&draft.files){files={...defaults(),...draft.files};projectId=draft.projectId||'';$('projectName').value=draft.name||'Mon premier site'}$('editor').value=files.html;listProjects();run();
+$('labExit').onclick=()=>location.assign('./app-2027.html');$('labUserProfile').onclick=()=>location.assign('./app-2027.html');$('labNotifications').onclick=()=>location.assign('./app-2027.html');$('labLanguage').onchange=e=>{try{localStorage.setItem('monavenir-language',e.target.value)}catch(_){};};window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('excelFrame').contentWindow||event.data?.type!=='monavenir-lab-role')return;const role=event.data.role;if(!['Élève','Enseignant','Administration'].includes(role))return;const details=$('labUserDetails');if(details&&details.textContent==='Laboratoire numérique')details.textContent=role});const draft=storageRead(draftKey,null);if(draft&&draft.files){files={...defaults(),...draft.files};projectId=draft.projectId||'';$('projectName').value=draft.name||'Mon premier site'}$('editor').value=files.html;listProjects();run();
 })();
 </script><script src="./vendor/supabase-2.57.4.js"></script><script type="module">
 import {client} from './js/api.js';
