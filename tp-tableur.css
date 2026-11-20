@@ -71,3 +71,26 @@ main{height:calc(100dvh - 64px);overflow:hidden;padding:0;max-width:none}
 #student{display:none!important}
 #teacher{max-height:35dvh;overflow:auto;margin:0!important;border-radius:0!important}
 @media(max-width:650px){main{padding:0}.sheet-editor{padding:0!important}.sheet-top{padding:6px 6px 4px}.sheet-filebar{gap:4px}.sheet-filebar button small{font-size:9px}.gridscroll{height:auto!important}.sheet-controls{margin:0}.format-tools{margin:0}}
+
+/* Tableur avancé : barre de travail permanente, fichiers uniquement dans ⋮ */
+.sheet-filebar{display:flex!important;align-items:center;justify-content:space-between;gap:8px;margin:0 0 5px}
+.sheet-title{font-size:14px;font-weight:700;color:#b60035}
+.sheet-filebar #moreTop{border:0;background:#fff0f4;color:#ad0033;width:36px;height:34px;min-height:34px;font-size:23px;border-radius:9px}
+.sheet-menu{top:39px;grid-template-columns:1fr 1fr;max-width:calc(100vw - 14px)}
+.sheet-formula{display:flex;align-items:center;gap:5px}
+.sheet-formula .actions{flex:1;min-width:0}
+.sheet-formula .actions .formula{min-width:0}
+.sheet-formula #formulaAccept{background:#c60038;color:white;padding:7px 11px;min-width:37px;height:37px;border-radius:8px}
+.formula-mark{color:#a80031;font-weight:700;font-size:16px}
+#formatTools{display:flex!important;overflow-x:auto;flex-wrap:nowrap;gap:5px;scrollbar-width:thin;padding:5px 1px}
+#formatTools button{flex:none;min-width:36px;padding:6px;font-size:14px}
+#formatTools .color-label{flex:none}
+#formatTools .color-label input{width:25px}
+#grid td.range-selected{background:#fff0f4!important;box-shadow:inset 0 0 0 1px #d94370}
+#grid td.range-selected input{background:#fff0f4}
+#grid td:has(input:focus){box-shadow:inset 0 0 0 2px #c60038}
+#grid td[hidden]{display:none}
+#grid th{cursor:pointer;user-select:none}
+.selection-hint{position:absolute;right:10px;bottom:55px;background:#fff9fb;color:#ad0032;border:1px solid #efb7c7;border-radius:7px;padding:2px 6px;font-size:11px;z-index:4;pointer-events:none}
+#editor.sheet-editor{position:relative}
+@media(max-width:650px){.sheet-filebar{margin-bottom:3px}.sheet-top{padding:4px 6px}.sheet-menu{top:36px}.format-tools{margin:0}.sheet-formula input{height:34px}.sheet-formula #formulaAccept{height:34px}}
