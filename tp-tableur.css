@@ -94,3 +94,33 @@ main{height:calc(100dvh - 64px);overflow:hidden;padding:0;max-width:none}
 .selection-hint{position:absolute;right:10px;bottom:55px;background:#fff9fb;color:#ad0032;border:1px solid #efb7c7;border-radius:7px;padding:2px 6px;font-size:11px;z-index:4;pointer-events:none}
 #editor.sheet-editor{position:relative}
 @media(max-width:650px){.sheet-filebar{margin-bottom:3px}.sheet-top{padding:4px 6px}.sheet-menu{top:36px}.format-tools{margin:0}.sheet-formula input{height:34px}.sheet-formula #formulaAccept{height:34px}}
+
+/* Harmonisation avec l'en-tête des espaces connectés monAvenir */
+header.app-header{height:64px;min-height:64px;background:#fff;color:#1c2431;border-bottom:1px solid #e8eaf0;padding:0 14px;box-shadow:none;position:relative}
+.app-header .brand{display:flex;align-items:center;gap:9px;min-width:0}
+.app-header .brandmark{width:38px;height:38px;border-radius:12px;background:#c8102e;color:#fff;display:grid;place-items:center;font-weight:850;font-size:14px}
+.app-header .brand-copy{display:flex;flex-direction:column;min-width:0}
+.app-header .brandname{font-size:15px;letter-spacing:-.3px;white-space:nowrap}
+.app-header .brand-sub{font-size:10px;color:#738093;white-space:nowrap}
+.app-header .back-app{color:#657084!important;background:transparent!important;padding:3px 5px;font-size:22px}
+.app-header .header-right{display:flex;align-items:center;gap:8px;min-width:0}
+.app-header .header-section{font-size:12px;color:#6b7382}
+.app-header .avatar{font-size:11px;border-radius:22px;padding:7px 9px;background:#fbe3e7;color:#b81d32;white-space:nowrap}
+@media(max-width:380px){.app-header .brand-sub,.app-header .header-section{display:none}}
+/* Deux lignes d'outils fixes : aucun balayage horizontal */
+#formatTools{display:grid!important;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;overflow:visible!important;padding:4px 0!important;max-height:none}
+#formatTools button,#formatTools .color-label{width:100%;min-width:0!important;min-height:33px;height:33px;padding:3px 1px!important;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:13px}
+#formatTools .color-label{font-size:0;gap:0}
+#formatTools .color-label input{width:24px;height:25px;flex:none}
+#formatTools #sumCell{font-size:0}
+#formatTools #sumCell::first-letter{font-size:15px}
+@media(max-width:390px){#formatTools{grid-template-columns:repeat(8,minmax(0,1fr))}}
+#ref{min-width:0}
+.chart-panel{position:absolute;left:8px;right:8px;top:118px;z-index:24;background:white;border:1px solid #e7e8ed;border-radius:14px;box-shadow:0 12px 38px #17203638;padding:10px;max-height:min(65dvh,460px);overflow:auto}
+.chart-panel[hidden]{display:none}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.chart-head button{background:#fff0f4;color:#a90033;padding:5px 10px}
+.chart-options{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.chart-options select,.chart-options input{width:auto;min-width:100px;flex:1;margin:0;font-size:12px;padding:7px}
+.chart-options button{font-size:12px;padding:8px}
+#chartSvg{width:100%;height:auto;max-height:260px}
