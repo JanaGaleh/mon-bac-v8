@@ -30,3 +30,44 @@ main{max-width:none;padding:10px}
 #grid td input:focus{outline:2px solid #c60038;background:#fff8fa}
 button,.upload{background:#c60038;color:white}
 @media(max-width:650px){main{padding:5px}.sheet-editor{padding:7px!important}.sheet-editor .actions button{flex:0 0 auto}.sheet-editor .actions label:not(.formula){width:75px}.gridscroll{height:68dvh}.sheet-editor{border-radius:10px!important}}
+
+/* Fidélité maquette mobile monAvenir : aucun bouton d'import sous la feuille */
+body{background:#fff;color:#202739;overflow:hidden}
+header{height:64px;min-height:64px;padding:8px 15px;background:#c60038;box-shadow:none}
+header strong{font-size:18px}header #role{font-size:13px}.back-app{background:transparent!important;color:white!important;font-size:26px;padding:5px 10px}
+main{height:calc(100dvh - 64px);overflow:hidden;padding:0;max-width:none}
+#feedback{position:fixed;bottom:70px;left:8px;right:8px;z-index:25;min-height:0;pointer-events:none;color:#a80031;background:#fff9fb;font-size:12px;margin:0}
+#feedback:empty{display:none}
+#editor.sheet-editor{height:100%;margin:0!important;padding:0!important;display:flex;flex-direction:column;border:0;border-radius:0;box-shadow:none;overflow:hidden}
+#editor[hidden]{display:none!important}
+#editorTitle,#task{display:none}
+.sheet-top{position:relative;flex-shrink:0;z-index:10;background:#fff;border-bottom:1px solid #e7e8ed;padding:7px 7px 5px}
+.sheet-filebar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) 36px;gap:5px;margin-bottom:7px}
+.sheet-filebar button{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:#fff;color:#bc0037;border:1px solid #e3e5eb;border-radius:11px;padding:5px 1px;font-size:22px;line-height:1;min-height:53px}
+.sheet-filebar button small{font-size:10px;color:#222b3b;line-height:1.15}
+.sheet-filebar button.accent{background:#c60038;color:#fff;border-color:#c60038}
+.sheet-filebar button.accent small{color:#fff}
+.sheet-filebar #moreTop{font-size:26px}
+.sheet-menu{position:absolute;right:7px;top:62px;background:white;box-shadow:0 12px 30px #17203633;border:1px solid #e1e4ea;border-radius:12px;padding:7px;z-index:30;display:grid;grid-template-columns:1fr 1fr;gap:5px;min-width:230px}
+.sheet-menu[hidden]{display:none}
+.sheet-menu button{font-size:12px;background:#fff1f4;color:#a90033;padding:9px}
+.sheet-formula .actions{display:flex;flex-wrap:nowrap;align-items:center;margin:0 0 6px;gap:6px}
+.sheet-formula .actions label{font-size:0;min-width:0}
+.sheet-formula .actions label:first-child{width:70px;flex:none}
+.sheet-formula .actions .formula{flex:1;min-width:0}
+.sheet-formula input{font-size:14px;height:37px;margin:0;border-radius:8px;padding:6px}
+.format-tools{border:0;border-radius:0;margin:0;padding:4px 0;gap:4px;overflow-x:auto;scrollbar-width:none}
+.format-tools button{min-width:39px;height:36px;padding:5px 9px;background:#fff;border:1px solid #e6e8ed;border-radius:8px;color:#202739;font-size:15px}
+.format-tools .color-label{border:1px solid #e6e8ed;padding:2px 5px;border-radius:8px}
+.format-tools .color-label input{height:28px;width:26px}
+.gridscroll{flex:1;min-height:0;height:auto!important;max-height:none;overflow:auto;border:0;border-radius:0}
+#grid th,#grid td{min-width:110px;width:110px;height:38px}
+#grid td input{height:37px}
+#grid .row-number{min-width:44px;width:44px}
+.sheet-controls{flex-shrink:0;position:sticky;bottom:0;z-index:8;margin:0;padding:8px 7px max(8px,env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e7e9ed;gap:5px}
+.sheet-controls button{padding:9px 13px;border:0;background:#f4f5f8;color:#202739;border-radius:9px}
+#sheetTabs button.selected{background:#c60038;color:#fff}
+.legacy-actions{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;margin:0!important;padding:0!important}
+#student{display:none!important}
+#teacher{max-height:35dvh;overflow:auto;margin:0!important;border-radius:0!important}
+@media(max-width:650px){main{padding:0}.sheet-editor{padding:0!important}.sheet-top{padding:6px 6px 4px}.sheet-filebar{gap:4px}.sheet-filebar button small{font-size:9px}.gridscroll{height:auto!important}.sheet-controls{margin:0}.format-tools{margin:0}}
