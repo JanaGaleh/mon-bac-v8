@@ -27,7 +27,7 @@ def prepare(original: pathlib.Path, destination: pathlib.Path) -> None:
     if source.startswith("--") and "Content-Disposition: form-data; name=\"worker.js\"" in source[:1000]:
         boundary = source.splitlines()[0]
         start = source.find(MARKER)
-        end = source.rfind("\\r\\n" + boundary + "--")
+        end = source.rfind("\r\n" + boundary + "--")
         if start < 0 or end < start:
             raise ValueError("Export multipart Cloudflare incomplet")
         source = source[start:end]
