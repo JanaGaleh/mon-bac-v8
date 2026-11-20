@@ -15,7 +15,7 @@ function renderSheetTabs(){
  $('addSheet').disabled=mode!=='free';
 }
 function renderGrid(){
- const grid=$('grid');grid.replaceChildren();const header=document.createElement('tr');
+ const grid=$('grid'),scroller=grid.closest('.gridscroll'),left=scroller?.scrollLeft||0,top=scroller?.scrollTop||0;grid.replaceChildren();const header=document.createElement('tr');
  ['',...letters].forEach((t,i)=>{const th=document.createElement('th');th.textContent=t;if(i===0)th.className='row-number';header.append(th)});grid.append(header);
  const frag=document.createDocumentFragment();
  for(let r=0;r<ROWS;r++){const tr=document.createElement('tr'),th=document.createElement('th');th.textContent=r+1;th.className='row-number';tr.append(th);
@@ -24,7 +24,7 @@ function renderGrid(){
  if(formats[ref]){const f=formats[ref];input.style.fontWeight=f.bold?'700':'';input.style.fontStyle=f.italic?'italic':'';input.style.textDecoration=f.underline?'underline':'';input.style.color=f.color||'';input.style.backgroundColor=f.fill||''}
  input.addEventListener('focus',()=>{selected=ref;$('ref').value=ref;$('formula').value=cells[ref]||''});
  input.addEventListener('change',()=>{cells[ref]=input.value;renderGrid();scheduleSave()});td.append(input);tr.append(td)}frag.append(tr)}
- grid.append(frag);$('formula').value=cells[selected]||'';renderSheetTabs();
+ grid.append(frag);if(scroller){scroller.scrollLeft=left;scroller.scrollTop=top}$('formula').value=cells[selected]||'';renderSheetTabs();
 }
 function applyFormat(patch){formats[selected]={...formats[selected],...patch};const input=$('grid').querySelector('[data-ref="'+selected+'"]');if(!input)return;const f=formats[selected];input.style.fontWeight=f.bold?'700':'';input.style.fontStyle=f.italic?'italic':'';input.style.textDecoration=f.underline?'underline':'';input.style.color=f.color||'';input.style.backgroundColor=f.fill||'';}
 
