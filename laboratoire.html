@@ -33,7 +33,17 @@ body.lab-excel .workspace,body.lab-excel .mobile-switch,body.lab-excel #practice
 body.lab-excel #notice{margin:0 0 8px}
 @media(max-width:760px){header{min-height:60px;padding:9px 10px!important}header .lab-symbol{font-size:21px}header .lab-subtitle{font-size:10px}main{padding:7px}.tiles{gap:5px}.tile{padding:9px 1px;border-radius:13px;font-size:10px}.tile span{font-size:19px}#excelPanel iframe{height:calc(100dvh - 165px);min-height:340px}}
 @media(max-width:350px){header .lab-symbol{display:none}.tile{font-size:9px}.tile span{font-size:17px}}
-</style></head><body><header><button type="button" id="backToApp" class="back-app" aria-label="Retour à mon espace monAvenir">←</button><span class="lab-symbol" aria-hidden="true">⚗</span><div class="lab-heading"><strong>Laboratoire numérique</strong><span class="lab-subtitle">Coder · Expérimenter · Créer</span></div><span class="header-spacer"></span><button type="button" id="labMenu" class="lab-head-menu" aria-label="Options du laboratoire">⋮</button></header>
+</style><style id="lab-space-header-style">
+header.lab-space-header{background:#fff!important;color:#1c2431!important;min-height:64px!important;box-shadow:none!important;border-bottom:1px solid #e8eaf0;padding:8px 13px!important;gap:9px}
+.lab-space-header .back-app{color:#657084!important;font-size:22px!important;min-width:32px;padding:4px!important}
+.lab-space-header .lab-brandmark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#c8102e;color:white;font-weight:850;font-size:15px;flex:none}
+.lab-space-header .lab-heading strong{color:#1c2431;font-size:17px!important;letter-spacing:-.3px}
+.lab-space-header .lab-subtitle{color:#738093;font-size:11px}
+.lab-space-header .lab-role{font-size:11px;background:#fbe3e7;color:#b81d32;padding:7px 9px;border-radius:22px;white-space:nowrap}
+.lab-space-header .lab-role[hidden]{display:none}
+.lab-space-header .lab-head-menu{color:#a60035;background:#fff0f4;border-radius:9px;font-size:21px;padding:6px 10px}
+@media(max-width:380px){.lab-space-header .lab-brandmark{width:35px;height:35px}.lab-space-header .lab-heading strong{font-size:15px!important}.lab-space-header .lab-role{font-size:10px;padding:5px 6px}.lab-space-header .lab-head-menu{padding:4px 7px}}
+</style></head><body><header class="lab-space-header"><button type="button" id="backToApp" class="back-app" aria-label="Retour à mon espace monAvenir">←</button><span class="lab-brandmark" aria-hidden="true">mA</span><div class="lab-heading"><strong>monAvenir</strong><span class="lab-subtitle">Laboratoire numérique</span></div><span class="header-spacer"></span><span id="labRole" class="lab-role" hidden></span><button type="button" id="labMenu" class="lab-head-menu" aria-label="Options du laboratoire">⋮</button></header>
 <main>
 <nav class="tiles" aria-label="Modules"><button class="tile active" data-module="web"><span>⌨</span>Web</button><button class="tile" data-module="algo"><span>◇</span>Algo</button><button class="tile" data-module="python"><span>🐍</span>Python</button><button class="tile" data-module="excel"><span>▦</span>Excel</button><button class="tile" data-module="projects"><span>▣</span>Mes TP</button></nav>
 <div id="notice" class="hint" role="status">Écrivez du HTML, du CSS et du JavaScript, puis cliquez sur Exécuter.</div>
@@ -71,7 +81,7 @@ document.querySelectorAll('[data-exercise]').forEach(b=>b.onclick=()=>{if(!confi
 
 function showExample(text){$('editor').value=text;examplePending=true;$('editor').addEventListener('focus',clearExample,{once:true})}
 function clearExample(){if(!examplePending)return;examplePending=false;$('editor').value='';$('saveStatus').textContent='Commencez à écrire';}
-function setMode(next){document.body.classList.toggle('lab-excel',next==='excel');if(next==='excel'){mode='excel';document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module==='excel'));$('notice').textContent='Tableur intégré : travaillez ici sans quitter le laboratoire.';if(!$('excelFrame').getAttribute('src'))$('excelFrame').src='./tp-tableur.html?v=198';return}if(mode==='web')files[active]=$('editor').value;else if(mode==='algo')algoCode=$('editor').value;else if(mode==='python')pythonCode=$('editor').value;
+function setMode(next){document.body.classList.toggle('lab-excel',next==='excel');if(next==='excel'){mode='excel';document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module==='excel'));$('notice').textContent='Tableur intégré : travaillez ici sans quitter le laboratoire.';if(!$('excelFrame').getAttribute('src'))$('excelFrame').src='./tp-tableur.html?embed=lab&v=200';return}if(mode==='web')files[active]=$('editor').value;else if(mode==='algo')algoCode=$('editor').value;else if(mode==='python')pythonCode=$('editor').value;
  mode=next;document.querySelectorAll('[data-module]').forEach(b=>b.classList.toggle('active',b.dataset.module===next));
  const isWeb=next==='web',isCode=next==='algo'||next==='python';
  document.querySelector('.panel-title .tabs').hidden=!isWeb;
@@ -107,6 +117,6 @@ async function runPython(){pythonCode=$('editor').value;$('console').textContent
  await py.runPythonAsync(pythonCode);$('console').textContent=output.join('\n')||'Programme exécuté sans affichage';
  }catch(e){$('console').textContent='Erreur Python : '+String(e.message||e)}}
 document.querySelectorAll('[data-module]').forEach(b=>b.onclick=()=>{const next=b.dataset.module;setMode(next)});
-$('labMenu').onclick=()=>{$('moreActions').click();if(mode==='excel')setMode('web')};const draft=storageRead(draftKey,null);if(draft&&draft.files){files={...defaults(),...draft.files};projectId=draft.projectId||'';$('projectName').value=draft.name||'Mon premier site'}$('editor').value=files.html;listProjects();run();
+$('labMenu').onclick=()=>{$('moreActions').click();if(mode==='excel')setMode('web')};window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==$('excelFrame').contentWindow||event.data?.type!=='monavenir-lab-role')return;const role=event.data.role;if(!['Élève','Enseignant','Administration'].includes(role))return;$('labRole').textContent=role;$('labRole').hidden=false});const draft=storageRead(draftKey,null);if(draft&&draft.files){files={...defaults(),...draft.files};projectId=draft.projectId||'';$('projectName').value=draft.name||'Mon premier site'}$('editor').value=files.html;listProjects();run();
 })();
 </script></body></html>
