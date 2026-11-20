@@ -29,6 +29,7 @@ const menus = {
     ["accueil", "◈", "Accueil"],
     ["cours", "▤", "Cours"],
     ["quiz", "◇", "Quiz"],
+    ["tableur", "▦", "TP Tableur"],
     ["resultats", "▥", "Résultats"],
     ["profil", "○", "Profil"],
   ],
@@ -36,6 +37,7 @@ const menus = {
     ["accueil", "◈", "Accueil"],
     ["cours", "▤", "Mes cours"],
     ["quiz", "◇", "Mes quiz"],
+    ["tableur", "▦", "TP Tableur"],
     ["eleves", "♧", "Élèves"],
     ["profil", "○", "Profil"],
   ],
@@ -246,7 +248,8 @@ function render() {
     role = state.profile.role;
   let html = "";
   if (state.tab === "terrainadmin" && role === "super_admin") html = title("Suivi du terrain", "Progression et gestion des accès.") + `<section class="card"><h2>Dépréciation du terrain</h2><p>Consultez les tentatives et ouvrez ou verrouillez les exercices.</p><a class="primary" href="./admin-terrain.html">Ouvrir le tableau de suivi →</a></section>`;
-  if (state.tab === "profil") {
+  if (state.tab === "tableur" && (role === "eleve" || role === "enseignant")) html = title("TP Tableur", "Calculer, pratiquer et progresser.") + `<section class="card"><h2>Laboratoire numérique</h2><p>Ouvre le tableur pour travailler sur des formules, préparer une feuille vierge ou t’entraîner.</p><p class="muted small">Les enseignants peuvent créer et affecter des TP ; les élèves peuvent enregistrer et rendre leurs travaux.</p><a class="primary" href="./tp-tableur.html">Ouvrir le TP Tableur →</a></section>`;
+  else if (state.tab === "profil") {
     html =
       title("Mon profil", "Tes informations et tes accès.") +
       `<div class="grid columns"><section class="card"><span class="badge neutral">${esc(roles[role])}</span><h2>${esc(state.profile.nom || "Mon compte")}</h2><p>${esc(state.user.email)}</p><p class="muted small">Pour modifier tes informations, contacte l’administration.</p><hr class="divider"><h3>Installer MON BAC</h3><p class="muted small">Sur Android : menu du navigateur → Installer l’application. Sur iPhone : Safari → Partager → Sur l’écran d’accueil.</p><p class="muted small">Les cours et quiz nécessitent une connexion Internet.</p></section>${role === "eleve" ? `<section class="card"><h2>Rejoindre un enseignant</h2><p class="muted">Saisis le code transmis par ton enseignant.</p><form id="joinForm"><label for="teacherCode">Code d’invitation</label><input id="teacherCode" name="code" required maxlength="100" autocomplete="off"><button class="primary wide">Rejoindre</button></form></section>` : ""}</div>`;
