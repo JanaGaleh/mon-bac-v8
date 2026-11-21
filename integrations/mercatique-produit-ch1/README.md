@@ -8,19 +8,21 @@ un hébergement d'images externe.
 
 ## Intégration
 
-Ce module complète la version active du Worker `monavenir-prix-psychologique`
-sans remplacer le Worker principal `ege-gfm-2027`, sans modifier ses routes,
-ses données, son authentification ni les autres chapitres.
+Ce module est intégré au registre V276 du Worker principal `ege-gfm-2027`
+dans la version de déploiement 278, sans modifier ses routes, ses données,
+son authentification ni les autres chapitres.
 
-Le fichier `patch-worker.mjs` exporte la fonction `patchWorker(source, moduleSource, photos)`.
-`source` est le JavaScript exact du Worker complémentaire en production ;
+Le fichier `patch-primary.mjs` exporte `patchPrimary(source, moduleSource, photos)`.
+`source` est le JavaScript exact du Worker principal V276 ;
 `moduleSource` le texte UTF-8 de `mercatique-ch1.js` ; `photos` les six fichiers
 `mercatique-images/scene-0.webp` à `scene-5.webp` encodés en base64 dans cet ordre.
 La fonction refuse de modifier une version qui ne correspond pas aux ancres
 attendues. Garder l'identifiant du déploiement actif pour une restauration.
 
-Les images sont servies individuellement sur la route statique déjà existante,
-avec un paramètre `mac1img=0…5` et le type MIME image/webp. Le lecteur de documents
+Le registre ajoute le chapitre aux choix et aux ressources natives de Fiches
+et Exercices. Sa nouvelle URL `/monavenir-chapters-v278.js` évite un cache ancien.
+Les images sont servies sur `/monavenir-merca-ch1-scene-0.webp` à
+`/monavenir-merca-ch1-scene-5.webp` avec le type MIME image/webp. Le lecteur de documents
 transversal existant assure les commandes d'agrandissement (photos, tableaux,
 graphiques SVG). La progression est enregistrée localement par identifiant de
 compte, pas synchronisée entre appareils.
