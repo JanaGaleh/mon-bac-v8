@@ -16,7 +16,7 @@ export function patchSource(path, source, moduleSource, styleSource) {
   if(path===SHELL){
     // Existing installations cache JS assets. Advance only the static shell
     // cache identifier so the existing install/activate logic fetches them anew.
-    const marker='-prix-psychologique-v1';
+    const marker='-prix-psychologique-documents-v2';
     if(!source.includes(LEARNING.slice(1))||!source.includes(INTERACTIVE.slice(1))||source.includes(marker))return null;
     const matches=[...source.matchAll(/const CACHE='(ege-gfm-2027-shell-[^'\r\n]+)';/g)];
     if(matches.length!==1)return null;
@@ -28,6 +28,17 @@ export function patchSource(path, source, moduleSource, styleSource) {
   if(!replacements.length||replacements.some(([anchor])=>source.split(anchor).length!==2))return null;
   let patched=source;
   for(const [anchor,next] of replacements)patched=patched.replace(anchor,next);
+  // Preserve native readers; add a fit-to-width command alongside their existing zoom.
+  if(path===LEARNING){
+    const nav='<button type="button" class="btn" data-reader="plus">+</button>';
+    if(patched.split(nav).length===2)patched=patched.replace(nav,nav+'<button type="button" class="btn" data-reader="fit">Ajuster</button>');
+    const pdf="case'minus':zoom=Math.max(.5,zoom-.25);break;";
+    if(patched.split(pdf).length===2)patched=patched.replace(pdf,pdf+"case'fit':zoom=1;break;");
+    const nonpdf="if(['plus','minus'].includes(e.target.dataset.reader)){z=Math.max(70,Math.min(250,z+(e.target.dataset.reader==='plus'?20:-20)));";
+    if(patched.split(nonpdf).length===2)patched=patched.replace(nonpdf,"if(['plus','minus','fit'].includes(e.target.dataset.reader)){z=e.target.dataset.reader==='fit'?100:Math.max(70,Math.min(250,z+(e.target.dataset.reader==='plus'?20:-20)));");
+  }
+  const attachment='host.append(a)';
+  if(patched.split(attachment).length===2)patched=patched.replace(attachment,attachment+`;void window.MADocZoom?.renderAttachment(host,ext,${path===LEARNING?'url':'u'})`);
   return `/* MonAvenir: module Mercatique complémentaire */\nif (!window.MAPrixPsychologique) {\n${moduleSource}\n}\nif (!document.getElementById('mapr-prix-style')) {const style=document.createElement('style');style.id='mapr-prix-style';style.textContent=${JSON.stringify(styleSource)};document.head.append(style);}\n;\n${patched}\n`;
 }
 

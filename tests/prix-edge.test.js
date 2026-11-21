@@ -30,7 +30,7 @@ test('other production paths untouched; preview may not proxy other assets',asyn
 test('installed PWA refreshes static shell only; leave caching and notification logic intact',()=>{
  const sw=`const CACHE='ege-gfm-2027-shell-v271';const files=['${LEARNING}','${INTERACTIVE}'];self.addEventListener('push',e=>{});`;
  const patched=patchSource(SHELL,sw,source,style);
- assert.equal(patched,sw.replace('shell-v271','shell-v271-prix-psychologique-v1'));
+ assert.equal(patched,sw.replace('shell-v271','shell-v271-prix-psychologique-documents-v2'));
  assert.equal(patchSource(SHELL,patched,source,style),null);
  assert.equal(patchSource(SHELL,sw.replace(INTERACTIVE,'other.js'),source,style),null);
 });

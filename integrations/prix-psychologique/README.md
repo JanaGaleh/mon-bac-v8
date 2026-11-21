@@ -21,3 +21,13 @@ Le Worker a été testé sur son sous-domaine de prévisualisation puis raccord�
 ## Tests
 
 `node --test tests/prix-psychologique.test.js tests/prix-edge.test.js`
+
+## Standard permanent — lisibilité des documents (v2)
+
+Le lecteur transversal `monavenir-document-viewer.js` et son CSS accompagnent désormais le module dans les scripts communs : schémas et tracés SVG, illustrations et photos de cours, graphiques, tableaux et aperçus de documents détectés sont présentés à une taille lisible. Les fichiers PDF ouverts depuis une question utilisent le moteur PDF existant lorsque l'aperçu est possible. Les lecteurs de cours natifs conservent leurs commandes et gagnent « Ajuster ». Un document non éditable peut être agrandi en plein écran (zoom avant/arrière, ajustement, geste à deux doigts) ; les tableaux à compléter s'agrandissent sur place sans déplacer leurs entrées dans un clone.
+
+Règles pour les prochains modules : identifier tout support pédagogique par `data-ma-document`, ou par `role="img"` et `viewBox` pour un vrai SVG ; ne jamais utiliser une dimension d'icône pour un graphique ; afficher à la largeur disponible en conservant le ratio et des textes lisibles ; permettre le zoom et le défilement sur les documents larges ; garder les droits de lecture/téléchargement existants. Un document texte peut être signalé par `data-ma-document-text`. Les icônes, portraits, publicités et grilles du Laboratoire ne doivent pas être considérés comme des documents. Vérifier les nouveaux supports sur téléphone, tablette et ordinateur.
+
+Génération reproductible du Worker complémentaire : `node integrations/prix-psychologique/build-edge.mjs` (sortie module JavaScript). La version du cache statique est suffixée `-prix-psychologique-documents-v2`. Aucune route supplémentaire n'est requise.
+
+Tests du lecteur : `node --test tests/document-viewer.test.js`. Test de dimensions optionnel dans un environnement où Chromium headless peut démarrer : `node tests/document-layout-smoke.mjs 390,844`.
