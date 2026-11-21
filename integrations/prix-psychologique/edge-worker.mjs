@@ -1,7 +1,8 @@
 // Narrow, reversible routing layer for the two public JS assets only.
 export const LEARNING='/mon-bac-v85-compact-list-20261119-sort-r1-market-r1-simple-r1-flow-r1-qcm-v266-optique-v268-feedback-v269.js';
 export const INTERACTIVE='/mon-bac-interactive-facture-20261119-sort-r1-market-r1-simple-r1-flow-r1-bento-v267-feedback-v269-optique-v270.js';
-export const PATHS=[LEARNING,INTERACTIVE];
+export const SHELL='/service-worker-ege-2027.js';
+export const PATHS=[LEARNING,INTERACTIVE,SHELL];
 const HOST='monavenir.janagaleh.com';
 const MAX_BYTES=512*1024;
 const learningAnchor="const optics=window.MAOptique?.card(window.MASimple?.scopeFor(st.screen),tab,query)||'';";
@@ -12,6 +13,15 @@ const clickAnchor="async function click(ev){const opt=";
 const clickPatch="async function click(ev){const prix=ev.target.closest('[data-mapr-open]');if(prix){if(!busy)window.MAPrixPsychologique?.open(prix,m.scope);return;}const opt=";
 
 export function patchSource(path, source, moduleSource, styleSource) {
+  if(path===SHELL){
+    // Existing installations cache JS assets. Advance only the static shell
+    // cache identifier so the existing install/activate logic fetches them anew.
+    const marker='-prix-psychologique-v1';
+    if(!source.includes(LEARNING.slice(1))||!source.includes(INTERACTIVE.slice(1))||source.includes(marker))return null;
+    const matches=[...source.matchAll(/const CACHE='(ege-gfm-2027-shell-[^'\r\n]+)';/g)];
+    if(matches.length!==1)return null;
+    return source.replace(matches[0][0],`const CACHE='${matches[0][1]}${marker}';`);
+  }
   // Never overwrite or duplicate a module already embedded by a newer main deployment.
   if(source.includes('window.MAPrixPsychologique'))return null;
   const replacements=path===LEARNING?[[learningAnchor,learningPatch]]:path===INTERACTIVE?[[interactiveAnchor,interactivePatch],[clickAnchor,clickPatch]]:[];
