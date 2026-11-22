@@ -1,0 +1,20 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict'),path=require('node:path');
+const context={window:{},document:{createElement:()=>({}),head:{append(){}},body:{},addEventListener(){},querySelectorAll:()=>[]},MutationObserver:class{observe(){}},requestAnimationFrame(){},st:{screen:'student-learning'}};
+context.window=context;
+context.MAChapters={native:()=>[{html:'old'}],nativeHTML:rows=>rows.map(r=>r.html).join(''),choices:()=>['Old'],compare:(a,b)=>a.localeCompare(b),group:(rows,render)=>rows.map(render).join('')};
+vm.createContext(context);
+for(const n of ['maths-terminales.js','utilite-pratique.js'])vm.runInContext(fs.readFileSync(path.resolve(__dirname,'../js',n),'utf8'),context,{filename:n});
+const a=context.MAMathsTS,scope={subject:'Mathématiques',level:'Terminale',series:'S'};
+assert.equal(a.chapters.length,6);assert.equal(a.chapters.flatMap(c=>c.parts).length,27);assert.equal(a.variants.length,108);assert.equal(a.variants.filter(v=>v.d===0).length,27);
+const keys=new Set();
+for(const v of a.variants){const k=[v.ci,v.pi,v.d].join('/');assert(!keys.has(k));keys.add(k);assert.equal(v.steps.length,v.d===3?5:v.d===2?4:3);assert(v.doc&&v.steps.every(s=>s.ask&&s.why&&a.correct(s.answer,s.answer)&&!a.correct('incorrect',s.answer)),k);}
+assert.equal(context.MAChapters.native(scope,'guided').length,7);
+assert.equal(context.MAChapters.native({...scope,series:'GFM'},'guided').length,1);
+assert.equal(context.MAChapters.native({...scope,level:'Première'},'guided').length,1);
+assert.equal(context.MAChapters.choices(scope).length,7);
+assert(a.correct('−4','-4'));assert(a.correct('3/2','1.5'));assert(a.correct('√3',String(Math.sqrt(3))));assert(!a.correct('−∞','+∞'));assert(!a.correct('x10','10'));assert(!a.correct('','0'));
+assert.match(context.MAUtilite.resolve({subject:'Gestion financière',title:'TVA à décaisser'}),/TVA/);
+assert.match(context.MAUtilite.resolve({subject:'Physique-Chimie',title:'Optique'}),/lunettes/);
+assert.equal(context.MAUtilite.resolve({practical_use:'Test de contexte'}),'Test de contexte');
+assert(!context.MAUtilite.html({practical_use:'<script>'}).includes('<script>'));
+console.log('6 chapitres, 27 parties, 108 exercices, '+a.variants.reduce((n,v)=>n+v.steps.length,0)+' questions : contrôles statiques et moteur de réponse OK.');
