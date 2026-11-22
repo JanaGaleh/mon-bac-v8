@@ -1,0 +1,25 @@
+name: MonAvenir — vérification Terminale S
+on:
+  push:
+    branches: [monavenir-maths-ts-v294]
+permissions:
+  contents: read
+jobs:
+  verification:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run check
+      - run: node --check js/maths-terminales.js && node --check js/utilite-pratique.js
+      - run: node tests/maths-terminales-data.cjs
+      - run: npm install --prefix "$RUNNER_TEMP/monavenir-browser" --ignore-scripts --no-audit --no-fund playwright@1.62.1
+      - run: '"$RUNNER_TEMP/monavenir-browser/node_modules/.bin/playwright" install --with-deps chromium'
+      - name: Vérifier les 108 parcours et les quatre tailles d’écran
+        run: NODE_PATH="$RUNNER_TEMP/monavenir-browser/node_modules" node tests/maths-terminales.cjs
