@@ -1,0 +1,26 @@
+// Executed in a real browser against an isolated mock student (no live data).
+(()=>{const $=s=>document.querySelector(s),out=$('#qa'),scope={subject:'Mercatique',level:'Terminale',series:'GFM'},checks=[];
+ function check(v,msg){if(!v)throw Error(msg);checks.push(msg);}
+ function act(a){const b=$(`[data-mpg-act="${a}"]`);if(!b)throw Error('Missing action '+a);b.click();}
+ function progress(){return Number($('.mpg-dialog progress').value);}
+ function submit(v){const t=window.MAPrixGuide.tasks[progress()];if(t.kind==='axis'){$(`input[name="answer"][value="${v}"]`).checked=true;}else{const i=$('[data-mpg-answer]');i.value=String(v);i.dispatchEvent(new Event('input',{bubbles:true}));}$('.mpg-dialog form').requestSubmit();}
+ function point(t,wrong=false){const svg=$('[data-mpg-plot]'),pt=svg.createSVGPoint();pt.x=62+t.row*108+(wrong?100:0);pt.y=292-t.expected*2.42;const p=pt.matrixTransform(svg.getScreenCTM());svg.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:p.x,clientY:p.y}));}
+ function bounds(){const b=$('.mpg-dialog').getBoundingClientRect(),main=$('.mpg-dialog main');return b.left>=-1&&b.right<=innerWidth+1&&main.scrollWidth<=main.clientWidth+2;}
+ function run(){try{
+  const mod=window.MAPrixGuide;check(mod.tasks.length===48,'48 validations');check(mod.data.buyers.join(',')==='0,40,60,50,0','correct data');check(!mod.nativeCard({...scope,level:'Première'}),'scope filter');check(!mod.nativeCard({...scope,subject:'Gestion financière'}),'subject filter');
+  if(window.MAChapters){const rows=window.MAChapters.native(scope,'interactive','all','');check(rows.some(r=>r.chapter_title==='Le prix'&&r.html.includes('data-mpg-open')),'actual interactive registry');const learn=window.MAChapters.native(scope,'learning','learn','prix psychologique');check(learn.some(r=>r.chapter_title==='Le prix'&&r.html.includes('data-mpg-open')),'actual learning registry');}
+  $('#mount').innerHTML=mod.nativeCard(scope);$('[data-mpg-open]').click();check(!!$('.mpg-dialog[open]'),'entry opens dialog');check(bounds(),'initial responsive bounds');check($('.mpg-active input')!==null,'active table input');check($('.mpg-table').querySelectorAll('.mpg-done').length===0,'no prefilled cells');
+  submit(99);check(progress()===0&&!!$('.mpg-retry'),'wrong cell stays');submit(0);check(progress()===1&&!!$('.mpg-good'),'right cell advances');
+  act('calc');$('[data-mpg-calc-a]').value='20';$('[data-mpg-calc-b]').value='200';$('[data-mpg-op]').value='/';act('calculate');check($('[data-mpg-calc-out]').textContent.includes('0,1'),'calculator');act('calc');act('formula');check($('.mpg-toolpanel').textContent.includes('Cumul décroissant'),'formula tool');act('formula');act('hint');check(!!$('.mpg-hint'),'hint only');act('hint');act('zoom');check(!!$('.mpg-table-wrap.mpg-wide')&&bounds(),'table zoom stays contained');act('zoom');
+  check(localStorage.getItem('monavenir-prix-guide-v1:qa-student')==='1','progress saved');
+  while(progress()<25){const t=mod.tasks[progress()];submit(t.expected);}
+  check(progress()===25,'25 cells');check($('.mpg-table')===null||$('.mpg-table').querySelectorAll('.mpg-done').length===25,'completed table');
+  submit('effectif');check(progress()===25,'wrong axis does not advance');submit('prix');submit('pourcentage');check(progress()===27,'both axes');check($('.mpg-chart').querySelectorAll('circle').length===0,'graph starts unplotted');
+  point(mod.tasks[progress()],true);check(progress()===27,'wrong plot column rejected');
+  for(let i=27;i<45;i++){const t=mod.tasks[progress()];if(t.kind==='point'){if(i===28)submit(t.expected);else point(t);}else act('link');check(progress()===i+1,'plot/link '+(i+1));}
+  check($('.mpg-chart').querySelectorAll('polyline').length===3&&$('.mpg-chart').querySelectorAll('circle').length===15,'three curves and 15 points');check(bounds(),'graph responsive bounds');act('zoom');check(bounds()&&!!$('.mpg-chart-wrap.mpg-wide'),'graph zoom contained');act('zoom');
+  submit('1500');check(progress()===45,'wrong final price stays');submit('2 000');submit('60');submit('120');check(progress()===48&&$('.mpg-complete').textContent.includes('2 000 FDJ'),'final correct result');check($('.mpg-table').querySelectorAll('.mpg-done').length===25,'final 25 cells');check(bounds(),'final responsive bounds');
+  act('restart');act('cancel-reset');check(progress()===48,'cancel reset preserves');act('restart');act('confirm-reset');check(progress()===0,'reset only exercise');check(localStorage.getItem('monavenir-prix-guide-v1:qa-student')==='0','reset persists');
+  out.textContent=JSON.stringify({ok:true,viewport:innerWidth,checks:checks.length,dialogWidth:Math.round($('.mpg-dialog').getBoundingClientRect().width)});
+ }catch(e){out.textContent=JSON.stringify({ok:false,viewport:innerWidth,message:e.message,checks});}out.dataset.status='done';}
+ run();})();
