@@ -72,7 +72,7 @@ const challenges=[
  [q('Pour Sₙ=1+…+n, calculer S₇.',28,'Sₙ=n(n+1)/2.'),q('Pour Sₙ=1²+…+n², calculer S₁₀.',385,'Sₙ=n(n+1)(2n+1)/6 ; donc 385.')],
  [q('Pour uₙ=2ⁿ, uₙ₊₁/uₙ vaut ?',2,'Le quotient vaut 2, supérieur à 1.'),q('Pour uₙ=(n+1)/(n+2), le sens de variation est ?', 'croissante','uₙ₊₁−uₙ=1/((n+2)(n+3))>0.')],
  [q('Si 0≤u≤4, borne supérieure de √(u+5) ?',3,'√(4+5)=3.'),q('Si 1≤u≤3, borne supérieure de (2u+1)/(u+2) ?',1.4,'La fonction est croissante (dérivée 3/(u+2)²) ; f(3)=7/5.')],
- [q('uₙ=5+2×(1/2)ⁿ : limite ?',5,'(1/2)ⁿ tend vers zéro.'),q('Une suite croissante vérifie uₙ≤3 et uₙ₊₁=(2uₙ+3)/(uₙ+2). Sa limite est ?',Math.sqrt(3),'L(L+2)=2L+3 donne L²=3 ; la limite positive est √3.')]
+ [q('uₙ=5+2×(1/2)ⁿ : limite ?',5,'(1/2)ⁿ tend vers zéro.'),q('Une suite croissante vérifie 0≤uₙ≤3 et uₙ₊₁=(2uₙ+3)/(uₙ+2). Sa limite est ?',Math.sqrt(3),'L(L+2)=2L+3 donne L²=3 ; la limite non négative est √3.')]
 ],
 [
  [q('Partie imaginaire de (2+i)² ?',4,'(2+i)²=3+4i.'),q('Partie réelle de (3+4i)/(1−i) ?',-.5,'Multiplier par 1+i : (−1+7i)/2.')],
