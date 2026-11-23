@@ -102,6 +102,7 @@ table{width:100%;border-collapse:collapse;min-width:540px;font-size:13px}th{colo
 import {ACCOUNTS,EXERCISES,entriesFor,currency,amountValue,checkJournal,netChange} from "./journal-model.mjs";
 const $=id=>document.getElementById(id);
 let exercise=EXERCISES[0],entries=[],stage="intro",entryIndex=0,failures=0,completed=false;
+const drafts=new Map();
 const accountOptions=["",...Object.keys(ACCOUNTS)];
 function element(tag,className,text) {
   const node=document.createElement(tag);if(className)node.className=className;
@@ -159,6 +160,14 @@ function makeJournal(){
     td1.append(sel);td2.append(name);td3.append(d);td4.append(c);
     row.append(td1,td2,td3,td4);tbody.append(row);
   }
+  const saved=drafts.get(entryIndex);
+  if(saved){[...tbody.querySelectorAll("tr")].forEach((row,i)=>{
+    const data=saved[i];if(!data)return;
+    const select=row.querySelector("select");select.value=data.account||"";
+    row.querySelector(".accname").textContent=ACCOUNTS[select.value]||"Sélectionne un compte";
+    row.querySelector('[data-field="debit"]').value=data.debit||"";
+    row.querySelector('[data-field="credit"]').value=data.credit||"";
+  });}
   updateTotals();clearValidation();failures=0;$("hint").hidden=true;
 }
 function showStage(){
@@ -179,6 +188,7 @@ function showStage(){
   if(stage==="finish")showRecap();
 }
 function chooseCase(id){
+  drafts.clear();
   exercise=EXERCISES.find(e=>e.id===id)||EXERCISES[0];
   $("caseSelect").value=exercise.id;entries=entriesFor(exercise);entryIndex=0;stage="intro";
   showStage();
@@ -221,11 +231,13 @@ $("caseSelect").addEventListener("change",e=>chooseCase(e.target.value));
 $("hintButton").addEventListener("click",()=>{$("hint").hidden=!$("hint").hidden;$("hint").textContent=entries[entryIndex].tip});
 $("checkButton").addEventListener("click",verify);
 $("backButton").addEventListener("click",()=>{
+  drafts.set(entryIndex,rowsNow());
   if(entryIndex===0){stage="intro";showStage();}
   else {entryIndex--;showStage();}
 });
 $("nextButton").addEventListener("click",()=>{
   if(!completed)return;
+  drafts.set(entryIndex,rowsNow());
   if(entryIndex<entries.length-1){entryIndex++;showStage();}
   else{stage="finish";showStage();}
 });
