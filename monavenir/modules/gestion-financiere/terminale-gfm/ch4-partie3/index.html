@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c8102e">
+<meta name="description" content="MonAvenir — Gestion financière Terminale GFM : journal comptable guidé, provisions pour risques et charges.">
+<title>Journal comptable guidé | MonAvenir</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Arial,sans-serif;color:#182334;background:#f8f9fb;font-synthesis:none;--red:#c8102e;--ink:#182334;--muted:#64748b;--line:#e4e8ee;--white:#fff;--green:#087a48;--danger:#b42318}
+*{box-sizing:border-box}body{margin:0;min-width:320px}button,select,input{font:inherit}button{cursor:pointer}button:disabled{opacity:.48;cursor:not-allowed}
+a{color:inherit}header{background:var(--white);border-bottom:1px solid var(--line);padding:17px max(16px,calc((100vw - 1060px)/2))}
+.brand{font-weight:800;color:var(--red);font-size:21px;letter-spacing:-.8px;text-decoration:none}.brand span{color:var(--ink)}
+.breadcrumb{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+main{max-width:1080px;margin:auto;padding:18px 16px 36px}.panel{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,3vw,28px);box-shadow:0 7px 30px #15223b08}
+.hero{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:16px}.hero h1{font-size:clamp(21px,3vw,29px);margin:9px 0 7px;letter-spacing:-.6px}.hero p{color:var(--muted);font-size:14px;line-height:1.6;margin:0}
+.tag{font-size:11px;color:var(--red);background:#fff1f3;padding:6px 10px;border-radius:99px;font-weight:750;display:inline-block}.coach{width:62px;height:62px;border-radius:50%;border:2px solid #e1e5eb;background:#f5e8eb;object-fit:cover;flex:none}
+#coachFallback{display:none;width:62px;height:62px;border-radius:50%;background:#fff1f3;align-items:center;justify-content:center;font-weight:800;color:var(--red)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:15px;align-items:start}.aside{position:sticky;top:14px}.aside h2{font-size:15px;margin:0 0 8px}.aside p,.aside li{font-size:13px;color:var(--muted);line-height:1.7}.aside ul{padding-left:18px;margin-bottom:0}
+label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}.picker{width:100%;min-height:43px;border:1px solid #cbd5e1;border-radius:10px;padding:9px;background:white;color:var(--ink)}
+.progress{height:7px;background:#e9edf1;border-radius:99px;overflow:hidden;margin:16px 0 6px}.progress>div{height:100%;width:0;background:var(--red);transition:width .2s}
+.small{font-size:12px;color:var(--muted);line-height:1.55}.context{margin:14px 0;background:#f5f7fa;border-radius:13px;padding:14px 16px;font-size:14px;line-height:1.75}.numbers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}.metric{background:#f7f8fa;border:1px solid var(--line);padding:14px;border-radius:13px}.metric small{display:block;color:var(--muted);margin-bottom:5px}.metric b{font-size:clamp(15px,2vw,20px);font-variant-numeric:tabular-nums}
+h2{font-size:18px;letter-spacing:-.3px;margin:18px 0 10px}.actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:16px}.buttons{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 15px;min-height:42px;border-radius:11px;font-weight:750;font-size:13px}
+.btn.primary{background:var(--red);border-color:var(--red);color:white}.btn:focus-visible,.picker:focus-visible,input:focus-visible{outline:3px solid #e0a4b0;outline-offset:2px}
+.table-wrap{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:540px;font-size:13px}th{color:#516177;background:#f6f7fa;text-align:left;font-weight:750;font-size:12px}th,td{border-bottom:1px solid var(--line);padding:10px 9px;vertical-align:middle}tr:last-child td{border-bottom:0}td:last-child,th:last-child{text-align:right}
+.account{min-width:105px;width:100%;background:#fff;border:1px solid #cdd5df;border-radius:9px;padding:9px 6px;font-size:13px}
+.amt{min-width:90px;width:100%;max-width:150px;border:1px solid #cdd5df;border-radius:9px;padding:9px 8px;text-align:right;font-size:14px;font-variant-numeric:tabular-nums}
+.accname{min-width:115px;max-width:240px;line-height:1.35;color:#596b7a}
+.bad{border-color:var(--danger)!important;background:#fff3f1!important}.good{border-color:#18a05f!important;background:#f1fbf5!important}
+.feedback{border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-top:12px;background:#f5f7fa}.feedback.error{background:#fff2f1;color:#8d271e}.feedback.success{background:#edf9f3;color:#075b3a}
+.hint{background:#fff9ee;border:1px solid #f1dfaf;border-radius:12px;padding:12px 14px;line-height:1.6;font-size:13px;margin-top:12px}
+.successTitle{color:var(--green)}.summary{background:#f4f9f6;padding:14px;border-radius:12px;margin:15px 0;font-size:14px}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+[hidden]{display:none!important}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.aside{position:static;order:2}.hero{align-items:flex-start}.coach,#coachFallback{width:48px;height:48px}main{padding:12px}.numbers{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.panel{padding:13px}.metric{padding:10px}.metric b{font-size:15px}.btn{padding:10px 11px}.hero h1{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.progress>div{transition:none}}
+</style>
+</head>
+<body>
+<header><a class="brand" href="/" aria-label="Retour à MonAvenir">mon<span>Avenir</span></a>
+<p class="breadcrumb">Lycée / Terminale GFM / Gestion financière / Chapitre 4 / Partie 3</p></header>
+<main>
+<div class="hero">
+  <div><span class="tag">EXERCICE GUIDÉ · MÉTHODE MENFOP RETENUE</span><h1>Le journal comptable, étape par étape</h1><p>Provisions pour risques et charges · Annulation puis constatation</p></div>
+  <img id="coachPhoto" class="coach" src="/monavenir-coach-jana-v276.webp" alt="Portrait miniature du professeur" loading="lazy">
+  <span id="coachFallback" aria-hidden="true">JG</span>
+</div>
+<div class="layout">
+  <section class="panel" aria-labelledby="practiceTitle">
+    <label for="caseSelect">Choisir une situation</label>
+    <select id="caseSelect" class="picker"></select>
+    <div class="progress" role="progressbar" aria-label="Progression de l'exercice" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressArea"><div id="progressBar"></div></div>
+    <div class="small" id="progressText"></div>
+    <h2 id="practiceTitle"></h2>
+    <p id="story" class="context"></p>
+    <div id="numbers" class="numbers">
+      <div class="metric"><small>Ancienne provision</small><b id="oldAmount"></b></div>
+      <div class="metric"><small>Provision nécessaire</small><b id="newAmount"></b></div>
+    </div>
+    <div id="intro">
+      <h2>Comprendre avant de comptabiliser</h2>
+      <p class="small">Repère l'ancienne provision et la provision nécessaire. Dans les exercices d'ajustement, on annule d'abord l'ancienne provision, puis on constate la nouvelle. En l'absence de provision nécessaire, la seconde écriture est inutile.</p>
+      <div class="actions"><span class="small" id="introLesson"></span><button class="btn primary" id="start">Commencer le journal →</button></div>
+    </div>
+    <div id="journal" hidden>
+      <p class="tag" id="entryTag"></p>
+      <h2 id="entryTitle"></h2>
+      <p class="small">Complète toi-même les deux lignes du journal. Choisis chaque compte, puis saisis le montant dans la bonne colonne. L'autre colonne doit rester vide.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th style="width:24%">Compte</th><th>Intitulé automatique</th><th>Débit (FDJ)</th><th>Crédit (FDJ)</th></tr></thead>
+        <tbody id="journalRows"></tbody>
+        <tfoot><tr><th colspan="2">Totaux saisis</th><th id="totalDebit">0</th><th id="totalCredit">0</th></tr></tfoot>
+      </table></div>
+      <p class="small" id="balance">Saisis les montants pour vérifier l'équilibre du journal.</p>
+      <div class="actions">
+        <div class="buttons"><button class="btn" id="hintButton">Indice</button><button class="btn" id="backButton">← Précédent</button></div>
+        <button class="btn primary" id="checkButton">Vérifier l'écriture</button>
+      </div>
+      <div id="hint" class="hint" hidden></div>
+      <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+      <div class="actions"><span class="small" id="doneMessage"></span><button class="btn primary" id="nextButton" hidden>Écriture suivante →</button></div>
+    </div>
+    <div id="finish" hidden>
+      <h2 class="successTitle">Exercice terminé</h2>
+      <p class="small">Les comptes et les montants ont été correctement enregistrés. Voici le récapitulatif des écritures validées.</p>
+      <div id="recap" class="table-wrap"></div>
+      <div class="summary"><strong id="netValue"></strong><p id="netExplanation" class="small" style="margin:7px 0 0"></p></div>
+      <div class="actions"><button id="retry" class="btn primary">Recommencer cet exercice</button><button id="another" class="btn">Situation suivante →</button></div>
+    </div>
+  </section>
+  <aside class="panel aside"><h2>Le conseil du professeur</h2>
+    <p>Observe l'opération avant de choisir les comptes. Le journal se remplit dans l'ordre des écritures, pas en recopiant un corrigé.</p>
+    <ul><li>Compte 15 : provision concernée.</li><li>6815 : dotation à constater.</li><li>7815 : reprise à enregistrer.</li><li>À chaque écriture : total Débit = total Crédit.</li></ul>
+    <p>La correction indique seulement les cellules erronées avant de proposer un indice. La progression reste enregistrée uniquement pendant cet exercice.</p>
+  </aside>
+</div>
+</main>
+<script type="module">
+import {ACCOUNTS,EXERCISES,entriesFor,currency,amountValue,checkJournal,netChange} from "./journal-model.mjs";
+const $=id=>document.getElementById(id);
+let exercise=EXERCISES[0],entries=[],stage="intro",entryIndex=0,failures=0,completed=false;
+const drafts=new Map();
+const accountOptions=["",...Object.keys(ACCOUNTS)];
+function element(tag,className,text) {
+  const node=document.createElement(tag);if(className)node.className=className;
+  if(text!==undefined)node.textContent=text;return node;
+}
+function accountPicker(row) {
+  const sel=element("select","account");sel.setAttribute("aria-label","Compte ligne "+(row+1));
+  for(const value of accountOptions) {
+    const opt=element("option","",value||"Choisir");
+    opt.value=value;sel.append(opt);
+  }
+  return sel;
+}
+function numberField(row,kind){
+  const input=element("input","amt");input.type="text";input.inputMode="numeric";input.autocomplete="off";
+  input.setAttribute("aria-label",kind+" ligne "+(row+1));input.placeholder="—";
+  return input;
+}
+function populateCases(){
+  EXERCISES.forEach(e=>{
+    const opt=element("option","",e.group==="risques"?"Risques · "+e.label:"Charges · "+e.label);
+    opt.value=e.id;$("caseSelect").append(opt);
+  });
+}
+function updateTotals(){
+  let d=0,c=0;
+  document.querySelectorAll("#journalRows tr").forEach(row=>{
+    d+=amountValue(row.querySelector('[data-field="debit"]').value)||0;
+    c+=amountValue(row.querySelector('[data-field="credit"]').value)||0;
+  });
+  $("totalDebit").textContent=d.toLocaleString("fr-FR");
+  $("totalCredit").textContent=c.toLocaleString("fr-FR");
+  $("balance").textContent=(d&&d===c)?"Débit = Crédit : écriture équilibrée. Vérifie aussi les comptes et chaque cellule.":(d||c)?"Le journal n'est pas encore équilibré.":"Saisis les montants pour vérifier l'équilibre du journal.";
+}
+function clearValidation() {
+  document.querySelectorAll("#journalRows .bad,#journalRows .good").forEach(n=>n.classList.remove("bad","good"));
+  $("feedback").hidden=true;$("nextButton").hidden=true;$("doneMessage").textContent="";completed=false;
+}
+function rowsNow(){
+  return Array.from(document.querySelectorAll("#journalRows tr")).map(row=>({
+    account:row.querySelector('select').value,
+    debit:row.querySelector('[data-field="debit"]').value,
+    credit:row.querySelector('[data-field="credit"]').value
+  }));
+}
+function makeJournal(){
+  const tbody=$("journalRows");tbody.replaceChildren();
+  for(let i=0;i<2;i++){
+    const row=element("tr");const sel=accountPicker(i);const d=numberField(i,"Débit"),c=numberField(i,"Crédit");
+    d.dataset.field="debit";c.dataset.field="credit";
+    const name=element("span","accname","Sélectionne un compte");
+    const td1=element("td"),td2=element("td"),td3=element("td"),td4=element("td");
+    sel.addEventListener("change",()=>{name.textContent=ACCOUNTS[sel.value]||"Sélectionne un compte";clearValidation()});
+    [d,c].forEach(n=>n.addEventListener("input",()=>{updateTotals();clearValidation()}));
+    td1.append(sel);td2.append(name);td3.append(d);td4.append(c);
+    row.append(td1,td2,td3,td4);tbody.append(row);
+  }
+  const saved=drafts.get(entryIndex);
+  if(saved){[...tbody.querySelectorAll("tr")].forEach((row,i)=>{
+    const data=saved[i];if(!data)return;
+    const select=row.querySelector("select");select.value=data.account||"";
+    row.querySelector(".accname").textContent=ACCOUNTS[select.value]||"Sélectionne un compte";
+    row.querySelector('[data-field="debit"]').value=data.debit||"";
+    row.querySelector('[data-field="credit"]').value=data.credit||"";
+  });}
+  updateTotals();clearValidation();failures=0;$("hint").hidden=true;
+}
+function showStage(){
+  $("intro").hidden=stage!=="intro";$("journal").hidden=stage!=="journal";$("finish").hidden=stage!=="finish";
+  $("practiceTitle").textContent=exercise.title;$("story").textContent=exercise.story;
+  $("oldAmount").textContent=currency(exercise.old);$("newAmount").textContent=currency(exercise.needed);
+  $("introLesson").textContent=exercise.lesson;
+  const denom=entries.length+2,position=stage==="intro"?0:stage==="journal"?entryIndex+1:denom;
+  const progress=Math.round(position/denom*100);
+  $("progressBar").style.width=progress+"%";$("progressArea").setAttribute("aria-valuenow",String(progress));
+  $("progressText").textContent=stage==="intro"?"Lecture de la situation":stage==="journal"?"Écriture "+(entryIndex+1)+" / "+entries.length: "Parcours terminé";
+  if(stage==="journal"){
+    $("entryTitle").textContent=entries[entryIndex].label;
+    $("entryTag").textContent=exercise.date+" · Écriture "+(entryIndex+1)+" sur "+entries.length;
+    $("nextButton").textContent=entryIndex===entries.length-1?"Afficher le bilan →":"Écriture suivante →";
+    makeJournal();
+  }
+  if(stage==="finish")showRecap();
+}
+function chooseCase(id){
+  drafts.clear();
+  exercise=EXERCISES.find(e=>e.id===id)||EXERCISES[0];
+  $("caseSelect").value=exercise.id;entries=entriesFor(exercise);entryIndex=0;stage="intro";
+  showStage();
+}
+function verify(){
+  const result=checkJournal(rowsNow(),entries[entryIndex]);failures++;
+  const rows=[...document.querySelectorAll("#journalRows tr")];
+  let count=0;
+  rows.forEach((r,i)=>{
+    const inputs=[r.querySelector("select"),r.querySelector('[data-field="debit"]'),r.querySelector('[data-field="credit"]')];
+    ["account","debit","credit"].forEach((field,j)=>{
+      const ok=result.cellResults[i][field],input=inputs[j];
+      input.classList.toggle("good",ok);input.classList.toggle("bad",!ok);
+      input.setAttribute("aria-invalid",String(!ok));if(!ok)count++;
+    });
+  });
+  $("feedback").hidden=false;$("feedback").className="feedback "+(result.valid?"success":"error");
+  if(result.valid){
+    completed=true;
+    $("feedback").textContent="Écriture correcte : comptes exacts, débit et crédit bien placés et montants équilibrés.";
+    $("nextButton").hidden=false;$("doneMessage").textContent="Étape validée";
+  }else{
+    $("feedback").textContent=count+" cellule(s) à corriger : elles sont signalées en rouge. "+(result.balanced?"Le total est équilibré, mais cela ne suffit pas.":"Vérifie aussi l'égalité Débit = Crédit.")+(failures>=2?" Consulte l'indice pour comprendre les mouvements.":"");
+    if(failures>=2)$("hint").hidden=false;
+  }
+}
+function showRecap(){
+  const table=element("table");table.style.minWidth="490px";
+  const head=element("thead");const hr=element("tr");
+  for(const t of ["Écriture","Compte débité","Compte crédité","Montant FDJ"])hr.append(element("th","",t));
+  head.append(hr);table.append(head);const body=element("tbody");
+  entries.forEach(e=>{const tr=element("tr");[e.label,e.debit,e.credit,e.amount.toLocaleString("fr-FR")].forEach(t=>tr.append(element("td","",t)));body.append(tr)});
+  table.append(body);$("recap").replaceChildren(table);
+  const delta=netChange(exercise);
+  $("netValue").textContent="Variation nette : "+(delta>0?"+":"")+currency(delta);
+  $("netExplanation").textContent=exercise.lesson;
+}
+$("start").addEventListener("click",()=>{entryIndex=0;stage="journal";showStage()});
+$("caseSelect").addEventListener("change",e=>chooseCase(e.target.value));
+$("hintButton").addEventListener("click",()=>{$("hint").hidden=!$("hint").hidden;$("hint").textContent=entries[entryIndex].tip});
+$("checkButton").addEventListener("click",verify);
+$("backButton").addEventListener("click",()=>{
+  drafts.set(entryIndex,rowsNow());
+  if(entryIndex===0){stage="intro";showStage();}
+  else {entryIndex--;showStage();}
+});
+$("nextButton").addEventListener("click",()=>{
+  if(!completed)return;
+  drafts.set(entryIndex,rowsNow());
+  if(entryIndex<entries.length-1){entryIndex++;showStage();}
+  else{stage="finish";showStage();}
+});
+$("retry").addEventListener("click",()=>chooseCase(exercise.id));
+$("another").addEventListener("click",()=>chooseCase(EXERCISES[(EXERCISES.indexOf(exercise)+1)%EXERCISES.length].id));
+$("coachPhoto").addEventListener("error",()=>{$("coachPhoto").hidden=true;$("coachFallback").style.display="flex"});
+populateCases();chooseCase(EXERCISES[0].id);
+</script>
+</body>
+</html>
